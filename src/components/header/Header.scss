@@ -1,0 +1,36 @@
+@import '../variables.scss';
+
+header {
+    position: fixed;
+    height: $headerHeight;
+    width: 100%;
+    background: red;
+    margin: 0 auto;
+    z-index: 100;
+    float: left;
+    line-height: $headerHeight / 2;
+}
+
+.logo {
+    float: left;
+    width: 24%;
+}
+
+nav {
+    width: 50%;
+    float: left;
+}
+
+ul {
+    list-style: outside none none;
+}
+
+li {
+    float: left;
+    padding: 0 10px;
+}
+
+.social {
+    float: left;
+    width: 24%;
+}

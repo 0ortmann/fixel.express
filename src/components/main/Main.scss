@@ -2,4 +2,19 @@
 
 main {
     padding-top: $headerHeight;
+    text-align: center;
+}
+
+.about__img {
+    margin-top: 2em;
+    margin-bottom: 1em; 
+}
+
+.about__description {
+    width: 50%;
+    top: 25%;
+    left: 25%;
+    align: center;
+    text-align: justify;
+    position: relative;
 }

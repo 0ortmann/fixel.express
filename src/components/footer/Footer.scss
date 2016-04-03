@@ -1,0 +1,58 @@
+@import '../variables.scss';
+
+footer {
+    margin-top: 20px;
+    height: $headerHeight;
+    width: 97%;
+    border: 2px solid $lightGrey;
+    border-radius: 9px;
+    float: left;
+    line-height: $headerHeight / 2;
+    background: #EDEDED;
+}
+
+.social {
+    margin-top: 1em;
+    position: relative;
+    width: 40%;
+    left: 30%;
+    float: left;
+    text-align: center;
+}
+
+.social__link {
+    border-radius: 50%;
+    margin: 0 20px;
+}
+
+ul {
+    list-style: outside none none;
+}
+
+li {
+    float: left;
+    padding: 0 20px;
+}
+
+.xing__animated:hover .xing__animated__white {
+    fill: white;
+}
+
+.xing__animated:hover .xing__animated__green {
+    fill: #b0d400;
+}
+
+.github__animated:hover .github__animated__blue {
+    fill: #4078c0;
+}
+
+.facebook__animated:hover .facebook__animated__blue {
+    fill: #3C5A99; 
+}
+
+.facebook__animated:hover .facebook__animated__white {
+    fill: #FFFFFF; 
+}
+
+
+

@@ -14,6 +14,7 @@ if(process.env.NODE_ENV == 'development') {
     }));
 
     app.use(require('webpack-hot-middleware')(compiler));
+    app.use(express.static('public'));
 }
 else {
     app.use(express.static('public'));

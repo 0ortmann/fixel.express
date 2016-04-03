@@ -2,21 +2,20 @@
 
 footer {
     margin-top: 20px;
-    height: $headerHeight;
-    width: 97%;
-    border: 2px solid $lightGrey;
-    border-radius: 9px;
+    height: 80px;
+    width: 100%;
     float: left;
-    line-height: $headerHeight / 2;
-    background: #EDEDED;
+    line-height: 40px;
     overflow: hidden;
 }
 
 .social {
-    width: 40%;
-    left: 30%;
+    background: #EDEDED;
+    border: 2px solid $lightGrey;
+    border-radius: 9px;
+    width: 50%;
+    left: 25%;
     position: relative;
-    padding-top: 1em;
     float: left;
     text-align: center;
 }
@@ -34,8 +33,7 @@ footer {
 
 .social__link {
     display: inline-block;
-    border-radius: 50%;
-    margin: 0 20px;
+    margin: 20px 20px 0 20px;
 }
 
 svg {

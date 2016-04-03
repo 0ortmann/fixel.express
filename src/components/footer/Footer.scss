@@ -9,49 +9,73 @@ footer {
     float: left;
     line-height: $headerHeight / 2;
     background: #EDEDED;
+    overflow: hidden;
 }
 
 .social {
-    margin-top: 1em;
-    position: relative;
     width: 40%;
     left: 30%;
+    position: relative;
+    padding-top: 1em;
     float: left;
     text-align: center;
 }
 
+@media only screen and (max-width: 768px) {
+    .social {
+        width: 96%;
+        left: 2%;
+        position: relative;
+        padding-top: 1em;
+        float: left;
+        text-align: center;
+    }
+}
+
 .social__link {
+    display: inline-block;
     border-radius: 50%;
     margin: 0 20px;
 }
 
-ul {
-    list-style: outside none none;
+svg {
+    width: 40px;
+    height: 40px;
 }
 
-li {
-    float: left;
-    padding: 0 20px;
+svg:hover {
+    transform: scale(1.2);
+    transition: $transitionTime;
 }
 
 .xing__animated:hover .xing__animated__white {
     fill: white;
+    transition-timing-function: ease-in-out;
+    transition: $transitionTime;
 }
 
 .xing__animated:hover .xing__animated__green {
     fill: #b0d400;
+    transition-timing-function: ease-in-out;
+    transition: $transitionTime;
 }
 
 .github__animated:hover .github__animated__blue {
     fill: #4078c0;
+    transition-timing-function: ease-in-out;
+    transition: $transitionTime;
 }
 
 .facebook__animated:hover .facebook__animated__blue {
-    fill: #3C5A99; 
+    fill: #3C5A99;
+    transition-timing-function: ease-in-out;
+    transition: $transitionTime;
 }
 
 .facebook__animated:hover .facebook__animated__white {
-    fill: #FFFFFF; 
+    fill: #FFFFFF;
+    transition-timing-function: ease-in-out;
+    transition: $transitionTime;
 }
 
 

@@ -43,37 +43,37 @@ svg {
 
 svg:hover {
     transform: scale(1.2);
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 .xing__animated:hover .xing__animated__white {
     fill: white;
     transition-timing-function: ease-in-out;
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 .xing__animated:hover .xing__animated__green {
     fill: #b0d400;
     transition-timing-function: ease-in-out;
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 .github__animated:hover .github__animated__blue {
     fill: #4078c0;
     transition-timing-function: ease-in-out;
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 .facebook__animated:hover .facebook__animated__blue {
     fill: #3C5A99;
     transition-timing-function: ease-in-out;
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 .facebook__animated:hover .facebook__animated__white {
     fill: #FFFFFF;
     transition-timing-function: ease-in-out;
-    transition: $transitionTime;
+    transition: $footerTransitionTime;
 }
 
 

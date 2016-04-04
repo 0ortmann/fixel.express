@@ -18,3 +18,14 @@ main {
     text-align: justify;
     position: relative;
 }
+
+@media only screen and (max-width: 768px) {
+    .about__description {
+        width: 86%;
+        top: 7%;
+        left: 7%;
+        align: center;
+        text-align: justify;
+        position: relative;
+    }
+}

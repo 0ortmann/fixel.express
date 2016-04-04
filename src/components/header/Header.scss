@@ -2,12 +2,86 @@
 
 header {
     height: $headerHeight;
-    width: 97%;
+    width: 100%;
     border: 2px solid $lightGrey;
     border-radius: 9px;
     margin: 0 auto;
-    z-index: 100;
     float: left;
-    line-height: $headerHeight / 2;
+    text-align: center;
 }
 
+.header__fixel {
+    position: relative;
+    text-align: right;
+    width: 100%;
+    heigth: 100%;
+    animation-name: fixel-express-running;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+.fixel__jumping {
+    font-size: 40px;
+    display: inline-block;
+    animation-name: fixel-express;
+    animation-duration: 0.2s;
+    animation-iteration-count: infinite;
+}
+
+.fixel__smoke {
+    padding-right: 160px;
+}
+
+.fixel__smoke span {
+    font-size: 0px;
+    border-radius: 50%;
+    height: 0px; 
+    animation-name: fixel-smoke;
+    animation-iteration-count: infinite;
+    animation-duration: 0.5s;
+}
+
+.fixel__smoke__0 {
+    border: 12px solid gray;
+    animation-delay: 0.125s;
+}
+
+.fixel__smoke__1 {
+    border: 15px solid gray;
+    padding-top: 6px;
+    animation-delay: 0.25s;
+}
+
+.fixel__smoke__2 {
+    border: 19px solid gray;
+    padding-top: 8px;
+    animation-delay: 0.375s;
+}
+
+.fixel__smoke__3 {
+    border: 22px solid gray;
+    padding-top: 11px;
+    animation-delay: 0.5s;
+}
+
+.express__e1 {
+    padding-left: 40px;
+}
+
+@keyframes fixel-express {
+    0%   { transform: rotate(-10deg); }
+    50%  { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes fixel-express-running {
+    0%   { right: -50%; }
+    50%  { right: 20% }
+    100% { right: 120%;}
+}
+
+@keyframes fixel-smoke {
+    0%   { transform: scale(0.2); transform: translate(0, 0); }
+    5%  { opacity: 1; transform: scale(0.2); transform: translate(0, -5px); }
+    100% { opacity: 0; transform: scale(1); transform: translate(20px, -130px); }
+}

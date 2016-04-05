@@ -13,21 +13,17 @@ footer {
     background: #EDEDED;
     border: 2px solid $lightGrey;
     border-radius: 9px;
-    width: 50%;
-    left: 25%;
     position: relative;
     float: left;
     text-align: center;
+    width: 50%;
+    left: 25%;
 }
 
-@media only screen and (max-width: 768px) {
+@media (max-width: 520px) {
     .social {
         width: 96%;
         left: 2%;
-        position: relative;
-        padding-top: 1em;
-        float: left;
-        text-align: center;
     }
 }
 

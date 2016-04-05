@@ -11,7 +11,7 @@ export default class Main extends Component {
     render() {
         return (
             <main>
-                <h2>FELIX ORTMANN</h2>
+                <h1>FELIX ORTMANN</h1>
                 <div className='about__subtitle'>
                     &mdash; Student, Entwickler, Verrückter &mdash;
                 </div>

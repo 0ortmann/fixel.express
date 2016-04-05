@@ -8,10 +8,12 @@ header {
     margin: 0 auto;
     float: left;
     text-align: center;
+    overflow: hidden; 
 }
 
 .header__fixel {
     position: relative;
+    top: 20%;
     text-align: right;
     width: 100%;
     heigth: 100%;

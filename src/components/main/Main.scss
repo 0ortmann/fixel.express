@@ -7,7 +7,7 @@ main {
 
 .about__img {
     margin-top: 2em;
-    margin-bottom: 1em; 
+    margin-bottom: 1em;
 }
 
 .about__description {
@@ -19,13 +19,11 @@ main {
     position: relative;
 }
 
-@media only screen and (max-width: 768px) {
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
     .about__description {
-        width: 86%;
+        width: $handheldContentWidth;
         top: 7%;
-        left: 7%;
-        align: center;
-        text-align: justify;
-        position: relative;
+        left: $handheldContentLeft;
+        font-size: 13px; 
     }
 }

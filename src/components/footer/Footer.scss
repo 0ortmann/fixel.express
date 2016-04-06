@@ -20,10 +20,10 @@ footer {
     left: 25%;
 }
 
-@media (max-width: 520px) {
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
     .social {
-        width: 96%;
-        left: 2%;
+        width: $handheldContentWidth;
+        left: $handheldContentLeft;
     }
 }
 
@@ -42,26 +42,67 @@ svg:hover {
     transition: $footerTransitionTime;
 }
 
-.xing__animated:hover .xing__animated__white {
-    fill: white;
+.social__svg:hover {
     transition-timing-function: ease-in-out;
     transition: $footerTransitionTime;
+
+    .xing__animated__white {
+        fill: white;
+    }
+    
+    .xing__animated__green {
+        fill: $xingGreen;
+    }
+
+    .github__animated__blue {
+        fill: $githubBlue;
+    }
+
+    .facebook__animated__blue {
+        fill: $facebookBlue;
+    }
+
+    .facebook__animated__white {
+        fill: white;
+    }
 }
 
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    .xing__animated__white {
+        fill: white;
+    }
+    .xing__animated__green {
+        fill: $xingGreen;
+    }
+
+    .github__animated__blue {
+        fill: $githubBlue;
+    }
+
+    .facebook__animated__blue {
+        fill: $facebookBlue;
+    }
+
+    .facebook__animated__white {
+        fill: white;
+    }
+}
+
+/*
 .xing__animated:hover .xing__animated__green {
-    fill: #b0d400;
+    fill: $xingGreen;
     transition-timing-function: ease-in-out;
     transition: $footerTransitionTime;
 }
 
 .github__animated:hover .github__animated__blue {
-    fill: #4078c0;
+    fill: $githubBlue;
     transition-timing-function: ease-in-out;
     transition: $footerTransitionTime;
 }
 
 .facebook__animated:hover .facebook__animated__blue {
-    fill: #3C5A99;
+    fill: $facebookBlue;
     transition-timing-function: ease-in-out;
     transition: $footerTransitionTime;
 }
@@ -72,5 +113,5 @@ svg:hover {
     transition: $footerTransitionTime;
 }
 
-
+*/
 

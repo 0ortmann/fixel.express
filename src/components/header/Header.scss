@@ -22,6 +22,16 @@ header {
     animation-iteration-count: infinite;
 }
 
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    header {
+        width: 98%;
+        left: $handheldContentLeft;
+    }
+    .header__fixel {
+        animation-name: fixel-express-running-mobile;
+    }
+}
+
 .fixel__jumping {
     font-size: 40px;
     display: inline-block;
@@ -81,6 +91,12 @@ header {
     0%   { right: -50%; }
     50%  { right: 20% }
     100% { right: 120%;}
+}
+
+@keyframes fixel-express-running-mobile {
+    0%   { right: -120%; }
+    50%  { right: 10% }
+    100% { right: 140%;}
 }
 
 @keyframes fixel-smoke {

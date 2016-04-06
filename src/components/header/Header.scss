@@ -13,13 +13,23 @@ header {
 
 .header__fixel {
     position: relative;
-    top: 20%;
+    top: 22%;
     text-align: right;
     width: 100%;
     heigth: 100%;
     animation-name: fixel-express-running;
     animation-duration: 4s;
     animation-iteration-count: infinite;
+}
+
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+    header {
+        width: 98%;
+        left: $handheldContentLeft;
+    }
+    .header__fixel {
+        animation-name: fixel-express-running-mobile;
+    }
 }
 
 .fixel__jumping {
@@ -32,12 +42,13 @@ header {
 
 .fixel__smoke {
     padding-right: 160px;
+    padding-bottom: 9px;
 }
 
 .fixel__smoke span {
     font-size: 0px;
     border-radius: 50%;
-    height: 0px; 
+    height: 0px;
     animation-name: fixel-smoke;
     animation-iteration-count: infinite;
     animation-duration: 0.5s;
@@ -56,7 +67,7 @@ header {
 
 .fixel__smoke__2 {
     border: 19px solid gray;
-    padding-top: 8px;
+    padding-top: 7px;
     animation-delay: 0.375s;
 }
 
@@ -80,6 +91,12 @@ header {
     0%   { right: -50%; }
     50%  { right: 20% }
     100% { right: 120%;}
+}
+
+@keyframes fixel-express-running-mobile {
+    0%   { right: -120%; }
+    50%  { right: 10% }
+    100% { right: 140%;}
 }
 
 @keyframes fixel-smoke {

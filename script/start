@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker run --net=host -p 3300:3300 -t fixel.express:latest&

@@ -14,14 +14,13 @@ main {
     align: center;
     left: 25%;
     position: relative;
-    text-align: center;
-    top: 25%;
     width: 50%;
 }
 
 .about__description p {
+    margin: 20px auto;
+    max-width: 640px;
     text-align: justify;
-    max-width: 786px;
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {

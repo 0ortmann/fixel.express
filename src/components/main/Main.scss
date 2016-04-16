@@ -11,12 +11,17 @@ main {
 }
 
 .about__description {
-    width: 50%;
-    top: 25%;
-    left: 25%;
     align: center;
-    text-align: justify;
+    left: 25%;
     position: relative;
+    text-align: center;
+    top: 25%;
+    width: 50%;
+}
+
+.about__description p {
+    text-align: justify;
+    max-width: 786px;
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {

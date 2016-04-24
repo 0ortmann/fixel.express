@@ -5,7 +5,7 @@ module.exports = {
     devtool: 'cheap-module-eval-source-map',
     entry: [
         'webpack-hot-middleware/client',
-        './src/entry.jsx'
+        './entry.jsx'
     ],
     plugins: [
         new webpack.HotModuleReplacementPlugin()
@@ -17,14 +17,13 @@ module.exports = {
     },
     module: {
         loaders: [{
-            test: /\.jsx$/,
+            test: /\.js$|\.jsx$/,
             exclude: /node_modules/,
-            loaders: ['babel'],
-            include: path.join(__dirname, 'src')
+            loaders: ['babel-loader?presets[]=es2015&presets[]=react'],
         },
         {
             test: /\.scss$/,
-            loader: 'style-loader!css-loader!sass-loader',
+            loader: ExtractTextPlugin.extract('style', 'css!sass'),
             include: path.join(__dirname, 'src')
         }]
     }

@@ -7,7 +7,11 @@ COPY webpack.config.production.js webpack.config.production.js
 
 RUN npm install --production
 
-COPY public public 
+COPY public/img public/img 
+COPY src src
+COPY entry.jsx entry.jsx
+RUN npm run build
+RUN rm -rf src
 
 CMD npm run start
 

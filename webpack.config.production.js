@@ -5,7 +5,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
     devtool: 'source-map',
     entry: [
-        './src/entry.jsx'
+        './entry.jsx'
     ],
     output: {
         filename: 'bundle.js',
@@ -17,10 +17,9 @@ module.exports = {
     ],
     module: {
         loaders: [{
-            test: /\.jsx$/,
+            test: /\.js$|\.jsx$/,
             exclude: /node_modules/,
-            loaders: ['babel'],
-            include: path.join(__dirname, 'src')
+            loaders: ['babel-loader?presets[]=es2015&presets[]=react'],
         },
         {
             test: /\.scss$/,

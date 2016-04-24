@@ -30,7 +30,7 @@ export default class Main extends Component {
                         mich früh in die Richtung Web bewegt und gleite nun zunehmend in DevOps Bereiche über.
                     </p>
                     <p>
-                        Seit Firmengründung bin ich bei <a href='https:joblift.de'>joblift</a> dabei und mache Fullstack. Nebenher bastel ich
+                        Seit Firmengründung bin ich bei <a href='https://joblift.de'>joblift</a> dabei und mache Fullstack. Nebenher bastel ich
                         an einem privaten Opensource Projekt (<a href='https://github.com/0ortmann/wg-tools'>wg-tools</a>), 
                         das gerade <a href='https://wg-tools.de'>online geganen</a> ist! Ein paar nette Kleinigkeiten und nützliche Dinge sind auf meinem Github-Account zu finden.
                     </p>

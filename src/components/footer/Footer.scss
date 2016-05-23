@@ -43,6 +43,7 @@ svg:hover {
 }
 
 .social__svg:hover {
+    background-color: #EDEDED;
     transition-timing-function: ease-in-out;
     transition: $footerTransitionTime;
 

@@ -23,7 +23,7 @@ module.exports = {
         },
         {
             test: /\.scss$/,
-            loader: ExtractTextPlugin.extract('style', 'css!sass'),
+            loader: 'style-loader!css-loader!sass-loader',
             include: path.join(__dirname, 'src')
         }]
     }

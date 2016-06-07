@@ -8,6 +8,7 @@ module.exports = {
         './entry.jsx'
     ],
     plugins: [
+        new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin()
     ],
     output: {
@@ -19,7 +20,10 @@ module.exports = {
         loaders: [{
             test: /\.js$|\.jsx$/,
             exclude: /node_modules/,
-            loaders: ['babel-loader?presets[]=es2015&presets[]=react'],
+            loader: 'babel',
+            query: {
+                presets: [ 'react-hmre' ]
+            }
         },
         {
             test: /\.scss$/,

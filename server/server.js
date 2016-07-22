@@ -34,28 +34,28 @@ function handleRender(req, res) {
 
 function renderFullPage(html) {
     return `
-    <!DOCTYPE HTML>
-    <html>
+        <!DOCTYPE HTML>
+        <html>
 
-    <head>
-        <meta charset='utf-8'>
-        <meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable=yes" />
-        <title>Fixel Express</title>
-        <link rel='stylesheet' type='text/css' href='assets/bundle.css'>
-        <link href='https://fonts.googleapis.com/css?family=Julius+Sans+One|Raleway|Oxygen' rel='stylesheet' type='text/css'>
-        <link sizes="96x96" href="img/favicon.ico" type="image/png" rel="icon">
-    </head>
+        <head>
+            <meta charset='utf-8'>
+            <meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable=yes" />
+            <title>Fixel Express</title>
+            <link rel='stylesheet' type='text/css' href='assets/bundle.css'>
+            <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+            <link sizes="96x96" href="img/favicon.ico" type="image/png" rel="icon">
+        </head>
 
-    <body>
-        <div id='content'>${html}</div>
-        <script type='text/javascript' src='assets/bundle.js' charset='utf-8'></script>
-    </body>
+        <body>
+            <div id='content'>${html}</div>
+            <script type='text/javascript' src='assets/bundle.js' charset='utf-8'></script>
+        </body>
 
-    </html>
-    `
+        </html>
+    `;
 }
 
-app.use(handleRender);
+app.get('/', handleRender);
 
 var server = app.listen(3300, function() {
     var host = server.address().address

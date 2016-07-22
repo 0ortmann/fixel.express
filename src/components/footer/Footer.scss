@@ -38,7 +38,9 @@ svg {
 }
 
 svg:hover {
-    transform: scale(1.2);
+    border: none !important;
+    display: block;
+    transform: scale(1.1);
     transition: $footerTransitionTime;
 }
 
@@ -88,31 +90,3 @@ svg:hover {
         fill: white;
     }
 }
-
-/*
-.xing__animated:hover .xing__animated__green {
-    fill: $xingGreen;
-    transition-timing-function: ease-in-out;
-    transition: $footerTransitionTime;
-}
-
-.github__animated:hover .github__animated__blue {
-    fill: $githubBlue;
-    transition-timing-function: ease-in-out;
-    transition: $footerTransitionTime;
-}
-
-.facebook__animated:hover .facebook__animated__blue {
-    fill: $facebookBlue;
-    transition-timing-function: ease-in-out;
-    transition: $footerTransitionTime;
-}
-
-.facebook__animated:hover .facebook__animated__white {
-    fill: #FFFFFF;
-    transition-timing-function: ease-in-out;
-    transition: $footerTransitionTime;
-}
-
-*/
-

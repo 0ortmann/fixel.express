@@ -1,13 +1,24 @@
 @import '../variables.scss';
 
-main {
+.about {
     padding-top: $headerHeight;
     text-align: center;
 }
 
 .about__img {
+    background-image: url('/img/little-me.jpg');
+    border-radius: 450px / 600px;
+    height: 395px;
     margin-top: 2em;
     margin-bottom: 1em;
+    width: 295px;
+    transition: 300ms ease-in-out;
+
+}
+
+.about__img:hover {
+    background-image: url('/img/profile.jpg');
+    transition: 300ms ease-in-out;
 }
 
 .about__description {
@@ -23,7 +34,7 @@ main {
     text-align: justify;
 }
 
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 540px) {
     .about__description {
         width: $handheldContentWidth;
         top: 7%;

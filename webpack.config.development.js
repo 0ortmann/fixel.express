@@ -29,6 +29,11 @@ module.exports = {
             test: /\.scss$/,
             loader: 'style-loader!css-loader!sass-loader',
             include: path.join(__dirname, 'src')
+        },
+        {
+            test: /\.json$/,
+            loader: 'json-loader',
+            include: path.join(__dirname, 'src/content')
         }]
     }
 };

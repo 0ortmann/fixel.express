@@ -25,6 +25,11 @@ module.exports = {
             test: /\.scss$/,
             loader: ExtractTextPlugin.extract('style', 'css!sass'),
             include: path.join(__dirname, 'src')
+        },
+        {
+            test: /\.json$/,
+            loader: 'json-loader',
+            include: path.join(__dirname, 'src/content')
         }]
     }
 };

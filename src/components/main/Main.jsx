@@ -3,29 +3,34 @@ import React, { Component } from 'react';
 import LanguageSelector from './LanguageSelector.jsx';
 import './Main.scss';
 
-const CONTENT = require('../../content/content.json');
 const langs = ['german', 'english']
 
 export default class Main extends Component {
     
     constructor(props) {
         super(props);
-        this.state = { content: CONTENT['german'] };
         this.switchLanguage = this.switchLanguage.bind(this);
+        this.state = { content: undefined };
     }
 
-    switchLanguage(evt) {
-        const lang = evt.target.value;
-        if (lang == undefined) {
+    componentWillMount() {
+        this.switchLanguage('german');
+    }
+
+    switchLanguage(lang) {
+        if (lang == undefined || lang == '') {
             return;
         }
-        const use = CONTENT[lang]
+        const use = this.props.content[lang]
         if (use != undefined) {
             this.setState( {'content': use});
         }
     }
 
     render() {
+        if (this.state.content == undefined) {
+            return null;
+        }
         return (
             <main className='about'>
                 <LanguageSelector selectCallback={this.switchLanguage} langs={langs}/>
@@ -42,4 +47,8 @@ export default class Main extends Component {
             </main>
         );
     }
+}
+
+Main.propTypes = {
+    content: React.PropTypes.object.isRequired
 }

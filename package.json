@@ -6,7 +6,8 @@
     "dev": "NODE_ENV=development node server/index.js",
     "start": "NODE_ENV=production node server/index.js",
     "build": "NODE_ENV=production webpack --config webpack.config.production.js",
-    "clean": "rm -rf public/assets"
+    "clean": "rm -rf public/assets",
+    "test": "jest --config=jest.conf.json"
   },
   "keywords": [
     "React",
@@ -24,14 +25,19 @@
     "extract-text-webpack-plugin": "^0.9.1",
     "json-loader": "^0.5.4",
     "node-sass": "^3.7.0",
-    "react": "^0.14.3",
-    "react-dom": "^0.14.3",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
     "sass-loader": "^3.1.2",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.9"
   },
   "devDependencies": {
+    "babel-jest": "^14.1.0",
+    "babel-preset-jest": "^14.1.0",
     "babel-preset-react-hmre": "^1.1.1",
+    "jest-cli": "^14.1.0",
+    "react-addons-test-utils": "^15.3.1",
+    "webpack-babel-jest": "^1.0.4",
     "webpack-dev-middleware": "^1.4.0",
     "webpack-hot-middleware": "^2.6.0"
   }

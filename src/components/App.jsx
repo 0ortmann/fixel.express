@@ -5,6 +5,8 @@ import Footer from './footer/Footer.jsx';
 
 import './App.scss';
 
+const CONTENT = require('../content/content.json');
+
 export default class App extends Component {
     
     constructor(props) {
@@ -15,7 +17,7 @@ export default class App extends Component {
         return (
             <div className='app'>
                 <Header />
-                <Main />
+                <Main content={CONTENT} />
                 <Footer />
             </div>
         );

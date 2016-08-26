@@ -11,9 +11,9 @@
 		"title" : "Student, Developer, Weirdo",
 		"description": [
 			"I like designing and implementing distributed systems and constantly look for challenges. Working on Linux servers is my favorite, a shell is everything I want. I love to learn new stuff and long for new intellectual input.",
-			"Currently I'm studying msc. at the University of Hamburg, Germany. I do software development since 2011; back then, things started with a distributed simulator for higher level Petri nets. For a living I do fullstack development, mostly web stuff.",
-			"I love being on the move in the nature, either with my backpack & tent or I go fishing on local lakes and rivers.",
-			"I do a lot of fun conding as well, make sure to check out my github page!"
+			"Currently I'm studying msc. at the University of Hamburg, Germany. I do software development since 2011; back then, things started with a distributed simulator for higher level Petri nets. For a living I do fullstack development, mostly web stuff (the backend parts) and devops.",
+			"I love being on the move in the nature, either with backpack & tent or I go fishing on local lakes and rivers.",
+			"I do a lot of fun coding as well, make sure to check out my github page!"
 		]
 	}
 }

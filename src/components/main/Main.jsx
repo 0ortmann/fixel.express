@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import LanguageSelector from './LanguageSelector.jsx';
+import FixHeaderBox from './FixHeaderBox.jsx';
 import './Main.scss';
 
 const langs = ['german', 'english']
@@ -38,7 +39,9 @@ export default class Main extends Component {
                 <div className='about__subtitle'>
                     &mdash; {this.state.content.title} &mdash;
                 </div>
+                <FixHeaderBox />
                 <img className='about__img'/>
+                <object className='gopher__left'/>
                 <div className='about__description'>
                     {this.state.content.description.map((paragraph, i) => {
                         return <p key={i}>{paragraph}</p>

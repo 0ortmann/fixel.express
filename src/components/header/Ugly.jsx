@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import './Header.scss';
+import './Ugly.scss';
 
-export default class Header extends Component {
+export default class Ugly extends Component {
     
     constructor(props) {
         super(props);
@@ -10,7 +10,7 @@ export default class Header extends Component {
     render() {
         return (
             <header>
-                <div className='header__fixel'>
+                <div className='header__fixel__moving'>
                     <div className='fixel__smoke'> 
                         <span className='fixel__smoke__0'></span>
                         <span className='fixel__smoke__1'></span>

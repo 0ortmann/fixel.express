@@ -11,20 +11,26 @@
 	height: 120px;
 	transform: rotate(10deg);
 	animation-name: fade-in;
-	animation-duration: 3.5s;
+	animation-duration: 2.5s;
+}
+
+.fixHeaderBox a {
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 .fix__arrow {
 	position: absolute;
-	right: 0;
-	bottom: 0;
+	bottom: 30px;
+	right: 205px;
 	background-image: url('/img/arrow.svg');
 	background-repeat: no-repeat;
+	width: 90px;
+	height: 135px;
 }
 
 @keyframes fade-in {
 	0% { opacity: 0; }
 	80% { opacity: 0; }
 	100% { opacity: 1; }
-
 }

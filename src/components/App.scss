@@ -1,4 +1,5 @@
 @import './variables.scss';
+@import './header/Header.scss';
 
 .app {
     width: 100%;
@@ -15,4 +16,16 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
 	color: $grey;
+}
+
+/* Preload image(s), so I have no flicker on hover */
+body:after{
+    position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
+    content: url('/img/profile.jpg') url('/img/gopher_straight_look_rotated.svg') 
+        url('/img/arrow.svg') url('/img/gopher_hammer_right.svg') url('/img/gopher_hammer_right_2.svg')
+        url('/img/gopher_hammer_left.svg') url('/img/gopher_hammer_left_2.svg');
+}
+
+.hide {
+    display: none;
 }

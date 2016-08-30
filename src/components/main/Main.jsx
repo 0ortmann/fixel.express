@@ -10,8 +10,12 @@ export default class Main extends Component {
     
     constructor(props) {
         super(props);
+        this.state = { 
+            content: undefined,
+            hideFixHint: false
+        };
         this.switchLanguage = this.switchLanguage.bind(this);
-        this.state = { content: undefined };
+        this.fixHeader = this.fixHeader.bind(this);
     }
 
     componentWillMount() {
@@ -28,6 +32,11 @@ export default class Main extends Component {
         }
     }
 
+    fixHeader() {
+        this.setState({ hideFixHint: true });
+        this.props.fixHeader();
+    }
+
     render() {
         if (this.state.content == undefined) {
             return null;
@@ -39,19 +48,20 @@ export default class Main extends Component {
                 <div className='about__subtitle'>
                     &mdash; {this.state.content.title} &mdash;
                 </div>
-                <FixHeaderBox />
+                <FixHeaderBox fixIt={this.fixHeader} hide={this.state.hideFixHint} displayText={this.state.content.box} />
                 <img className='about__img'/>
-                <object className='gopher__left'/>
                 <div className='about__description'>
                     {this.state.content.description.map((paragraph, i) => {
                         return <p key={i}>{paragraph}</p>
                     })}
                 </div>
+                <object className='gopher__left'/>
             </main>
         );
     }
 }
 
 Main.propTypes = {
-    content: React.PropTypes.object.isRequired
+    content: React.PropTypes.object.isRequired,
+    fixHeader: React.PropTypes.func.isRequired
 }

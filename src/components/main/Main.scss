@@ -46,22 +46,22 @@
 
 .gopher__left {
     position: absolute;
-    top: 350px;
+    top: 550px;
     border: none;
     background-image: url('/img/gopher_straight_look_rotated.svg');
     background-repeat: no-repeat;
     height: 200px;
     width: 280px;
     animation-name: gopher-slide;
-    animation-duration: 10s;
+    animation-duration: 15s;
     animation-iteration-count: infinite;
 }
 
 @keyframes gopher-slide {
     0%   {left: -290px; }
-    20%   {left: -290px; }
+    25%   {left: -290px; }
     30% {left: -120px; }
-    70% {left: -120px; }
+    75% {left: -120px; }
     80% {left: -290px; }
     100%   {left: -290px; }
 }

@@ -1,0 +1,93 @@
+@import '../variables.scss';
+
+.gopherContainer {
+    display: inline-block;
+    margin-top: 20px;
+    position: absolute;
+    width: 120px;
+    height: $headerHeight;
+}
+
+.gopherContainer.move-right {
+    right: -moz-calc(50% + 120px);
+    right: -webkit-calc(50% + 120px);
+    right: calc(50% + 120px);
+    animation: gopher-appear 1.5s ease-in, gopher-move-right 2.5s ease-in 1.5s 1;
+}
+
+.gopherContainer.move-left {
+    left: -moz-calc(50% + 120px);
+    left: -webkit-calc(50% + 120px);
+    left: calc(50% + 120px);
+    animation: gopher-appear 1.5s ease-in, gopher-move-left 2.5s ease-in 1.5s 1;
+}
+
+.gopherHammer {
+    width: 120px;
+    background-repeat: no-repeat;
+}
+
+.gopherHammer-left {
+    background-image: url('/img/gopher_hammer_left.svg');
+}
+
+.gopherHammer-right {
+    background-image: url('/img/gopher_hammer_right.svg');
+}
+
+.gopherHammer-left2 {
+    background-image: url('/img/gopher_hammer_left_2.svg');
+}
+
+.gopherHammer-right2 {
+    background-image: url('/img/gopher_hammer_right_2.svg');
+}
+
+.expressWrapper {
+    margin-top: 20px;
+    display: inline-block;
+    width: 360px;
+    transition-property: all;
+    transform-style: preserve-3d;
+    position: absolute;
+    right: -moz-calc(50% - 180px);
+    right: -webkit-calc(50% - 180px);
+    right: calc(50% - 180px);
+    animation: express-appear 1.5s ease-in, get-hammered 2.5s ease-in 1.5s 1;
+}
+
+@keyframes gopher-appear {
+    0%     {bottom: -120px; }
+    100%   {bottom: -10px; }
+}
+
+@keyframes gopher-move-right {
+    30%     {
+                right: -moz-calc(50% + 120px);
+                right: -webkit-calc(50% + 120px);
+                right: calc(50% + 120px);
+           }
+    100%   { right: 50%; }
+}
+
+@keyframes gopher-move-left {
+    30%     {
+                left: -moz-calc(50% + 120px);
+                left: -webkit-calc(50% + 120px);
+                left: calc(50% + 120px);
+           }
+    100%   { left: 50%; }
+}
+
+@keyframes get-hammered {
+    100% {
+            transform: scale(0.7);
+            transform: rotateX(-90deg);
+            transform-origin: bottom;
+        }
+}
+
+@keyframes express-appear {
+    0%   { top: -100px; }
+    100% { top: 0%;}
+}

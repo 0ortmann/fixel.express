@@ -1,34 +1,12 @@
-@import '../variables.scss';
-
 header {
     height: $headerHeight;
     width: 99.5%;
     border: 2px solid $lightGrey;
     border-radius: 9px;
     margin: 0 auto;
-    text-align: center;
-    overflow: hidden; 
-}
-
-.header__fixel {
     position: relative;
-    top: 22%;
-    text-align: right;
-    width: 100%;
-    heigth: 100%;
-    animation-name: fixel-express-running;
-    animation-duration: 4s;
-    animation-iteration-count: infinite;
-}
-
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {
-    header {
-        width: 98%;
-        left: $handheldContentLeft;
-    }
-    .header__fixel {
-        animation-name: fixel-express-running-mobile;
-    }
+    overflow: hidden;
+    text-align: center;
 }
 
 .fixel__jumping {
@@ -84,18 +62,6 @@ header {
     0%   { transform: rotate(-10deg); }
     50%  { transform: rotate(10deg); }
     100% { transform: rotate(0deg); }
-}
-
-@keyframes fixel-express-running {
-    0%   { right: -50%; }
-    50%  { right: 20% }
-    100% { right: 120%;}
-}
-
-@keyframes fixel-express-running-mobile {
-    0%   { right: -120%; }
-    50%  { right: 10% }
-    100% { right: 140%;}
 }
 
 @keyframes fixel-smoke {

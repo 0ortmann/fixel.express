@@ -9,6 +9,12 @@
     font-size: 16px;
 }
 
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {
+    .app {
+        padding: 0;
+    }
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Raleway', sans-serif;
     font-weight: normal;

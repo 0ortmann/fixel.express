@@ -14,6 +14,12 @@
 	animation-duration: 2.5s;
 }
 
+@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {
+    .fixHeaderBox {
+        display: none;
+    }
+}
+
 .fixHeaderBox a {
 	cursor: pointer;
 	text-decoration: underline;

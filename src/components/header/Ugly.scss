@@ -11,16 +11,6 @@
     animation-iteration-count: infinite;
 }
 
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {
-    header {
-        width: 98%;
-        left: $handheldContentLeft;
-    }
-    .header__fixel__moving {
-        animation-name: fixel-express-running-mobile;
-    }
-}
-
 @keyframes fixel-express-running {
     0%   { right: -50%; }
     50%  { right: 20% }

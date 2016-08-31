@@ -1,4 +1,6 @@
-FROM node:5
+FROM mhart/alpine-node:6
+
+RUN apk add --no-cache make gcc g++ python
 
 COPY package.json package.json
 COPY webpack.config.production.js webpack.config.production.js

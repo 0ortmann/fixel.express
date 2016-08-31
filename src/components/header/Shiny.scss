@@ -1,10 +1,11 @@
 .shinyHeader {
+	margin-top: 33px;
 	animation: scale-in 6s ease-in, rainbow 6s ease-in 0s 2;
 }
 
 @keyframes scale-in {
 	0% { transform: scale(0.1); }
-	50% { transform: scale(0.9); }
+	30% { transform: scale(0.9); }
 	100% { transform: scale(1); }
 }
 

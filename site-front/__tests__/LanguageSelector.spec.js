@@ -1,5 +1,3 @@
-jest.unmock('../src/components/main/LanguageSelector.jsx');
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';

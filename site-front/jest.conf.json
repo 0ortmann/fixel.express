@@ -1,10 +1,5 @@
 {
 	"name": "Frontend Tests",
-	"unmockedModulePathPatterns": [
-		"<rootDir>/node_modules/react",
-		"<rootDir>/node_modules/react-dom",
-		"<rootDir>/node_modules/react-addons-test-utils"
-	],
 	"verbose": "true",
 	"scriptPreprocessor": "<rootDir>/node_modules/webpack-babel-jest"
 }

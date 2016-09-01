@@ -1,5 +1,3 @@
-jest.unmock('../src/components/main/Main.jsx');
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
@@ -7,8 +5,16 @@ import Main from '../src/components/main/Main.jsx';
 
 describe('Main', () => {
 
-	const gerCont = { description: ['foo', 'bar'], title: 't1'}; 
-	const engCont = { description: ['ping', 'pong'], title: 't2'};
+	const gerCont = { 
+		description: ['foo', 'bar'],
+		title: 't1',
+		box: 'box'
+	}; 
+	const engCont = {
+		description: ['ping', 'pong'],
+		title: 't2',
+		box: 'box'
+	};
 
 	const content = {
 		german: gerCont,

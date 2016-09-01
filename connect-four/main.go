@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"net/http"
 	"sync"
@@ -16,9 +17,10 @@ type GameStore struct {
 }
 
 type Game struct {
-	Id    string
-	Mode  string
-	Board [7][6]string
+	Id     string
+	Mode   string
+	Winner string
+	Board  [][]string
 }
 
 func NewGame() *Game {
@@ -29,8 +31,10 @@ func NewGame() *Game {
 		return nil
 	}
 	return &Game{
-		Id:   fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:]),
-		Mode: "random", // minmax, heuristics etc..
+		Id:     fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:]),
+		Mode:   "random", // minmax, heuristics etc..
+		Winner: "",
+		Board:  make([][]string, 7),
 	}
 }
 
@@ -61,9 +65,25 @@ var gs = NewGameStore()
 
 func main() {
 	http.HandleFunc("/new", newHandler)
-	http.HandleFunc("/play", playHandler)
+	http.HandleFunc("/play", errorHandler(playHandler))
 
 	http.ListenAndServe(":5000", nil)
+}
+
+func errorHandler(f func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+	// function adapter for errors
+	return func(w http.ResponseWriter, req *http.Request) {
+		if req.Method != "POST" {
+			http.Error(w, "Method not allowed", 405)
+			return
+		}
+		err := f(w, req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Error handling request for %q: %v", req.RequestURI, err)
+		}
+	}
+
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
@@ -74,11 +94,8 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 	enc.Encode(game)
 }
 
-func playHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(w, "Method not allowed", 405)
-		return
-	}
+func playHandler(w http.ResponseWriter, req *http.Request) error {
+	
 	type Post struct {
 		GameId string
 		Col    int
@@ -86,54 +103,51 @@ func playHandler(w http.ResponseWriter, req *http.Request) {
 
 	var post Post
 	decoder := json.NewDecoder(req.Body)
-	err := decoder.Decode(&post)
-
-	if err != nil {
-		http.Error(w, "Invalid JSON", 400)
-		return
+	if err := decoder.Decode(&post); err != nil {
+		return errors.New("Not valid JSON")
 	}
 	if post.GameId == "" || post.Col >= 7 {
-		http.Error(w, "Wrong JSON format", 400)
-		return
+		return errors.New("Wrong JSON format")
 	}
+
 	game := gs.Get(post.GameId)
 
 	if game == nil {
-		http.Error(w, "No game with that ID", 404)
-		return
+		return errors.New("No game with that ID")
 	}
-	err = apply(game, post.Col, "player")
-
-	if err != nil {
-		http.Error(w, "Field already in use", 409)
-		return
+	if game.Winner != "" {
+		return errors.New("Game already ended, winner was "+game.Winner)
+	}
+	if err := apply(game, post.Col, "player"); err != nil {
+		return errors.New("Field already in use")
 	}
 
 	col, err := autoPlay(game)
 	if err != nil {
-		http.Error(w, "Unable to play", 400)
+		return errors.New("Unable to play")
 	}
 
-	win := checkWin(game)
+	checkWin(game)
+
 	type Resp struct {
-		Col int
+		Col    int
 		Winner string
 	}
 	var resp Resp
 	resp.Col = col
-	resp.Winner = win
+	resp.Winner = game.Winner
 	enc := json.NewEncoder(w)
 	enc.Encode(&resp)
+	return nil
 }
 
 // put a token with value "player" into the column "col".
-// Returns an error if no game with that id exists of the column is already full
+// Returns an error if the column is already full
 func apply(game *Game, col int, player string) error {
-	rc := count(game.Board[col])
-	if rc == 6 {
+	if len(game.Board[col]) == 6 {
 		return errors.New("Column already full")
 	}
-	game.Board[col][rc] = player
+	game.Board[col] = append(game.Board[col], player)
 	fmt.Println(game)
 	return nil
 }
@@ -141,10 +155,10 @@ func apply(game *Game, col int, player string) error {
 // The computer plays automatically and returns the column number that was picked to insert a chip
 func autoPlay(game *Game) (int, error) {
 	switch game.Mode {
-	case "random": 
+	case "random":
 		return playRandom(game)
 	}
-	return 0, nil
+	return -1, errors.New("Unknown game mode")
 }
 
 func playRandom(game *Game) (int, error) {
@@ -161,17 +175,62 @@ func playRandom(game *Game) (int, error) {
 	return -1, errors.New("No more usable columns, all full!")
 }
 
-func checkWin(game *Game) string {
-	return ""
+func checkWin(game *Game) {
+	game.Winner = getWinner(game.Board, 4)
+
 }
-
-
-func count(arr [6]string) (c int) {
-	for i := 0; i < len(arr); i++ {
-		if arr[i] == "" {
-			return
+func getWinner(board [][]string, k int) (w string) {
+	for c := 0; c < len(board); c++ {
+		for r := 0; r < len(board[c]); r++ {
+			w = checkPoint(c, r, board, k)
+			if w != "" {
+				return
+			}
 		}
-		c++
 	}
 	return
+}
+
+// check above, right besides, cross-right-down and cross-right-up
+func checkPoint(x int, y int, board [][]string, k int) string {
+	name := board[x][y]
+	aCnt := 0
+	bCnt := 0
+	cuCnt := 0
+	cdCnt := 0
+	fmt.Println("checkpoint ", x, y, name)
+	for i := 0; i < k; i++ {
+		//above
+		if x < len(board) && y+i < len(board[x]) {
+			fmt.Println("in above")
+			if name == board[x][y+i] {
+				aCnt++
+			}
+		}
+		//besides
+		if x+i < len(board) && y < len(board[x+i]) {
+			fmt.Println("in besides")
+			if name == board[x+i][y] {
+				bCnt++
+			}
+		}
+		//cross up
+		if x+i < len(board) && y+i < len(board[x+i]) {
+			fmt.Println("in cu")
+			if name == board[x+i][y+i] {
+				cuCnt++
+			}
+		}
+		//cross down
+		if x+i < len(board) && y-i > 0 && y-i < len(board[x+i]) {
+			fmt.Println("in cd")
+			if name == board[x+i][y-i] {
+				cdCnt++
+			}
+		}
+	}
+	if aCnt == k || bCnt == k || cuCnt == k || cdCnt == k {
+		return name
+	}
+	return ""
 }

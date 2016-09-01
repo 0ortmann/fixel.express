@@ -1,5 +1,6 @@
 import React from 'react';
-import App from '../src/components/App.jsx';
+import Root from '../src/containers/Root.jsx';
+import configureStore from '../src/store/configureStore.js';
 
 import path from 'path';
 import Express from 'express';
@@ -26,12 +27,13 @@ else {
 
 
 function handleRender(req, res) {
-	var html = renderToString(<App />);
+	const store = configureStore();
+	var html = renderToString(<Root store={store}/>);
 
-	res.send(renderFullPage(html));
+	res.send(renderFullPage(html, store.getState()));
 }
 
-function renderFullPage(html) {
+function renderFullPage(html, preloadedState) {
 	return `
 		<!DOCTYPE HTML>
 		<html>
@@ -47,6 +49,7 @@ function renderFullPage(html) {
 
 		<body>
 			<div id='content'>${html}</div>
+			<script>window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState)}</script>
 			<script type='text/javascript' src='assets/bundle.js' charset='utf-8'></script>
 		</body>
 

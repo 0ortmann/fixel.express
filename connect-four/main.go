@@ -87,9 +87,11 @@ func errorHandler(f func(http.ResponseWriter, *http.Request) error) http.Handler
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "new")
 	game := NewGame()
 	gs.Set(game)
+	w.Header().Set("Content-Type", "application/json")
+	// remove this again
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	enc := json.NewEncoder(w)
 	enc.Encode(game)
 }

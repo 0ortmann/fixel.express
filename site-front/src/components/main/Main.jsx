@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import LanguageSelector from './LanguageSelector.jsx';
 import FixHeaderBox from './FixHeaderBox.jsx';
 import './Main.scss';
 
+import { newGame } from '../../actions/ConnectFourActionCreators.js';
+
 const langs = ['german', 'english']
 
-export default class Main extends Component {
+export class Main extends Component {
     
     constructor(props) {
         super(props);
@@ -20,6 +23,7 @@ export default class Main extends Component {
 
     componentWillMount() {
         this.switchLanguage('german');
+        this.props.newGame();
     }
 
     switchLanguage(lang) {
@@ -65,3 +69,8 @@ Main.propTypes = {
     content: React.PropTypes.object.isRequired,
     fixHeader: React.PropTypes.func.isRequired
 }
+
+
+export default connect(null, {
+    newGame
+})(Main)

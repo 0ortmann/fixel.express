@@ -11,19 +11,19 @@ describe('LanguageSelector', () => {
 	let selector;
 
 	beforeEach(function() {
-        selector = TestUtils.renderIntoDocument( <LanguageSelector langs={langs} selectCallback={cb} /> );
-    });
+		selector = TestUtils.renderIntoDocument( <LanguageSelector langs={langs} selectCallback={cb} /> );
+	});
 
 	it('should render', () => {
-        let selectorNode = ReactDOM.findDOMNode(selector);
-        expect(selectorNode).toBeDefined();
-        let options = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
-        expect(options.length).toEqual(3);
+		let selectorNode = ReactDOM.findDOMNode(selector);
+		expect(selectorNode).toBeDefined();
+		let options = TestUtils.scryRenderedDOMComponentsWithTag(selector, 'option');
+		expect(options.length).toEqual(3);
 	});
 
 	it('call the callback with language paramter', () => {
 		let select = TestUtils.findRenderedDOMComponentWithTag(selector, 'select');
-		expect(select).toBeDefined()
+		expect(select).toBeDefined();
 		TestUtils.Simulate.change( select, {target: {value: 'l2' }} );
 		expect(cb).toBeCalledWith('l2');
 	});

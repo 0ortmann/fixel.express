@@ -27,17 +27,17 @@ describe('Main', () => {
 	let main;
 
 	beforeEach(function() {
-        main = TestUtils.renderIntoDocument( <Main content={content} fixHeader={fixHeader} />);
-    });
+		main = TestUtils.renderIntoDocument( <Main content={content} fixHeader={fixHeader} />);
+	});
 
 	it('should render', () => {
-        const mainNode = ReactDOM.findDOMNode(main);
-        expect(mainNode).toBeDefined();
-        expect(main.state.content).toEqual(gerCont);
-        const paragraphs = TestUtils.scryRenderedDOMComponentsWithTag(main, 'p');
-        expect(paragraphs.length).toEqual(2);
-        expect(paragraphs[0].textContent).toEqual('foo')
-        expect(paragraphs[1].textContent).toEqual('bar')
+		const mainNode = ReactDOM.findDOMNode(main);
+		expect(mainNode).toBeDefined();
+		expect(main.state.content).toEqual(gerCont);
+		const paragraphs = TestUtils.scryRenderedDOMComponentsWithTag(main, 'p');
+		expect(paragraphs.length).toEqual(2);
+		expect(paragraphs[0].textContent).toEqual('foo');
+		expect(paragraphs[1].textContent).toEqual('bar');
 	});
 
 	it('should switch language correctly', () => {

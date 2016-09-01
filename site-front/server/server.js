@@ -1,3 +1,6 @@
+import React from 'react';
+import App from '../src/components/App.jsx';
+
 import path from 'path';
 import Express from 'express';
 import webpack from 'webpack';

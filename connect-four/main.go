@@ -235,7 +235,7 @@ func checkPoint(x int, y int, board [][]string, k int) string {
 			}
 		}
 		//cross down
-		if x+i < len(board) && y-i > 0 && y-i < len(board[x+i]) {
+		if x+i < len(board) && y-i >= 0 && y-i < len(board[x+i]) {
 			fmt.Println("in cd")
 			if name == board[x+i][y-i] {
 				cdCnt++

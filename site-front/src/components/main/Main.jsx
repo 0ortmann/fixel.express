@@ -3,9 +3,11 @@ import { connect } from 'react-redux';
 
 import LanguageSelector from './LanguageSelector.jsx';
 import FixHeaderBox from './FixHeaderBox.jsx';
+
+import ConnectFourBoard from './ConnectFourBoard.jsx';
 import './Main.scss';
 
-import { newGame } from '../../actions/ConnectFourActionCreators.js';
+import { newGame, insertToken } from '../../actions/ConnectFourActionCreators.js';
 
 const langs = ['german', 'english']
 
@@ -19,6 +21,7 @@ export class Main extends Component {
         };
         this.switchLanguage = this.switchLanguage.bind(this);
         this.fixHeader = this.fixHeader.bind(this);
+        this.play = this.play.bind(this);
     }
 
     componentWillMount() {
@@ -41,8 +44,15 @@ export class Main extends Component {
         this.props.fixHeader();
     }
 
+    play(column) {
+        const { gameId, insertToken } = this.props;
+        insertToken(gameId, column);
+    }
+
     render() {
-        if (this.state.content == undefined) {
+        const { content, hideFixHint } = this.state;
+        const { board, cols, rows } = this.props;
+        if (content == undefined) {
             return null;
         }
         return (
@@ -50,16 +60,17 @@ export class Main extends Component {
                 <LanguageSelector selectCallback={this.switchLanguage} langs={langs}/>
                 <h1>FELIX ORTMANN</h1>
                 <div className='about__subtitle'>
-                    &mdash; {this.state.content.title} &mdash;
+                    &mdash; {content.title} &mdash;
                 </div>
-                <FixHeaderBox fixIt={this.fixHeader} hide={this.state.hideFixHint} displayText={this.state.content.box} />
+                <FixHeaderBox fixIt={this.fixHeader} hide={hideFixHint} displayText={content.box} />
                 <img className='about__img'/>
                 <div className='about__description'>
-                    {this.state.content.description.map((paragraph, i) => {
+                    {content.description.map((paragraph, i) => {
                         return <p key={i}>{paragraph}</p>
                     })}
                 </div>
                 <object className='gopher__left'/>
+                <ConnectFourBoard play={this.play} board={board} rows={rows} cols={cols} />
             </main>
         );
     }
@@ -70,7 +81,17 @@ Main.propTypes = {
     fixHeader: React.PropTypes.func.isRequired
 }
 
+function mapStateToProps(state, ownProps) {
+    return {
+        gameId: state.gameId,
+        board: state.board,
+        cols: state.columns,
+        rows: state.rows
+    }
+}
 
-export default connect(null, {
-    newGame
+
+export default connect(mapStateToProps, {
+    newGame,
+    insertToken
 })(Main)

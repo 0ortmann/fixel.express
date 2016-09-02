@@ -25,13 +25,18 @@ describe('Main', () => {
 
 	const fixHeader = jest.genMockFunction();
 	const newGame = jest.genMockFunction();
+	const cols = 7;
+	const rows = 6;
+	const gameId = '123';
+	const board = [[], [], [], [], [], [], []];
 
 	let main;
 
 
 	beforeEach(function() {
 		main = TestUtils.renderIntoDocument(
-			<Main content={content} fixHeader={fixHeader} newGame={newGame} />
+			<Main content={content} fixHeader={fixHeader} newGame={newGame} 
+				cols={cols} rows={rows} board={board} gameId={gameId} />
 		);
 	});
 

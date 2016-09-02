@@ -21,31 +21,34 @@ function postApi(endpoint, body) {
 	const fullUrl = API + endpoint;
 
 	return fetch( fullUrl, {
-		method: 'Post',
-		body,
-		})
-		.then( res => {
-			if (res.status >= 400) {
-				return Promise.reject(res);
-			}
-			return res.json();
-		});
+		method: 'POST',
+		body: JSON.stringify(body),
+		headers: {
+			"Content-type": "application/json"
+		}
+	})
+	.then( res => {
+		if (res.status >= 400) {
+			return Promise.reject(res);
+		}
+		return res.json();
+	});
 }
 
 
 function actionWith(origAction, newData) {
-	const withoutCallApi = Object.assign({}, origAction, newData);
+	let withoutCallApi = Object.assign({}, origAction, newData);
 	delete withoutCallApi[CALL_API];
 	return withoutCallApi;
 }
 
-export default store => next => action => {
+export default () => next => action => {
 	const apiCall = action[CALL_API];
 
 	if (typeof apiCall === 'undefined') {
 		return next(action);
 	}
-	const { endpoint, method, types } = apiCall;
+	const { endpoint, method, types, body } = apiCall;
 
 	// mark as pending
 	const [ requestType, successType, failureType ] = types;
@@ -66,6 +69,7 @@ export default store => next => action => {
 	else if (method == 'Post') {
 		return postApi(endpoint, body).then(
 			response => next(actionWith( {
+				body,
 				response,
 				type: successType
 			})), 
@@ -75,4 +79,4 @@ export default store => next => action => {
 			}))
 		);
 	}
-}
+};

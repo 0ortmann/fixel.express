@@ -1,12 +1,12 @@
 import ACTIONS from '../constants/Constants';
 
-export function insertToken(column) {
+export function insertToken(game, column) {
 	return {
 		[ACTIONS.CALL_API]: {
 			types: [ACTIONS.INSERT_TOKEN, ACTIONS.INSERT_TOKEN_SUCCESS, ACTIONS.INSERT_TOKEN_ERROR],
 			method: 'Post',
 			endpoint: '/play',
-			column
+			body: { gameId: game, col: column }
 		}
 	};
 }

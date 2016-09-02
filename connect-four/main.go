@@ -64,8 +64,8 @@ func (gs *GameStore) Set(game *Game) bool {
 var gs = NewGameStore()
 
 func main() {
-	http.HandleFunc("/new", newHandler)
-	http.HandleFunc("/play", errorHandler(playHandler))
+	http.HandleFunc("/new", allowCors(newHandler))
+	http.HandleFunc("/play", allowCors(errorHandler(playHandler)))
 
 	http.ListenAndServe(":5000", nil)
 }
@@ -86,12 +86,22 @@ func errorHandler(f func(http.ResponseWriter, *http.Request) error) http.Handler
 
 }
 
+func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-type")
+		if req.Method == "OPTIONS" {
+			fmt.Fprintf(w, "OK")
+			return
+		}
+		f(w, req)
+	}
+}
+
 func newHandler(w http.ResponseWriter, req *http.Request) {
 	game := NewGame()
 	gs.Set(game)
-	w.Header().Set("Content-Type", "application/json")
-	// remove this again
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
 	enc.Encode(game)
 }
@@ -106,7 +116,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	var post Post
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&post); err != nil {
-		return errors.New("Not valid JSON")
+		return err
 	}
 	if post.GameId == "" || post.Col >= 7 {
 		return errors.New("Wrong JSON format")
@@ -124,6 +134,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 		return errors.New("Field already in use")
 	}
 
+	// fixme: player win -> computer does a last move
 	col, err := autoPlay(game)
 	if err != nil {
 		return errors.New("Unable to play")
@@ -132,8 +143,8 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	checkWin(game)
 
 	type Resp struct {
-		Col    int
-		Winner string
+		Col    int `json:"col"`
+		Winner string `json:"winner"`
 	}
 	var resp Resp
 	resp.Col = col

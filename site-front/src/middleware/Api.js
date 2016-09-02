@@ -24,7 +24,7 @@ function postApi(endpoint, body) {
 		method: 'POST',
 		body: JSON.stringify(body),
 		headers: {
-			"Content-type": "application/json"
+			'Content-type': 'application/json'
 		}
 	})
 	.then( res => {

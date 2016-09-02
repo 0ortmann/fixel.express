@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
-import Main from '../src/components/main/Main.jsx';
+
+// dont import the connected ('wrapped') component, but the pure one
+import { Main } from '../src/components/main/Main.jsx';
 
 describe('Main', () => {
 
@@ -22,12 +24,15 @@ describe('Main', () => {
 	};
 
 	const fixHeader = jest.genMockFunction();
-
+	const newGame = jest.genMockFunction();
 
 	let main;
 
+
 	beforeEach(function() {
-		main = TestUtils.renderIntoDocument( <Main content={content} fixHeader={fixHeader} />);
+		main = TestUtils.renderIntoDocument(
+			<Main content={content} fixHeader={fixHeader} newGame={newGame} />
+		);
 	});
 
 	it('should render', () => {

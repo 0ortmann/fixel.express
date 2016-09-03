@@ -27,7 +27,7 @@ func NewGame() *Game {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
-		fmt.Println("Error generating UUID ", err)
+		log.Print("Error generating UUID ", err)
 		return nil
 	}
 	return &Game{
@@ -162,7 +162,6 @@ func apply(game *Game, col int, player string) (int, error) {
 		return -1, errors.New("Column already full")
 	}
 	game.Board[col] = append(game.Board[col], player)
-	fmt.Println(game)
 	return len(game.Board[col]) - 1, nil
 }
 
@@ -196,6 +195,8 @@ func setWinner(c int, r int, game *Game, k int) {
 	}
 }
 
+// checks if an insert of the string 'name' at position (c, r)
+// has 'k' direct neighbors with the same 'name' on the board
 func insertWins(c int, r int, board [][]string, name string, k int) bool {
 	cr := checkAxisWith(c, r, board, name, k, checkCrossRightUp, checkCrossLeftDown)
 	cl := checkAxisWith(c, r, board, name, k, checkCrossLeftUp, checkCrossRightDown)
@@ -224,9 +225,9 @@ func insertWins(c int, r int, board [][]string, name string, k int) bool {
 	}
 }
 
-// invokes all the given pointchecker with the other arguments.
-// counts the in-order successes of point checking. If that count 
-// is greater or eaqual than the given k, true is sent in the channel, false otherwise
+// Invokes all the given Pointcheckers with the other arguments.
+// Counts the in-order successes of point checking and stops counting on a Pointchecker once a negative success was detected.
+// If the total count is greater or eaqual than the given k, true is sent in the channel, false otherwise
 func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...PointChecker) chan bool {
 	res := make(chan bool)
 	go func() {
@@ -238,7 +239,6 @@ func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...Po
 					cntPcs[idx]++
 				}
 			}
-			
 		}
 		sum := 0
 		for _, c := range cntPcs {
@@ -250,8 +250,7 @@ func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...Po
 }
 
 // signature: col, row, board, name, distance
-// check if the given name is found on a point on the board 
-// with distance d from point (c, r)
+// check if 'name' is found on a point on the board with distance d from point (c, r)
 type PointChecker func(int, int, [][]string, string, int) bool
 
 func checkCrossRightUp(c int, r int, board [][]string, name string, d int) bool {

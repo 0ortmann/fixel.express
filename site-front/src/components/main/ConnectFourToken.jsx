@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import classNames from 'classnames';
 
-//import './ConnectFourToken.scss';
+import './ConnectFourToken.scss';
 
 export default class ConnectFourToken extends Component {
 
@@ -18,14 +19,12 @@ export default class ConnectFourToken extends Component {
 
 	render() {
 		const player = this.props.player;
-		if (typeof player === 'undefiend') {
+		if (typeof player === 'undefined') {
 			return null;
 		}
+		const classes = classNames('connectFourToken', { red: player == 'player', blue: player == 'computer' } );
 		return (
-			<div className='connectFourToken'>
-				{player}
-			</div>
-
+			<div className={classes} />
 		);
 	}
 }

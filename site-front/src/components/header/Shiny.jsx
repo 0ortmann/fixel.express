@@ -13,7 +13,7 @@ export default class Shiny extends Component {
     render() {
         return (
             <header>
-                <h1 className='shinyHeader'>I'm not a frontend guy</h1>
+                <h1 className='shinyHeader'>I'm not a design person</h1>
             </header>
         );
     }

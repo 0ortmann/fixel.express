@@ -6,7 +6,8 @@ const initialState = {
 	isPlaying: false,
 	playError: false,
 	columns: 7,
-	rows: 6
+	rows: 6,
+	winner: ''
 };
 
 export default function board(state = initialState, action) {
@@ -26,6 +27,7 @@ export default function board(state = initialState, action) {
 		return { 
 			...state, 
 			board: apply(state.board, action.body, action.response),
+			winner: action.body.winner,
 			playError: false,
 			isPlaying: false
 		};
@@ -49,6 +51,8 @@ function apply(board, body, response) {
 	const cCol = response.col; // computer insert column
 	let muteBoard = [...board];
 	muteBoard[pCol].push('player');
-	muteBoard[cCol].push('computer');
+	if (cCol > -1) {
+		muteBoard[cCol].push('computer');
+	}
 	return muteBoard;
 }

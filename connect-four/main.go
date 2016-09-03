@@ -107,12 +107,10 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func playHandler(w http.ResponseWriter, req *http.Request) error {
-	
 	type Post struct {
 		GameId string
 		Col    int
 	}
-
 	var post Post
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&post); err != nil {
@@ -121,129 +119,197 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if post.GameId == "" || post.Col >= 7 {
 		return errors.New("Wrong JSON format")
 	}
-
 	game := gs.Get(post.GameId)
-
 	if game == nil {
 		return errors.New("No game with that ID")
 	}
 	if game.Winner != "" {
-		return errors.New("Game already ended, winner was "+game.Winner)
+		return errors.New("Game already ended, winner was " + game.Winner)
 	}
-	if err := apply(game, post.Col, "player"); err != nil {
-		return errors.New("Field already in use")
-	}
-
-	// fixme: player win -> computer does a last move
-	col, err := autoPlay(game)
+	pRow, err := apply(game, post.Col, "player")
 	if err != nil {
-		return errors.New("Unable to play")
+		return err
 	}
+	checkWin(post.Col, pRow, game, 4)
+	if game.Winner != "" {
+		return playResult(w, game, -1)
+	}
+	cCol, cRow, err := autoPlay(game)
+	if err != nil {
+		return err
+	}
+	checkWin(cCol, cRow, game, 4)
+	return playResult(w, game, cCol)
+}
 
-	checkWin(game)
-
+// fomulate a response with game winner (may be empty) and the column picked by the computer
+func playResult(w http.ResponseWriter, game *Game, cCol int) error {
 	type Resp struct {
-		Col    int `json:"col"`
+		Col    int    `json:"col"`
 		Winner string `json:"winner"`
 	}
 	var resp Resp
-	resp.Col = col
+	resp.Col = cCol
 	resp.Winner = game.Winner
 	enc := json.NewEncoder(w)
-	enc.Encode(&resp)
-	return nil
+	return enc.Encode(&resp)
 }
 
 // put a token with value "player" into the column "col".
-// Returns an error if the column is already full
-func apply(game *Game, col int, player string) error {
+// Returns the row it was inserted into and an error if the column is already full
+func apply(game *Game, col int, player string) (int, error) {
 	if len(game.Board[col]) == 6 {
-		return errors.New("Column already full")
+		return -1, errors.New("Column already full")
 	}
 	game.Board[col] = append(game.Board[col], player)
 	fmt.Println(game)
-	return nil
+	return len(game.Board[col]) - 1, nil
 }
 
-// The computer plays automatically and returns the column number that was picked to insert a chip
-func autoPlay(game *Game) (int, error) {
+// The computer plays automatically and returns the column number and row where a chip was inserted
+func autoPlay(game *Game) (int, int, error) {
 	switch game.Mode {
 	case "random":
 		return playRandom(game)
 	}
-	return -1, errors.New("Unknown game mode")
+	return -1, -1, errors.New("Unknown game mode")
 }
 
-func playRandom(game *Game) (int, error) {
+func playRandom(game *Game) (int, int, error) {
 	// has to terminate if all cols are full
 	rCol, _ := rand.Int(rand.Reader, big.NewInt(7))
 	c := int(rCol.Int64())
 	for i := 0; i < 6; i++ {
 		c = (c + i) % 6
-		err := apply(game, c, "computooor")
+		r, err := apply(game, c, "computooor")
 		if err == nil {
-			return c, nil
+			return c, r, nil
 		}
 	}
-	return -1, errors.New("No more usable columns, all full!")
+	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-func checkWin(game *Game) {
-	game.Winner = getWinner(game.Board, 4)
-
-}
-func getWinner(board [][]string, k int) (w string) {
-	for c := 0; c < len(board); c++ {
-		for r := 0; r < len(board[c]); r++ {
-			w = checkPoint(c, r, board, k)
-			if w != "" {
-				return
-			}
-		}
+func checkWin(c int, r int, game *Game, k int) {
+	name := game.Board[c][r]
+	if checkInsertWins(c, r, game.Board, name, k) {
+		game.Winner = name
 	}
-	return
 }
 
-// check above, right besides, cross-right-down and cross-right-up
-func checkPoint(x int, y int, board [][]string, k int) string {
-	name := board[x][y]
-	aCnt := 0
-	bCnt := 0
-	cuCnt := 0
-	cdCnt := 0
-	fmt.Println("checkpoint ", x, y, name)
-	for i := 0; i < k; i++ {
-		//above
-		if x < len(board) && y+i < len(board[x]) {
-			fmt.Println("in above")
-			if name == board[x][y+i] {
-				aCnt++
-			}
+func checkInsertWins(c int, r int, board [][]string, name string, k int) bool {
+	fmt.Println("check win", c, r, name)
+	cr := checkCrossRight(c, r, board, name, k)
+	cl := checkCrossLeft(c, r, board, name, k)
+	rl := checkBesides(c, r, board, name, k)
+	blw := checkBelow(c, r, board, name, k)
+	succ := false
+	axis := 0
+	for {
+		select {
+		case res := <-cr:
+			fmt.Println("res from cr", res)
+			succ = succ || res
+			axis++
+		case res := <-cl:
+			fmt.Println("res from cl", res)
+			succ = succ || res
+			axis++
+		case res := <-rl:
+			fmt.Println("res from rl", res)
+			succ = succ || res
+			axis++
+		case res := <-blw:
+			fmt.Println("res from blw", res)
+			succ = succ || res
+			axis++
 		}
-		//besides
-		if x+i < len(board) && y < len(board[x+i]) {
-			fmt.Println("in besides")
-			if name == board[x+i][y] {
-				bCnt++
-			}
-		}
-		//cross up
-		if x+i < len(board) && y+i < len(board[x+i]) {
-			fmt.Println("in cu")
-			if name == board[x+i][y+i] {
-				cuCnt++
-			}
-		}
-		//cross down
-		if x+i < len(board) && y-i >= 0 && y-i < len(board[x+i]) {
-			fmt.Println("in cd")
-			if name == board[x+i][y-i] {
-				cdCnt++
-			}
+		if succ || axis == 4 {
+			fmt.Println("hit", succ, axis)
+			return succ
 		}
 	}
-	if aCnt == k || bCnt == k || cuCnt == k || cdCnt == k {
-		return name
-	}
-	return ""
+}
+
+func checkCrossRight(c int, r int, board [][]string, name string, k int) chan bool {
+	res := make(chan bool)
+	cru := 0 // cross right up
+	cld := 0 // cross left down
+	go func() {
+		for i := 1; i < k; i++ {
+			if cru == i-1 && c+i < len(board) && r+i < len(board[c+i]) {
+				if name == board[c+i][r+i] {
+					cru++
+				}
+			}
+			if cld == i-1 && c-i >= 0 && r-i >= 0 && r-i < len(board[c-i]) {
+				if name == board[c-i][r-i] {
+					cld++
+				}
+			}
+		}
+		res <- (cru + cld + 1) >= k
+	}()
+	return res
+}
+
+func checkCrossLeft(c int, r int, board [][]string, name string, k int) chan bool {
+	res := make(chan bool)
+	clu := 0 // cross left up
+	crd := 0 // cross right down
+	go func() {
+		for i := 1; i < k; i++ {
+			if clu == i-1 && c-i >= 0 && r+i < len(board[c-i]) {
+				if name == board[c-i][r+i] {
+					clu++
+				}
+			}
+			if crd == i-1 && c+i < len(board) && r-i >= 0 && r-i < len(board[c+i]) {
+				if name == board[c+i][r-i] {
+					crd++
+				}
+			}
+		}
+		res <- (clu + crd + 1) >= k
+	}()
+	return res
+}
+
+func checkBesides(c int, r int, board [][]string, name string, k int) chan bool {
+	res := make(chan bool)
+	rgt := 0 // right
+	lft := 0 // left
+	go func() {
+		for i := 1; i < k; i++ {
+			if rgt == i-1 && c+i < len(board) && r < len(board[c+i]) {
+				if name == board[c+i][r] {
+					fmt.Println("add right", name, "==", board[c+i][r])
+					rgt++
+				}
+			}
+			if lft == i-1 && c-i >= 0 && r < len(board[c-i]) {
+				if name == board[c-i][r] {
+					fmt.Println("add left", name, "==", board[c-i][r])
+					lft++
+				}
+			}
+		}
+		res <- (rgt + lft + 1) >= k
+	}()
+	return res
+}
+
+func checkBelow(c int, r int, board [][]string, name string, k int) chan bool {
+	res := make(chan bool)
+	blw := 0 // below
+	go func() {
+		for i := 1; i < k; i++ {
+			if blw == i-1 && r-i >= 0 && r-i < len(board[c]) {
+				if name == board[c][r-i] {
+					blw++
+				}
+			}
+		}
+		res <- (blw + 1) >= k
+	}()
+	return res
 }

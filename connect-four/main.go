@@ -21,20 +21,32 @@ type Game struct {
 	Mode   string
 	Winner string
 	Board  [][]string
+	Cols   int
+	Rows   int
+	Win    int
 }
 
-func NewGame() *Game {
+// create a (cols x rows) game board. 'win' neighbored pieces are needed to win
+// and mode determines the computer playmode (eg random)
+func NewGame(cols, rows, win int, mode string) *Game {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
-		log.Print("Error generating UUID ", err)
+		log.Print("Error generating UUID", err)
+		return nil
+	}
+	if cols < 1 || rows < 1 {
+		log.Print("Please provide sane size", err)
 		return nil
 	}
 	return &Game{
 		Id:     fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:]),
-		Mode:   "random", // minmax, heuristics etc..
+		Mode:   mode, // minmax, heuristics etc..
 		Winner: "",
-		Board:  make([][]string, 7),
+		Board:  make([][]string, cols),
+		Cols:   cols,
+		Rows:   rows,
+		Win:    win,
 	}
 }
 
@@ -99,7 +111,7 @@ func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	game := NewGame()
+	game := NewGame(7, 6, 4, "random")
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
@@ -116,12 +128,12 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if err := decoder.Decode(&post); err != nil {
 		return err
 	}
-	if post.GameId == "" || post.Col >= 7 {
-		return errors.New("Wrong JSON format")
-	}
 	game := gs.Get(post.GameId)
 	if game == nil {
 		return errors.New("No game with that ID")
+	}
+	if post.Col >= game.Cols {
+		return errors.New("Wrong JSON format")
 	}
 	if game.Winner != "" {
 		return errors.New("Game already ended, winner was " + game.Winner)
@@ -130,7 +142,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	setWinner(post.Col, pRow, game, 4)
+	setWinner(post.Col, pRow, game)
 	if game.Winner != "" {
 		return playResult(w, game, -1)
 	}
@@ -138,7 +150,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	setWinner(cCol, cRow, game, 4)
+	setWinner(cCol, cRow, game)
 	return playResult(w, game, cCol)
 }
 
@@ -188,20 +200,21 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-func setWinner(c int, r int, game *Game, k int) {
+// checks if the insert at position (c, r) lead to a win for the player with that token
+// sets the Winner-field on the game, if so.
+func setWinner(c int, r int, game *Game) {
 	name := game.Board[c][r]
-	if insertWins(c, r, game.Board, name, k) {
+	if insertWins(c, r, name, game) {
 		game.Winner = name
 	}
 }
 
-// checks if an insert of the string 'name' at position (c, r)
-// has 'k' direct neighbors with the same 'name' on the board
-func insertWins(c int, r int, board [][]string, name string, k int) bool {
-	cr := checkAxisWith(c, r, board, name, k, checkCrossRightUp, checkCrossLeftDown)
-	cl := checkAxisWith(c, r, board, name, k, checkCrossLeftUp, checkCrossRightDown)
-	rl := checkAxisWith(c, r, board, name, k, checkRightOf, checkLeftOf)
-	blw := checkAxisWith(c, r, board, name, k, checkBelow)
+// checks if an insert of the string 'name' at position (c, r) wins the game
+func insertWins(c int, r int, name string, game *Game) bool {
+	cr := checkAxisWith(c, r, game, name, checkCrossRightUp, checkCrossLeftDown)
+	cl := checkAxisWith(c, r, game, name, checkCrossLeftUp, checkCrossRightDown)
+	rl := checkAxisWith(c, r, game, name, checkRightOf, checkLeftOf)
+	blw := checkAxisWith(c, r, game, name, checkBelow)
 	succ := false
 	axis := 0
 	for {
@@ -228,14 +241,14 @@ func insertWins(c int, r int, board [][]string, name string, k int) bool {
 // Invokes all the given Pointcheckers with the other arguments.
 // Counts the in-order successes of point checking and stops counting on a Pointchecker once a negative success was detected.
 // If the total count is greater or eaqual than the given k, true is sent in the channel, false otherwise
-func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...PointChecker) chan bool {
+func checkAxisWith(c int, r int, game *Game, name string, pcs ...PointChecker) chan bool {
 	res := make(chan bool)
 	go func() {
 		cntPcs := make([]int, len(pcs), len(pcs))
-		for dist := 1; dist < k; dist++ {
+		for dist := 1; dist < game.Win; dist++ {
 			for idx, pc := range pcs {
 				// counter on pointchecker guard their next invocation
-				if cntPcs[idx] == dist-1 && pc(c, r, board, name, dist) {
+				if cntPcs[idx] == dist-1 && pc(c, r, game.Board, name, dist, game.Rows) == 1 {
 					cntPcs[idx]++
 				}
 			}
@@ -244,39 +257,111 @@ func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...Po
 		for _, c := range cntPcs {
 			sum += c
 		}
-		res <- (sum + 1) >= k // count of connected neighbors + self greater k?
+		res <- (sum + 1) >= game.Win // count of connected neighbors + self greater win-condition
 	}()
 	return res
 }
 
 // signature: col, row, board, name, distance
+// checks a point (dc, dr) which is 'd' distance away from the point (col, row)
+// for one specific angle (cross/right etc).
+// Returns a 1 if the given name equals the name on (dc, dr),
+// a 0 if (dc, dr) is empty, a -1 if (dc, dr) out of bounds
+// and a -2 if there is a different name found on that found.
 // check if 'name' is found on a point on the board with distance d from point (c, r)
-type PointChecker func(int, int, [][]string, string, int) bool
+type PointChecker func(int, int, [][]string, string, int, int) int
 
-func checkCrossRightUp(c int, r int, board [][]string, name string, d int) bool {
-	return c+d < len(board) && r+d < len(board[c+d]) && name == board[c+d][r+d]
+func checkCrossRightUp(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c+d >= len(board) || r+d > avail:
+		return -1 // out of bounds
+	case r+d >= len(board[c+d]):
+		return 0 // empty
+	case name == board[c+d][r+d]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkCrossRightDown(c int, r int, board [][]string, name string, d int) bool {
-	return c+d < len(board) && r-d >= 0 && r-d < len(board[c+d]) && name == board[c+d][r-d]
+func checkCrossRightDown(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c+d >= len(board) || r-d < 0:
+		return -1
+	case r-d >= len(board[c+d]):
+		return 0
+	case name == board[c+d][r-d]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkCrossLeftDown(c int, r int, board [][]string, name string, d int) bool {
-	return c-d >= 0 && r-d >= 0 && r-d < len(board[c-d]) && name == board[c-d][r-d]
+func checkCrossLeftDown(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c-d < 0 || r-d < 0:
+		return -1
+	case r-d >= len(board[c-d]):
+		return 0
+	case name == board[c-d][r-d]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkCrossLeftUp(c int, r int, board [][]string, name string, d int) bool {
-	return c-d >= 0 && r+d < len(board[c-d]) && name == board[c-d][r+d]
+func checkCrossLeftUp(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c-d < 0 || r+d > avail:
+		return -1
+	case r+d >= len(board[c-d]):
+		return 0
+	case name == board[c-d][r+d]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkLeftOf(c int, r int, board [][]string, name string, d int) bool {
-	return c-d >= 0 && r < len(board[c-d]) && name == board[c-d][r]
+func checkLeftOf(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c-d < 0 || r > avail:
+		return -1
+	case r >= len(board[c-d]):
+		return 0
+	case name == board[c-d][r]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkRightOf(c int, r int, board [][]string, name string, d int) bool {
-	return c+d < len(board) && r < len(board[c+d]) && name == board[c+d][r]
+func checkRightOf(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c+d >= len(board) || r > avail:
+		return -1
+	case r >= len(board[c+d]):
+		return 0
+	case name == board[c+d][r]:
+		return 1
+	default:
+		return -2
+	}
 }
 
-func checkBelow(c int, r int, board [][]string, name string, d int) bool {
-	return r-d >= 0 && r-d < len(board[c]) && name == board[c][r-d]
+func checkBelow(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c >= len(board) || r-d < 0:
+		return -1
+	case name == board[c][r-d]:
+		return 1
+	default:
+		return -2
+	}
 }
+
+// signature: col, row, board, name, distance.
+// check if 'name' is found on a point on the board with distance d from point (c, r).
+// returns -1 if a different name is found, 0 if nothing is there and 1 if 'name' is found on that point.
+
+type PointRater func(c int, r int, game *Game, name string)

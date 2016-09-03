@@ -130,7 +130,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	checkWin(post.Col, pRow, game, 4)
+	setWinner(post.Col, pRow, game, 4)
 	if game.Winner != "" {
 		return playResult(w, game, -1)
 	}
@@ -138,7 +138,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	checkWin(cCol, cRow, game, 4)
+	setWinner(cCol, cRow, game, 4)
 	return playResult(w, game, cCol)
 }
 
@@ -189,127 +189,95 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-func checkWin(c int, r int, game *Game, k int) {
+func setWinner(c int, r int, game *Game, k int) {
 	name := game.Board[c][r]
-	if checkInsertWins(c, r, game.Board, name, k) {
+	if insertWins(c, r, game.Board, name, k) {
 		game.Winner = name
 	}
 }
 
-func checkInsertWins(c int, r int, board [][]string, name string, k int) bool {
-	fmt.Println("check win", c, r, name)
-	cr := checkCrossRight(c, r, board, name, k)
-	cl := checkCrossLeft(c, r, board, name, k)
-	rl := checkBesides(c, r, board, name, k)
-	blw := checkBelow(c, r, board, name, k)
+func insertWins(c int, r int, board [][]string, name string, k int) bool {
+	cr := checkAxisWith(c, r, board, name, k, checkCrossRightUp, checkCrossLeftDown)
+	cl := checkAxisWith(c, r, board, name, k, checkCrossLeftUp, checkCrossRightDown)
+	rl := checkAxisWith(c, r, board, name, k, checkRightOf, checkLeftOf)
+	blw := checkAxisWith(c, r, board, name, k, checkBelow)
 	succ := false
 	axis := 0
 	for {
 		select {
 		case res := <-cr:
-			fmt.Println("res from cr", res)
 			succ = succ || res
 			axis++
 		case res := <-cl:
-			fmt.Println("res from cl", res)
 			succ = succ || res
 			axis++
 		case res := <-rl:
-			fmt.Println("res from rl", res)
 			succ = succ || res
 			axis++
 		case res := <-blw:
-			fmt.Println("res from blw", res)
 			succ = succ || res
 			axis++
 		}
 		if succ || axis == 4 {
-			fmt.Println("hit", succ, axis)
 			return succ
 		}
 	}
 }
 
-func checkCrossRight(c int, r int, board [][]string, name string, k int) chan bool {
+// invokes all the given pointchecker with the other arguments.
+// counts the in-order successes of point checking. If that count 
+// is greater or eaqual than the given k, true is sent in the channel, false otherwise
+func checkAxisWith(c int, r int, board [][]string, name string, k int, pcs ...PointChecker) chan bool {
 	res := make(chan bool)
-	cru := 0 // cross right up
-	cld := 0 // cross left down
 	go func() {
-		for i := 1; i < k; i++ {
-			if cru == i-1 && c+i < len(board) && r+i < len(board[c+i]) {
-				if name == board[c+i][r+i] {
-					cru++
+		cntPcs := make([]int, len(pcs), len(pcs))
+		for dist := 1; dist < k; dist++ {
+			for idx, pc := range pcs {
+				// counter on pointchecker guard their next invocation
+				if cntPcs[idx] == dist-1 && pc(c, r, board, name, dist) {
+					cntPcs[idx]++
 				}
 			}
-			if cld == i-1 && c-i >= 0 && r-i >= 0 && r-i < len(board[c-i]) {
-				if name == board[c-i][r-i] {
-					cld++
-				}
-			}
+			
 		}
-		res <- (cru + cld + 1) >= k
+		sum := 0
+		for _, c := range cntPcs {
+			sum += c
+		}
+		res <- (sum + 1) >= k // count of connected neighbors + self greater k?
 	}()
 	return res
 }
 
-func checkCrossLeft(c int, r int, board [][]string, name string, k int) chan bool {
-	res := make(chan bool)
-	clu := 0 // cross left up
-	crd := 0 // cross right down
-	go func() {
-		for i := 1; i < k; i++ {
-			if clu == i-1 && c-i >= 0 && r+i < len(board[c-i]) {
-				if name == board[c-i][r+i] {
-					clu++
-				}
-			}
-			if crd == i-1 && c+i < len(board) && r-i >= 0 && r-i < len(board[c+i]) {
-				if name == board[c+i][r-i] {
-					crd++
-				}
-			}
-		}
-		res <- (clu + crd + 1) >= k
-	}()
-	return res
+// signature: col, row, board, name, distance
+// check if the given name is found on a point on the board 
+// with distance d from point (c, r)
+type PointChecker func(int, int, [][]string, string, int) bool
+
+func checkCrossRightUp(c int, r int, board [][]string, name string, d int) bool {
+	return c+d < len(board) && r+d < len(board[c+d]) && name == board[c+d][r+d]
 }
 
-func checkBesides(c int, r int, board [][]string, name string, k int) chan bool {
-	res := make(chan bool)
-	rgt := 0 // right
-	lft := 0 // left
-	go func() {
-		for i := 1; i < k; i++ {
-			if rgt == i-1 && c+i < len(board) && r < len(board[c+i]) {
-				if name == board[c+i][r] {
-					fmt.Println("add right", name, "==", board[c+i][r])
-					rgt++
-				}
-			}
-			if lft == i-1 && c-i >= 0 && r < len(board[c-i]) {
-				if name == board[c-i][r] {
-					fmt.Println("add left", name, "==", board[c-i][r])
-					lft++
-				}
-			}
-		}
-		res <- (rgt + lft + 1) >= k
-	}()
-	return res
+func checkCrossRightDown(c int, r int, board [][]string, name string, d int) bool {
+	return c+d < len(board) && r-d >= 0 && r-d < len(board[c+d]) && name == board[c+d][r-d]
 }
 
-func checkBelow(c int, r int, board [][]string, name string, k int) chan bool {
-	res := make(chan bool)
-	blw := 0 // below
-	go func() {
-		for i := 1; i < k; i++ {
-			if blw == i-1 && r-i >= 0 && r-i < len(board[c]) {
-				if name == board[c][r-i] {
-					blw++
-				}
-			}
-		}
-		res <- (blw + 1) >= k
-	}()
-	return res
+func checkCrossLeftDown(c int, r int, board [][]string, name string, d int) bool {
+	return c-d >= 0 && r-d >= 0 && r-d < len(board[c-d]) && name == board[c-d][r-d]
+}
+
+func checkCrossLeftUp(c int, r int, board [][]string, name string, d int) bool {
+	return c-d >= 0 && r+d < len(board[c-d]) && name == board[c-d][r+d]
+}
+
+func checkLeftOf(c int, r int, board [][]string, name string, d int) bool {
+	return c-d >= 0 && r < len(board[c-d]) && name == board[c-d][r]
+}
+
+func checkRightOf(c int, r int, board [][]string, name string, d int) bool {
+	return c+d < len(board) && r < len(board[c+d]) && name == board[c+d][r]
+}
+
+func checkBelow(c int, r int, board [][]string, name string, d int) bool {
+	return r-d >= 0 && r-d < len(board[c]) && name == board[c][r-d]
 }

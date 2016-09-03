@@ -211,55 +211,79 @@ func setWinner(c int, r int, game *Game) {
 
 // checks if an insert of the string 'name' at position (c, r) wins the game
 func insertWins(c int, r int, name string, game *Game) bool {
-	cr := checkAxisWith(c, r, game, name, checkCrossRightUp, checkCrossLeftDown)
-	cl := checkAxisWith(c, r, game, name, checkCrossLeftUp, checkCrossRightDown)
-	rl := checkAxisWith(c, r, game, name, checkRightOf, checkLeftOf)
-	blw := checkAxisWith(c, r, game, name, checkBelow)
-	succ := false
+	cr := rateAlongAxis(c, r, game, name, "c-r", checkCrossRightUp, checkCrossLeftDown)
+	cl := rateAlongAxis(c, r, game, name, "c-l", checkCrossLeftUp, checkCrossRightDown)
+	rl := rateAlongAxis(c, r, game, name, "r-l", checkRightOf, checkLeftOf)
+	blw := rateAlongAxis(c, r, game, name, "blw", checkBelow)
+
+	rate := 0
 	axis := 0
-	for {
-		select {
-		case res := <-cr:
-			succ = succ || res
-			axis++
-		case res := <-cl:
-			succ = succ || res
-			axis++
-		case res := <-rl:
-			succ = succ || res
-			axis++
-		case res := <-blw:
-			succ = succ || res
-			axis++
+	for r := range merge(cr, cl, rl, blw) {
+		axis ++
+		if rate < r {
+			rate = r
 		}
-		if succ || axis == 4 {
-			return succ
+		if rate +1 >= game.Win {
+			// rate of surrounding + yourself
+			return true
+		}
+		if axis == 4 {
+			return false
 		}
 	}
+	return false
 }
 
-// Invokes all the given Pointcheckers with the other arguments.
-// Counts the in-order successes of point checking and stops counting on a Pointchecker once a negative success was detected.
-// If the total count is greater or eaqual than the given k, true is sent in the channel, false otherwise
-func checkAxisWith(c int, r int, game *Game, name string, pcs ...PointChecker) chan bool {
-	res := make(chan bool)
+
+// rates the point (c, r) along an axis that is specified by the provided Pointcheckers
+// calculates the rate for that axis and pushes it into the result channel. If the axis
+// is not usable because one cannot win with that axis, it has value 0.
+func rateAlongAxis(c int, r int, game *Game, name string, dir string, pcs ...PointChecker) <-chan int {
+	res := make(chan int)
 	go func() {
-		cntPcs := make([]int, len(pcs), len(pcs))
-		for dist := 1; dist < game.Win; dist++ {
-			for idx, pc := range pcs {
-				// counter on pointchecker guard their next invocation
-				if cntPcs[idx] == dist-1 && pc(c, r, game.Board, name, dist, game.Rows) == 1 {
-					cntPcs[idx]++
-				}
-			}
+		subRates := make([]int, len(pcs), len(pcs))
+		subDists := make([]int, len(pcs), len(pcs))
+		for i, pc := range pcs {
+			subRates[i], subDists[i] = ratePoint(c, r, game, name, pc)
+			fmt.Println("rating for", c, r, dir, subRates[i])
 		}
-		sum := 0
-		for _, c := range cntPcs {
-			sum += c
+		rate, dist := 0, 0
+		for i := 0; i < len(pcs); i++ {
+			rate += subRates[i]
+			dist += subDists[i]
 		}
-		res <- (sum + 1) >= game.Win // count of connected neighbors + self greater win-condition
+		if dist < game.Win {
+			// not enough fields in a row usable for 'name', whole axis is not valuable
+			res <- -1
+			return
+		}
+		res <- rate // axis usable, return rate
 	}()
 	return res
+}
+
+// rates the point (c, r) in the context of 'game' and uses the given pointchecker.
+// returns the rate and the max distance of fields that were considered for rating.
+// rating function:
+// introspect next neighbor, using the Pointchecker:
+// found same chip as self: increments the rate by one
+// found empty field: no influence to rate
+// found field out of bounds or unfriendly chip: terminate checking
+func ratePoint(c, r int, game *Game, name string, pc PointChecker) (int, int) {
+	rate := 0
+	dist := 1
+	StraightInARow:
+		for ; dist < game.Win; dist++ {
+			switch pc(c, r, game.Board, name, dist, game.Rows) {
+			case 1: // same chip
+				rate++
+			case 0: // no chip, not out of bounds
+				break
+			case -1, -2:
+				break StraightInARow
+			}
+		}
+	return rate, dist
 }
 
 // signature: col, row, board, name, distance
@@ -360,8 +384,24 @@ func checkBelow(c int, r int, board [][]string, name string, d, avail int) int {
 	}
 }
 
-// signature: col, row, board, name, distance.
-// check if 'name' is found on a point on the board with distance d from point (c, r).
-// returns -1 if a different name is found, 0 if nothing is there and 1 if 'name' is found on that point.
+func merge(cs ...<-chan int) <-chan int {
+    var wg sync.WaitGroup
+    out := make(chan int)
 
-type PointRater func(c int, r int, game *Game, name string)
+    output := func(c <-chan int) {
+        for n := range c {
+            out <- n
+        }
+        wg.Done()
+    }
+    wg.Add(len(cs))
+    for _, c := range cs {
+        go output(c)
+    }
+
+    go func() {
+        wg.Wait()
+        close(out)
+    }()
+    return out
+}

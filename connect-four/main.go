@@ -200,6 +200,10 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
+func playIntelligent(game *Game, depth int) (int, int, error) {
+	return 0, 0, nil
+}
+
 // checks if the insert at position (c, r) lead to a win for the player with that token
 // sets the Winner-field on the game, if so.
 func setWinner(c int, r int, game *Game) {
@@ -209,8 +213,16 @@ func setWinner(c int, r int, game *Game) {
 	}
 }
 
-// checks if an insert of the string 'name' at position (c, r) wins the game
-func insertWins(c int, r int, name string, game *Game) bool {
+func insertWins(c, r int, name string, game *Game) bool {
+	rate := rateInsert(c, r, name, game) + 1 // count self
+	if rate >= game.Win {
+		return true
+	}
+	return false
+}
+
+// get max rate of insert at pos (c, r), regarding all possible axis on the board
+func rateInsert(c int, r int, name string, game *Game) int {
 	cr := rateAlongAxis(c, r, game, name, "c-r", checkCrossRightUp, checkCrossLeftDown)
 	cl := rateAlongAxis(c, r, game, name, "c-l", checkCrossLeftUp, checkCrossRightDown)
 	rl := rateAlongAxis(c, r, game, name, "r-l", checkRightOf, checkLeftOf)
@@ -221,15 +233,11 @@ func insertWins(c int, r int, name string, game *Game) bool {
 	for r := range merge(cr, cl, rl, ab) {
 		axis++
 		rate = max(rate, r)
-		if rate +1 >= game.Win {
-			// rate of surrounding + yourself
-			return true
-		}
 		if axis == 4 {
-			return false
+			break
 		}
 	}
-	return false
+	return rate
 }
 
 
@@ -244,11 +252,12 @@ func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointC
 		
 		ratesPc1, maxD1 := ratePoint(c, r, game, name, pc1)
 		ratesPc2, maxD2 := ratePoint(c, r, game, name, pc2)
-		fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1)
-		fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2)
+		fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1, maxD1)
+		fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2, maxD2)
 
-		if maxD1 + maxD2 < game.Win {
+		if maxD1 + maxD2 -1 < game.Win {
 			// cannot form k adjacent chips for name, axis is useless
+			fmt.Println("maxrate for", c, r, dir, -1)
 			res <- -1
 			return 
 		}
@@ -268,7 +277,7 @@ func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointC
 				maxRate = rate1 + rate2
 			}
 		}
-		fmt.Println("maxrate for", c, r, maxRate)
+		fmt.Println("maxrate for", c, r, dir, maxRate)
 		res <- maxRate // axis usable, return rate
 	}()
 	return res
@@ -282,7 +291,7 @@ func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointC
 // introspect k-th neighbor, using the Pointchecker (guarantees angle):
 // found same chip as self: rate at that point is 1 + rates of previos point
 // found empty field: rate for that point is rate of previos point
-// found field out of bounds or unfriendly chip: rate at that point is -1, terminate checking
+// found field out of bounds or unfriendly chip: rate at that point is undefined, terminate checking
 func ratePoint(c, r int, game *Game, name string, pc PointChecker) (map[int]int, int) {
 	rates := make(map[int]int)
 	dist := 1
@@ -294,11 +303,10 @@ func ratePoint(c, r int, game *Game, name string, pc PointChecker) (map[int]int,
 			case 0: // no chip, not out of bounds
 				rates[dist] = rates[dist-1]
 			case -1, -2:
-				rates[dist] = -1
 				break StraightInARow
 			}
 		}
-	return rates, dist-1
+	return rates, dist
 }
 
 // signature: col, row, board, name, distance

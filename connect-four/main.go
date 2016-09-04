@@ -202,42 +202,70 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-// depth = 2
+// first move for a maximizer
 func playIntelligent(game *Game, depth int) (int, int, error) {
-	maximums := make(map[int]int, game.Cols) // col -> val
-	minimums := make(map[int]int, game.Cols) // cal -> val
+	myScore, myCol := -1000, -1
 
 	for c := 0; c < game.Cols; c++ {
-		comBc := make([][]string, game.Cols)
-		copy(comBc, game.Board)
-		_, err := apply(comBc, c, "computooor")
+		boardCopy := make([][]string, game.Cols)
+		copy(boardCopy, game.Board)
+		_, err := apply(boardCopy, c, "computooor")
 		if err != nil {
 			continue
 		}
-		// minimizer need to do this at least once
-		for c2 := 0; c2 < game.Cols; c2++ {
-			pBc := make([][]string, game.Cols)
-			copy(pBc, comBc)
-			r2, err := apply(pBc, c2, "player")
-			if err != nil { // else column full
-				continue
-			}
-			minimums[c2] = 0 - rateInsertAt(c2, r2, "player", pBc, game.Win, game.Rows)
+		fmt.Println("player rates for computer move", c)
+		// what would do player now with this game state?
+		score, _ := lastAlphaBeta(boardCopy, "player", game.Rows, game.Win)
+		if myScore < score {
+			myScore = score
+			myCol = c
 		}
-		pMin, pCol := min(minimums)
-		fmt.Println("player rates for computer move", c, minimums, "would pick col", pCol)
-
-		maximums[c] = pMin
 	}
-	_, cCol := max(maximums)
-	fmt.Println("player will choose smallest of", maximums, "so i pick the highest. thats col", cCol)
-	myRow, err := apply(game.Board, cCol, "computooor")
+	fmt.Println("i pick the highest thats column", myCol, "with score", myScore)
+	myRow, err := apply(game.Board, myCol, "computooor")
 	if err != nil {
 		return -1, -1, err
 	}
 	fmt.Println("")
 	fmt.Println("")
-	return cCol, myRow, nil
+	return myCol, myRow, nil
+}
+
+
+// last alpha beta step
+// decides what player 'name' would do now with the given board
+// returns the score of the best decision for that player and the column
+func lastAlphaBeta(board [][]string, name string, maxRows, win int) (int, int) {
+	pScore, cScore, myCol := 1000, -1000, -1
+	// minimizer need to do this at least once
+	for c := 0; c < len(board); c++ {
+		bCopy := make([][]string, len(board))
+		copy(bCopy, board)
+		r, err := apply(bCopy, c, name)
+		if err != nil { // else column full
+			continue
+		}
+		switch name {
+		case "player": // minimizer
+			ps := 0 - rateInsertAt(c, r, name, bCopy, win, maxRows)
+			if ps < pScore {
+				pScore = ps
+				myCol = c
+			}
+		case "computooor": // maximizer
+			cs := rateInsertAt(c, r, name, bCopy, win, maxRows)
+			if cs > cScore {
+				cScore = cs
+				myCol = c
+			}
+		}
+	}
+	if name == "player" {
+		fmt.Println(name, "would pick column", myCol, "with score", pScore )
+		return pScore, myCol
+	}
+	fmt.Println(name, "would pick column", myCol, "with score", cScore )
+	return cScore, myCol
 }
 
 // checks if the insert at position (c, r) lead to a win for the player with that token
@@ -480,36 +508,16 @@ func merge(cs ...<-chan int) <-chan int {
 	return out
 }
 
-// returns the max value of passed map and its key. if multiple vals are highest, the first found
-// key is returned for that val. only considers vals that have a key
-func max(nums map[int]int) (int, int) {
-	if len(nums) == 0 {
-		return 0, 0
+func max(a, b int) int {
+	if a < b {
+		return b
 	}
-	max := -1000
-	idx := -1
-	for i, num := range nums {
-		if max < num {
-			max = num
-			idx = i
-		}
-	}
-	return max, idx
+	return a
 }
 
-// returns the min value of passed map and its key. if multiple vals are lowest, the first found
-// key is returned for that val. only considers vals that have a key
-func min(nums map[int]int) (int, int) {
-	if len(nums) == 0 {
-		return 0, 0
+func min(a, b int) int {
+	if a > b {
+		return b
 	}
-	min := 1000
-	idx := -1
-	for i, num := range nums {
-		if min > num {
-			min = num
-			idx = i
-		}
-	}
-	return min, idx
+	return a
 }

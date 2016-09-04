@@ -38,8 +38,15 @@ export default function board(state = initialState, action) {
 		};
 	case ACTIONS.NEW_GAME_SUCCESS:
 		return { 
-			...state, 
-			gameId: action.response['Id']
+			...state,
+			gameId: action.response['Id'],
+			board: initialState.board,
+			isPlaying: initialState.isPlaying,
+			playError: initialState.playError,
+			columns: initialState.columns,
+			rows: initialState.rows,
+			winner: initialState.winner
+
 		};
 	default:
 		return state;
@@ -49,7 +56,10 @@ export default function board(state = initialState, action) {
 function apply(board, body, response) {
 	const pCol = body.col; // player insert column
 	const cCol = response.col; // computer insert column
-	let muteBoard = [...board];
+	let muteBoard = [];
+	board.map((row, i) => {
+		muteBoard[i] = [...row];
+	});
 	muteBoard[pCol].push('player');
 	if (cCol > -1) {
 		muteBoard[cCol].push('computer');

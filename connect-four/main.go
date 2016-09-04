@@ -214,15 +214,13 @@ func insertWins(c int, r int, name string, game *Game) bool {
 	cr := rateAlongAxis(c, r, game, name, "c-r", checkCrossRightUp, checkCrossLeftDown)
 	cl := rateAlongAxis(c, r, game, name, "c-l", checkCrossLeftUp, checkCrossRightDown)
 	rl := rateAlongAxis(c, r, game, name, "r-l", checkRightOf, checkLeftOf)
-	blw := rateAlongAxis(c, r, game, name, "blw", checkBelow)
+	ab := rateAlongAxis(c, r, game, name, "a-b", checkAbove, checkBelow)
 
 	rate := 0
 	axis := 0
-	for r := range merge(cr, cl, rl, blw) {
-		axis ++
-		if rate < r {
-			rate = r
-		}
+	for r := range merge(cr, cl, rl, ab) {
+		axis++
+		rate = max(rate, r)
 		if rate +1 >= game.Win {
 			// rate of surrounding + yourself
 			return true
@@ -235,55 +233,72 @@ func insertWins(c int, r int, name string, game *Game) bool {
 }
 
 
-// rates the point (c, r) along an axis that is specified by the provided Pointcheckers
-// calculates the rate for that axis and pushes it into the result channel. If the axis
-// is not usable because one cannot win with that axis, it has value 0.
-func rateAlongAxis(c int, r int, game *Game, name string, dir string, pcs ...PointChecker) <-chan int {
+// rates the point (c, r) along an axis that is specified by the provided Pointcheckers.
+// calculates the rate for that axis and pushes it into the result channel. 
+// If the axis is not usable because one cannot win with that axis, it has value -1.
+// else the rate of an axis is defined as the max of all rates that are 
+// found in distance d = game.Win from (c, r)
+func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
 	res := make(chan int)
 	go func() {
-		subRates := make([]int, len(pcs), len(pcs))
-		subDists := make([]int, len(pcs), len(pcs))
-		for i, pc := range pcs {
-			subRates[i], subDists[i] = ratePoint(c, r, game, name, pc)
-			fmt.Println("rating for", c, r, dir, subRates[i])
-		}
-		rate, dist := 0, 0
-		for i := 0; i < len(pcs); i++ {
-			rate += subRates[i]
-			dist += subDists[i]
-		}
-		if dist < game.Win {
-			// not enough fields in a row usable for 'name', whole axis is not valuable
+		
+		ratesPc1, maxD1 := ratePoint(c, r, game, name, pc1)
+		ratesPc2, maxD2 := ratePoint(c, r, game, name, pc2)
+		fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1)
+		fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2)
+
+		if maxD1 + maxD2 < game.Win {
+			// cannot form k adjacent chips for name, axis is useless
 			res <- -1
-			return
+			return 
 		}
-		res <- rate // axis usable, return rate
+
+		maxRate := 0 // holds the maximal rate that is possible within a game winning dist
+		for i := 0; i < game.Win; i++ {
+			// build possible distances
+			rate1, ok1 := ratesPc1[i]
+			rate2, ok2 := ratesPc2[game.Win - i]
+			if !ok1 && ok2 && maxRate < rate2 {
+				maxRate = rate2
+			}
+			if ok1 && !ok2 && maxRate < rate1 {
+				maxRate = rate1
+			}
+			if ok1 && ok2 && maxRate < rate1 + rate2 {
+				maxRate = rate1 + rate2
+			}
+		}
+		fmt.Println("maxrate for", c, r, maxRate)
+		res <- maxRate // axis usable, return rate
 	}()
 	return res
 }
 
 // rates the point (c, r) in the context of 'game' and uses the given pointchecker.
-// returns the rate and the max distance of fields that were considered for rating.
+// returns the rate for each distance of fields that were considered for rating as a map,
+// eg. at dist 1: rate 0, at dist 2 : rate 1 etc..
+// returns the max dist of considered points as second argument.
 // rating function:
-// introspect next neighbor, using the Pointchecker:
-// found same chip as self: increments the rate by one
-// found empty field: no influence to rate
-// found field out of bounds or unfriendly chip: terminate checking
-func ratePoint(c, r int, game *Game, name string, pc PointChecker) (int, int) {
-	rate := 0
+// introspect k-th neighbor, using the Pointchecker (guarantees angle):
+// found same chip as self: rate at that point is 1 + rates of previos point
+// found empty field: rate for that point is rate of previos point
+// found field out of bounds or unfriendly chip: rate at that point is -1, terminate checking
+func ratePoint(c, r int, game *Game, name string, pc PointChecker) (map[int]int, int) {
+	rates := make(map[int]int)
 	dist := 1
 	StraightInARow:
 		for ; dist < game.Win; dist++ {
 			switch pc(c, r, game.Board, name, dist, game.Rows) {
 			case 1: // same chip
-				rate++
+				rates[dist] = rates[dist-1] + 1
 			case 0: // no chip, not out of bounds
-				break
+				rates[dist] = rates[dist-1]
 			case -1, -2:
+				rates[dist] = -1
 				break StraightInARow
 			}
 		}
-	return rate, dist
+	return rates, dist-1
 }
 
 // signature: col, row, board, name, distance
@@ -417,4 +432,11 @@ func merge(cs ...<-chan int) <-chan int {
         close(out)
     }()
     return out
+}
+
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
 }

@@ -51,7 +51,7 @@ export class Main extends Component {
 
     render() {
         const { content, hideFixHint } = this.state;
-        const { board, cols, rows } = this.props;
+        const { board, cols, rows, newGame } = this.props;
         if (content == undefined) {
             return null;
         }
@@ -70,6 +70,7 @@ export class Main extends Component {
                     })}
                 </div>
                 <object className='gopher__left'/>
+                <button onClick={newGame}>Ding Dong</button>
                 <ConnectFourBoard play={this.play} board={board} rows={rows} cols={cols} />
             </main>
         );

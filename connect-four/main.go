@@ -200,10 +200,6 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-func playIntelligent(game *Game, depth int) (int, int, error) {
-	return 0, 0, nil
-}
-
 // checks if the insert at position (c, r) lead to a win for the player with that token
 // sets the Winner-field on the game, if so.
 func setWinner(c int, r int, game *Game) {
@@ -214,7 +210,7 @@ func setWinner(c int, r int, game *Game) {
 }
 
 func insertWins(c, r int, name string, game *Game) bool {
-	rate := rateInsert(c, r, name, game) + 1 // count self
+	rate := rateInsertAt(c, r, name, game) + 1 // count self
 	if rate >= game.Win {
 		return true
 	}
@@ -222,7 +218,7 @@ func insertWins(c, r int, name string, game *Game) bool {
 }
 
 // get max rate of insert at pos (c, r), regarding all possible axis on the board
-func rateInsert(c int, r int, name string, game *Game) int {
+func rateInsertAt(c int, r int, name string, game *Game) int {
 	cr := rateAlongAxis(c, r, game, name, "c-r", checkCrossRightUp, checkCrossLeftDown)
 	cl := rateAlongAxis(c, r, game, name, "c-l", checkCrossLeftUp, checkCrossRightDown)
 	rl := rateAlongAxis(c, r, game, name, "r-l", checkRightOf, checkLeftOf)
@@ -240,40 +236,39 @@ func rateInsert(c int, r int, name string, game *Game) int {
 	return rate
 }
 
-
 // rates the point (c, r) along an axis that is specified by the provided Pointcheckers.
-// calculates the rate for that axis and pushes it into the result channel. 
+// calculates the rate for that axis and pushes it into the result channel.
 // If the axis is not usable because one cannot win with that axis, it has value -1.
-// else the rate of an axis is defined as the max of all rates that are 
+// else the rate of an axis is defined as the max of all rates that are
 // found in distance d = game.Win from (c, r)
 func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
 	res := make(chan int)
 	go func() {
-		
+
 		ratesPc1, maxD1 := ratePoint(c, r, game, name, pc1)
 		ratesPc2, maxD2 := ratePoint(c, r, game, name, pc2)
 		fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1, maxD1)
 		fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2, maxD2)
 
-		if maxD1 + maxD2 -1 < game.Win {
+		if maxD1+maxD2-1 < game.Win {
 			// cannot form k adjacent chips for name, axis is useless
 			fmt.Println("maxrate for", c, r, dir, -1)
 			res <- -1
-			return 
+			return
 		}
 
 		maxRate := 0 // holds the maximal rate that is possible within a game winning dist
 		for i := 0; i < game.Win; i++ {
 			// build possible distances
 			rate1, ok1 := ratesPc1[i]
-			rate2, ok2 := ratesPc2[game.Win - i]
+			rate2, ok2 := ratesPc2[game.Win-i]
 			if !ok1 && ok2 && maxRate < rate2 {
 				maxRate = rate2
 			}
 			if ok1 && !ok2 && maxRate < rate1 {
 				maxRate = rate1
 			}
-			if ok1 && ok2 && maxRate < rate1 + rate2 {
+			if ok1 && ok2 && maxRate < rate1+rate2 {
 				maxRate = rate1 + rate2
 			}
 		}
@@ -295,17 +290,17 @@ func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointC
 func ratePoint(c, r int, game *Game, name string, pc PointChecker) (map[int]int, int) {
 	rates := make(map[int]int)
 	dist := 1
-	StraightInARow:
-		for ; dist < game.Win; dist++ {
-			switch pc(c, r, game.Board, name, dist, game.Rows) {
-			case 1: // same chip
-				rates[dist] = rates[dist-1] + 1
-			case 0: // no chip, not out of bounds
-				rates[dist] = rates[dist-1]
-			case -1, -2:
-				break StraightInARow
-			}
+StraightInARow:
+	for ; dist < game.Win; dist++ {
+		switch pc(c, r, game.Board, name, dist, game.Rows) {
+		case 1: // same chip
+			rates[dist] = rates[dist-1] + 1
+		case 0: // no chip, not out of bounds
+			rates[dist] = rates[dist-1]
+		case -1, -2:
+			break StraightInARow
 		}
+	}
 	return rates, dist
 }
 
@@ -421,30 +416,33 @@ func checkBelow(c int, r int, board [][]string, name string, d, avail int) int {
 }
 
 func merge(cs ...<-chan int) <-chan int {
-    var wg sync.WaitGroup
-    out := make(chan int)
+	var wg sync.WaitGroup
+	out := make(chan int)
 
-    output := func(c <-chan int) {
-        for n := range c {
-            out <- n
-        }
-        wg.Done()
-    }
-    wg.Add(len(cs))
-    for _, c := range cs {
-        go output(c)
-    }
+	output := func(c <-chan int) {
+		for n := range c {
+			out <- n
+		}
+		wg.Done()
+	}
+	wg.Add(len(cs))
+	for _, c := range cs {
+		go output(c)
+	}
 
-    go func() {
-        wg.Wait()
-        close(out)
-    }()
-    return out
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+	return out
 }
 
-func max(a, b int) int {
-	if a < b {
-		return b
+func max(nums ...int) int {
+	max := nums[1]
+	for _, num := range nums {
+		if max < num {
+			max = num
+		}
 	}
-	return a
+	return max
 }

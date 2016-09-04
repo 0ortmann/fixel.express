@@ -111,7 +111,7 @@ func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	game := NewGame(7, 6, 4, "random")
+	game := NewGame(7, 6, 4, "intelligent")
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
@@ -182,6 +182,8 @@ func autoPlay(game *Game) (int, int, error) {
 	switch game.Mode {
 	case "random":
 		return playRandom(game)
+	case "intelligent":
+		return playIntelligent(game, 2)
 	}
 	return -1, -1, errors.New("Unknown game mode")
 }
@@ -202,11 +204,40 @@ func playRandom(game *Game) (int, int, error) {
 
 // depth = 2
 func playIntelligent(game *Game, depth int) (int, int, error) {
+	maximums := make(map[int]int, game.Cols) // col -> val
+	minimums := make(map[int]int, game.Cols) // cal -> val
+
 	for c := 0; c < game.Cols; c++ {
+		comBc := make([][]string, game.Cols)
+		copy(comBc, game.Board)
+		_, err := apply(comBc, c, "computooor")
+		if err != nil {
+			continue
+		}
+		// minimizer need to do this at least once
+		for c2 := 0; c2 < game.Cols; c2++ {
+			pBc := make([][]string, game.Cols)
+			copy(pBc, comBc)
+			r2, err := apply(pBc, c2, "player")
+			if err != nil { // else column full
+				continue
+			}
+			minimums[c2] = 0 - rateInsertAt(c2, r2, "player", pBc, game.Win, game.Rows)
+		}
+		pMin, pCol := min(minimums)
+		fmt.Println("player rates for computer move", c, minimums, "would pick col", pCol)
 
+		maximums[c] = pMin
 	}
-
-	return -1, -1, errors.New("No more usable columns, all full!")
+	_, cCol := max(maximums)
+	fmt.Println("player will choose smallest of", maximums, "so i pick the highest. thats col", cCol)
+	myRow, err := apply(game.Board, cCol, "computooor")
+	if err != nil {
+		return -1, -1, err
+	}
+	fmt.Println("")
+	fmt.Println("")
+	return cCol, myRow, nil
 }
 
 // checks if the insert at position (c, r) lead to a win for the player with that token
@@ -237,7 +268,9 @@ func rateInsertAt(c int, r int, name string, board [][]string, dist int, rows in
 	axis := 0
 	for r := range merge(cr, cl, rl, ab) {
 		axis++
-		rate = max(rate, r)
+		if rate < r {
+			rate = r
+		}
 		if axis == 4 {
 			break
 		}
@@ -256,12 +289,12 @@ func rateAlongAxis(c int, r int, name string, board [][]string, dist int, rows i
 
 		ratesPc1, maxD1 := ratePoint(c, r, name, board, dist, rows, pc1)
 		ratesPc2, maxD2 := ratePoint(c, r, name, board, dist, rows, pc2)
-		fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1, maxD1)
-		fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2, maxD2)
+		//fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1, maxD1)
+		//fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2, maxD2)
 
 		if maxD1+maxD2-1 < dist {
 			// cannot form k adjacent chips for name, axis is useless
-			fmt.Println("maxrate for", c, r, dir, -1)
+			//fmt.Println("maxrate for", c, r, dir, -1)
 			res <- -1
 			return
 		}
@@ -281,7 +314,7 @@ func rateAlongAxis(c int, r int, name string, board [][]string, dist int, rows i
 				maxRate = rate1 + rate2
 			}
 		}
-		fmt.Println("maxrate for", c, r, dir, maxRate)
+		//fmt.Println("maxrate for", c, r, dir, maxRate)
 		res <- maxRate // axis usable, return rate
 	}()
 	return res
@@ -388,6 +421,7 @@ func checkLeftOf(c int, r int, board [][]string, name string, d, avail int) int 
 }
 
 func checkRightOf(c int, r int, board [][]string, name string, d, avail int) int {
+	//fmt.Println("check right of", c, r, d)
 	switch {
 	case c+d >= len(board) || r >= avail:
 		return -1
@@ -446,12 +480,36 @@ func merge(cs ...<-chan int) <-chan int {
 	return out
 }
 
-func max(nums ...int) int {
-	max := nums[1]
-	for _, num := range nums {
+// returns the max value of passed map and its key. if multiple vals are highest, the first found
+// key is returned for that val. only considers vals that have a key
+func max(nums map[int]int) (int, int) {
+	if len(nums) == 0 {
+		return 0, 0
+	}
+	max := -1000
+	idx := -1
+	for i, num := range nums {
 		if max < num {
 			max = num
+			idx = i
 		}
 	}
-	return max
+	return max, idx
+}
+
+// returns the min value of passed map and its key. if multiple vals are lowest, the first found
+// key is returned for that val. only considers vals that have a key
+func min(nums map[int]int) (int, int) {
+	if len(nums) == 0 {
+		return 0, 0
+	}
+	min := 1000
+	idx := -1
+	for i, num := range nums {
+		if min > num {
+			min = num
+			idx = i
+		}
+	}
+	return min, idx
 }

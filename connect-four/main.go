@@ -138,24 +138,24 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if game.Winner != "" {
 		return errors.New("Game already ended, winner was " + game.Winner)
 	}
-	pRow, err := apply(game, post.Col, "player")
+	pRow, err := apply(game.Board, post.Col, "player")
 	if err != nil {
 		return err
 	}
 	setWinner(post.Col, pRow, game)
 	if game.Winner != "" {
-		return playResult(w, game, -1)
+		return sendResult(w, game, -1)
 	}
 	cCol, cRow, err := autoPlay(game)
 	if err != nil {
 		return err
 	}
 	setWinner(cCol, cRow, game)
-	return playResult(w, game, cCol)
+	return sendResult(w, game, cCol)
 }
 
 // fomulate a response with game winner (may be empty) and the column picked by the computer
-func playResult(w http.ResponseWriter, game *Game, cCol int) error {
+func sendResult(w http.ResponseWriter, game *Game, cCol int) error {
 	type Resp struct {
 		Col    int    `json:"col"`
 		Winner string `json:"winner"`
@@ -169,12 +169,12 @@ func playResult(w http.ResponseWriter, game *Game, cCol int) error {
 
 // put a token with value "player" into the column "col".
 // Returns the row it was inserted into and an error if the column is already full
-func apply(game *Game, col int, player string) (int, error) {
-	if len(game.Board[col]) == 6 {
+func apply(board [][]string, col int, player string) (int, error) {
+	if len(board[col]) == 6 {
 		return -1, errors.New("Column already full")
 	}
-	game.Board[col] = append(game.Board[col], player)
-	return len(game.Board[col]) - 1, nil
+	board[col] = append(board[col], player)
+	return len(board[col]) - 1, nil
 }
 
 // The computer plays automatically and returns the column number and row where a chip was inserted
@@ -192,7 +192,7 @@ func playRandom(game *Game) (int, int, error) {
 	c := int(rCol.Int64())
 	for i := 0; i < 6; i++ {
 		c = (c + i) % 6
-		r, err := apply(game, c, "computooor")
+		r, err := apply(game.Board, c, "computooor")
 		if err == nil {
 			return c, r, nil
 		}

@@ -297,7 +297,7 @@ type PointChecker func(int, int, [][]string, string, int, int) int
 
 func checkCrossRightUp(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
-	case c+d >= len(board) || r+d > avail:
+	case c+d >= len(board) || r+d >= avail:
 		return -1 // out of bounds
 	case r+d >= len(board[c+d]):
 		return 0 // empty
@@ -336,7 +336,7 @@ func checkCrossLeftDown(c int, r int, board [][]string, name string, d, avail in
 
 func checkCrossLeftUp(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
-	case c-d < 0 || r+d > avail:
+	case c-d < 0 || r+d >= avail:
 		return -1
 	case r+d >= len(board[c-d]):
 		return 0
@@ -349,7 +349,7 @@ func checkCrossLeftUp(c int, r int, board [][]string, name string, d, avail int)
 
 func checkLeftOf(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
-	case c-d < 0 || r > avail:
+	case c-d < 0 || r >= avail:
 		return -1
 	case r >= len(board[c-d]):
 		return 0
@@ -362,11 +362,24 @@ func checkLeftOf(c int, r int, board [][]string, name string, d, avail int) int 
 
 func checkRightOf(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
-	case c+d >= len(board) || r > avail:
+	case c+d >= len(board) || r >= avail:
 		return -1
 	case r >= len(board[c+d]):
 		return 0
 	case name == board[c+d][r]:
+		return 1
+	default:
+		return -2
+	}
+}
+
+func checkAbove(c int, r int, board [][]string, name string, d, avail int) int {
+	switch {
+	case c >= len(board) || r+d >= avail:
+		return -1
+	case r+d >= len(board[c]):
+		return 0
+	case name == board[c][r+d]:
 		return 1
 	default:
 		return -2

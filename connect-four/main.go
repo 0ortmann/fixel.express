@@ -190,10 +190,9 @@ func autoPlay(game *Game) (int, int, error) {
 
 func playRandom(game *Game) (int, int, error) {
 	// has to terminate if all cols are full
-	rCol, _ := rand.Int(rand.Reader, big.NewInt(7))
-	c := int(rCol.Int64())
-	for i := 0; i < 6; i++ {
-		c = (c + i) % 6
+	c := randomNumber(7)
+	for i := 0; i < game.Rows; i++ {
+		c = (c + i) % game.Rows
 		r, err := apply(game.Board, c, "computooor")
 		if err == nil {
 			return c, r, nil
@@ -202,70 +201,99 @@ func playRandom(game *Game) (int, int, error) {
 	return -1, -1, errors.New("No more usable columns, all full!")
 }
 
-// first move for a maximizer
+// provides a starting point to the alpha beta algorithm, using the computooor player
 func playIntelligent(game *Game, depth int) (int, int, error) {
-	myScore, myCol := -1000, -1
 
-	for c := 0; c < game.Cols; c++ {
-		boardCopy := make([][]string, game.Cols)
-		copy(boardCopy, game.Board)
-		_, err := apply(boardCopy, c, "computooor")
-		if err != nil {
-			continue
-		}
-		fmt.Println("player rates for computer move", c)
-		// what would do player now with this game state?
-		score, _ := lastAlphaBeta(boardCopy, "player", game.Rows, game.Win)
-		if myScore < score {
-			myScore = score
-			myCol = c
-		}
+	alpha, beta := -1000, 1000
+	_, col := goMaximizer(depth-1, alpha, beta, game.Board, "computooor", game.Rows, game.Win)
+	
+	row, err := apply(game.Board, col, "computooor")
+	if err != nil { // column full
+		panic("column full")
 	}
-	fmt.Println("i pick the highest thats column", myCol, "with score", myScore)
-	myRow, err := apply(game.Board, myCol, "computooor")
-	if err != nil {
-		return -1, -1, err
-	}
-	fmt.Println("")
-	fmt.Println("")
-	return myCol, myRow, nil
+	return col, row, nil
 }
 
+// alpha is best score for computer so far in seachtree
+// beta is best score for player so far in seachtree
+//
+// returns the best possible score for 'name' when thinking 'depth' turns ahead
+// asserts that 'name' wants to insert a token at (col, row) into the board
+func alphaBeta(depth, alpha, beta, col, row int, board [][]string, name string, maxRows, win int) (int, int) {
 
-// last alpha beta step
-// decides what player 'name' would do now with the given board
-// returns the score of the best decision for that player and the column
-func lastAlphaBeta(board [][]string, name string, maxRows, win int) (int, int) {
-	pScore, cScore, myCol := 1000, -1000, -1
-	// minimizer need to do this at least once
+	if depth == 0 {
+		// an axis has a value or is not usable (val = -1)
+		s := scoreInsertAt(col, row, name, board, win, maxRows)
+		if s < 0 {
+			s = -1000 // axis not usable
+		}
+		if name == "computooor" { // maximizer
+			//fmt.Println("Eval rate at", col, row, "for name", name, "score", s)
+			return s, col
+		}
+		//fmt.Println("Eval rate at", col, row, "for name", name, "score", 0-s)
+		return 0-s, col
+
+	}
+	// simulate move and aggreate via alpha beta again whats best
+	if name == "computooor" { // maximizer
+		return goMaximizer(depth, alpha, beta, board, name, maxRows, win)
+	}
+	return goMinimizer(depth, alpha, beta, board, name, maxRows, win)
+}
+
+func goMaximizer(depth, alpha, beta int, board [][]string, name string, maxRows, win int) (int, int) {
+	// until all possible columns examined or alpha gte beta
+	score := -1000
+	posColumns := make(map[int][]int) // for randomness, score -> 'cols with that score'
 	for c := 0; c < len(board); c++ {
 		bCopy := make([][]string, len(board))
 		copy(bCopy, board)
 		r, err := apply(bCopy, c, name)
-		if err != nil { // else column full
+		if err != nil { // column full
 			continue
 		}
-		switch name {
-		case "player": // minimizer
-			ps := 0 - rateInsertAt(c, r, name, bCopy, win, maxRows)
-			if ps < pScore {
-				pScore = ps
-				myCol = c
-			}
-		case "computooor": // maximizer
-			cs := rateInsertAt(c, r, name, bCopy, win, maxRows)
-			if cs > cScore {
-				cScore = cs
-				myCol = c
-			}
+		s, _ := alphaBeta(depth-1, alpha, beta, c, r, bCopy, "player", maxRows, win)
+		s = 0-s
+		if s >= score {
+			score = s
+			posColumns[s] = append(posColumns[s], c)
+		}
+		alpha = max(score, alpha)
+		if beta <= alpha {
+			break
 		}
 	}
-	if name == "player" {
-		fmt.Println(name, "would pick column", myCol, "with score", pScore )
-		return pScore, myCol
+	c := posColumns[score][randomNumber(len(posColumns[score]))]
+	fmt.Println("Max++", depth, c, "with options", posColumns[score], "with score", score, "a b was", alpha, beta)
+	return score, c
+}
+
+func goMinimizer(depth, alpha, beta int, board [][]string, name string, maxRows, win int) (int, int) {
+	// until all possible columns examined or alpha gte beta
+	score := 1000
+	posColumns := make(map[int][]int) // for randomness, score -> 'cols with that score'
+	for c := 0; c < len(board); c++ {
+		bCopy := make([][]string, len(board))
+		copy(bCopy, board)
+		r, err := apply(bCopy, c, name)
+		if err != nil { // column full
+			continue
+		}
+		s, _ := alphaBeta(depth-1, alpha, beta, c, r, bCopy, "computooor", maxRows, win)
+		s = 0-s
+		if s <= score {
+			score = s
+			posColumns[s] = append(posColumns[s], c)
+		}
+		if beta <= alpha {
+			break
+		}
+		beta = min(score, beta)
 	}
-	fmt.Println(name, "would pick column", myCol, "with score", cScore )
-	return cScore, myCol
+	c := posColumns[score][randomNumber(len(posColumns[score]))]
+	fmt.Println("Min--", depth, c, "with options", posColumns[score], "with score", score, "a b was", alpha, beta)
+	return score, c
 }
 
 // checks if the insert at position (c, r) lead to a win for the player with that token
@@ -278,27 +306,25 @@ func setWinner(c int, r int, game *Game) {
 }
 
 func insertWins(c, r int, name string, game *Game) bool {
-	rate := rateInsertAt(c, r, name, game.Board, game.Win, game.Rows) + 1 // count self
-	if rate >= game.Win {
+	rate := scoreInsertAt(c, r, name, game.Board, game.Win, game.Rows) + 1 // count self
+	if rate >= game.Win * game.Win {
 		return true
 	}
 	return false
 }
 
 // get max rate of insert at pos (c, r), regarding all possible axis on the board
-func rateInsertAt(c int, r int, name string, board [][]string, dist int, rows int) int {
-	cr := rateAlongAxis(c, r, name, board, dist, rows, "c-r", checkCrossRightUp, checkCrossLeftDown)
-	cl := rateAlongAxis(c, r, name, board, dist, rows, "c-l", checkCrossLeftUp, checkCrossRightDown)
-	rl := rateAlongAxis(c, r, name, board, dist, rows, "r-l", checkRightOf, checkLeftOf)
-	ab := rateAlongAxis(c, r, name, board, dist, rows, "a-b", checkAbove, checkBelow)
+func scoreInsertAt(c int, r int, name string, board [][]string, dist int, rows int) int {
+	cr := scoreAxis(c, r, name, board, dist, rows, "c-r", checkCrossRightUp, checkCrossLeftDown)
+	cl := scoreAxis(c, r, name, board, dist, rows, "c-l", checkCrossLeftUp, checkCrossRightDown)
+	rl := scoreAxis(c, r, name, board, dist, rows, "r-l", checkRightOf, checkLeftOf)
+	ab := scoreAxis(c, r, name, board, dist, rows, "a-b", checkAbove, checkBelow)
 
 	rate := 0
 	axis := 0
 	for r := range merge(cr, cl, rl, ab) {
 		axis++
-		if rate < r {
-			rate = r
-		}
+		rate = max(rate, r)
 		if axis == 4 {
 			break
 		}
@@ -308,143 +334,161 @@ func rateInsertAt(c int, r int, name string, board [][]string, dist int, rows in
 
 // rates the point (c, r) along an axis that is specified by the provided Pointcheckers.
 // calculates the rate for that axis and pushes it into the result channel.
-// If the axis is not usable because one cannot win with that axis, it has value -1.
+// If the axis is not usable, it has value -1.
 // else the rate of an axis is defined as the max of all rates that are
 // found in distance d = game.Win from (c, r)
-func rateAlongAxis(c int, r int, name string, board [][]string, dist int, rows int, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
+
+
+// Scores the axis, which is defined by the composition of the provided pointcheckers.
+// (c, r) is used as center of the axis, scoring takes place for the given 'name' asserting 'k' as
+// necessary amount of similar pieces in a line for winning.
+// 'rows' is needed for boundary checking
+// Scoring function: 
+// the rate of on axis is either -1 if it is not usable
+// or the maximum o.t. sums of all possible-neighbor scores over all lines of length k
+func scoreAxis(c int, r int, name string, board [][]string, k int, rows int, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
 	res := make(chan int)
 	go func() {
 
-		ratesPc1, maxD1 := ratePoint(c, r, name, board, dist, rows, pc1)
-		ratesPc2, maxD2 := ratePoint(c, r, name, board, dist, rows, pc2)
-		//fmt.Println("distances rated", c, r, dir, "pc1", ratesPc1, maxD1)
-		//fmt.Println("distances rated", c, r, dir, "pc2", ratesPc2, maxD2)
-
-		if maxD1+maxD2-1 < dist {
+		scoresPc1 := scoreNeighbors(c, r, name, board, k, rows, pc1, dir)
+		scoresPc2 := scoreNeighbors(c, r, name, board, k, rows, pc2, dir)
+		//fmt.Println("distances rated", c, r, dir, "pc1", scoresPc1)
+		//fmt.Println("distances rated", c, r, dir, "pc2", scoresPc2)
+		
+		if len(scoresPc1)+len(scoresPc2)+1 < k {
 			// cannot form k adjacent chips for name, axis is useless
 			//fmt.Println("maxrate for", c, r, dir, -1)
 			res <- -1
 			return
 		}
 
-		maxRate := 0 // holds the maximal rate that is possible within a game winning dist
-		for i := 0; i < dist; i++ {
-			// build possible distances
-			rate1, ok1 := ratesPc1[i]
-			rate2, ok2 := ratesPc2[dist-i-1]
-			if !ok1 && ok2 && maxRate < rate2 {
-				maxRate = rate2
-			}
-			if ok1 && !ok2 && maxRate < rate1 {
-				maxRate = rate1
-			}
-			if ok1 && ok2 && maxRate < rate1+rate2 {
-				maxRate = rate1 + rate2
-			}
+		axis := toAxis(scoresPc1, scoresPc2, k)
+
+		maxScore := -1 // holds the maximal score that is possible within a game-winning dist
+		for i := 0; i < len(axis) - k; i++ {
+			maxScore = max(maxScore, sum(axis, i, i+k))
 		}
-		//fmt.Println("maxrate for", c, r, dir, maxRate)
-		res <- maxRate // axis usable, return rate
+		//fmt.Println("maxScore for", c, r, dir, maxScore)
+		res <- maxScore // axis usable, return rate
 	}()
 	return res
 }
 
-// rates the point (c, r) in on the 'board' with bounds 'maxDist' and 'maxRows' and uses the given pointchecker.
-// returns the rate for each distance of fields that were considered for rating as a map,
-// eg. at dist 1: rate 0, at dist 2 : rate 1 etc..
-// returns the max dist of considered points as second argument.
-// rating function:
-// introspect k-th neighbor, using the Pointchecker (guarantees angle):
-// found same chip as self: rate at that point is 1 + rates of previos point
-// found empty field: rate for that point is rate of previos point
-// found field out of bounds or unfriendly chip: rate at that point is undefined, terminate checking
-func ratePoint(c, r int, name string, board [][]string, maxDist int, maxRows int, pc PointChecker) (map[int]int, int) {
-	rates := make(map[int]int)
-	dist := 1
-StraightInARow:
-	for ; dist < maxDist; dist++ {
+// Scores the neighbors of point (c, r) on the board with bound 'maxRows' and k as necessary amuont to win
+// The provided Pointchecker is used for checking the state of the neighbors up to a distance of 'k'.
+// The Pointchecker itself guarantees staying in a correct angle.
+// Returns the scores for the neighbors as map of dist(neighbor) -> score(neighbor)
+// scoring function - scores the neighbors based on its property:
+// UNR : 0
+// EMPTY : 1
+// FRIEND : k (k is the win condition on the game, say 4)
+// FOE / OOB : terminate, do not expand result map any more
+func scoreNeighbors(c, r int, name string, board [][]string, k, maxRows int, pc PointChecker, dir string) map[int]int {
+	scores := make(map[int]int)
+	for dist := 1; dist < k; dist++ {
 		switch pc(c, r, board, name, dist, maxRows) {
-		case 1: // same chip
-			rates[dist] = rates[dist-1] + 1
-		case 0: // no chip, not out of bounds
-			rates[dist] = rates[dist-1]
-		case -1, -2:
-			break StraightInARow
+		case OOB, FOE:
+			break
+		case UNR:
+			scores[dist] = 0
+		case EMPTY:
+			scores[dist] = 1
+		case FRIEND:
+			scores[dist] = k
 		}
 	}
-	return rates, dist
+	fmt.Println("scores for", dir, c, r, scores)
+	return scores
 }
+
+// result values of a pointcheck
+const (
+	OOB = iota // out of bounds
+	FRIEND = iota
+	FOE = iota
+	EMPTY = iota
+	UNR = iota // unreachable
+)
 
 // signature: col, row, board, name, distance
 // checks a point (dc, dr) which is 'd' distance away from the point (col, row)
 // for one specific angle (cross/right etc).
-// Returns a 1 if the given name equals the name on (dc, dr),
-// a 0 if (dc, dr) is empty, a -1 if (dc, dr) out of bounds
-// and a -2 if there is a different name found on that found.
-// check if 'name' is found on a point on the board with distance d from point (c, r)
+// Returns a result integer, that indicates if the checked point is
+// out of bounds, un/friendly, empty or unreachable 
 type PointChecker func(int, int, [][]string, string, int, int) int
 
 func checkCrossRightUp(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c+d >= len(board) || r+d >= avail:
-		return -1 // out of bounds
-	case r+d >= len(board[c+d]):
-		return 0 // empty
+		return OOB
+	case r+d > len(board[c+d]):
+		return UNR
+	case r+d == len(board[c+d]):
+		return EMPTY // empty
 	case name == board[c+d][r+d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkCrossRightDown(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c+d >= len(board) || r-d < 0:
-		return -1
-	case r-d >= len(board[c+d]):
-		return 0
+		return OOB
+	case r-d > len(board[c+d]):
+		return UNR
+	case r-d == len(board[c+d]):
+		return EMPTY
 	case name == board[c+d][r-d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkCrossLeftDown(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c-d < 0 || r-d < 0:
-		return -1
-	case r-d >= len(board[c-d]):
-		return 0
+		return OOB
+	case r-d > len(board[c-d]):
+		return UNR
+	case r-d == len(board[c-d]):
+		return EMPTY
 	case name == board[c-d][r-d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkCrossLeftUp(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c-d < 0 || r+d >= avail:
-		return -1
-	case r+d >= len(board[c-d]):
-		return 0
+		return OOB
+	case r+d > len(board[c-d]):
+		return UNR
+	case r+d == len(board[c-d]):
+		return EMPTY
 	case name == board[c-d][r+d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkLeftOf(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c-d < 0 || r >= avail:
-		return -1
-	case r >= len(board[c-d]):
-		return 0
+		return OOB
+	case r > len(board[c-d]):
+		return UNR
+	case r == len(board[c-d]):
+		return EMPTY
 	case name == board[c-d][r]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
@@ -452,37 +496,45 @@ func checkRightOf(c int, r int, board [][]string, name string, d, avail int) int
 	//fmt.Println("check right of", c, r, d)
 	switch {
 	case c+d >= len(board) || r >= avail:
-		return -1
-	case r >= len(board[c+d]):
-		return 0
+		return OOB
+	case r > len(board[c+d]):
+		return UNR
+	case r == len(board[c+d]):
+		return EMPTY
 	case name == board[c+d][r]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkAbove(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c >= len(board) || r+d >= avail:
-		return -1
-	case r+d >= len(board[c]):
-		return 0
+		return OOB
+	case r+d > len(board[c]):
+		return UNR
+	case r+d == len(board[c]):
+		return EMPTY
 	case name == board[c][r+d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
 func checkBelow(c int, r int, board [][]string, name string, d, avail int) int {
 	switch {
 	case c >= len(board) || r-d < 0:
-		return -1
+		return OOB
+	case r-d > len(board[c]):
+		return UNR
+	case r-d == len(board[c]):
+		return EMPTY
 	case name == board[c][r-d]:
-		return 1
+		return FRIEND
 	default:
-		return -2
+		return FOE
 	}
 }
 
@@ -520,4 +572,38 @@ func min(a, b int) int {
 		return b
 	}
 	return a
+}
+
+func randomNumber(max int) int {
+	rBig, _ := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	return int(rBig.Int64())
+}
+
+// joins the two maps from one end to the other, uses 'mid' as their middle
+func toAxis(map1, map2 map[int]int, mid int) []int{
+	// maps: nothing in the middle
+	result := make([]int, len(map1) + len(map2) + 1)
+	for i := len(map1); i > 0; i-- {
+		val, ok := map1[i]
+		if ok {
+			result = append(result, val)
+		}
+	}
+	result = append(result, mid)
+	for i := 0; i < len(map2); i++ {
+		val, ok := map2[i]
+		if ok {
+			result = append(result, val)
+		}
+	}
+	return result
+}
+
+// sum of the array from start to stop
+func sum(arr []int, start, stop int) int {
+	sum := 0
+	for ; start < stop; start++ {
+		sum += arr[start]
+	}
+	return sum
 }

@@ -261,7 +261,7 @@ func rateAlongAxis(c int, r int, game *Game, name string, dir string, pc1 PointC
 		for i := 0; i < game.Win; i++ {
 			// build possible distances
 			rate1, ok1 := ratesPc1[i]
-			rate2, ok2 := ratesPc2[game.Win-i]
+			rate2, ok2 := ratesPc2[game.Win-i-1]
 			if !ok1 && ok2 && maxRate < rate2 {
 				maxRate = rate2
 			}

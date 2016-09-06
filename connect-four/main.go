@@ -183,7 +183,7 @@ func autoPlay(game *Game) (int, int, error) {
 	case "random":
 		return playRandom(game)
 	case "intelligent":
-		return playIntelligent(game, 2)
+		return playIntelligent(game, 6)
 	}
 	return -1, -1, errors.New("Unknown game mode")
 }
@@ -195,6 +195,7 @@ func playRandom(game *Game) (int, int, error) {
 		c = (c + i) % game.Rows
 		r, err := apply(game.Board, c, "computooor")
 		if err == nil {
+			fmt.Println("")
 			return c, r, nil
 		}
 	}
@@ -204,13 +205,15 @@ func playRandom(game *Game) (int, int, error) {
 // provides a starting point to the alpha beta algorithm, using the computooor player
 func playIntelligent(game *Game, depth int) (int, int, error) {
 
-	alpha, beta := -1000, -1000
-	_, col := goMaximizer(depth-1, alpha, beta, game.Board, "computooor", game.Rows, game.Win)
-	
+	alpha, beta := -1000, 1000
+	_, choices := goMaximizer(depth-1, alpha, beta, game.Board, "computooor", game.Rows, game.Win)
+
+	col := choices.GetOne()
 	row, err := apply(game.Board, col, "computooor")
 	if err != nil { // column full
 		panic("column full")
 	}
+	fmt.Println("")
 	return col, row, nil
 }
 
@@ -219,29 +222,24 @@ func playIntelligent(game *Game, depth int) (int, int, error) {
 //
 // returns the best possible score for 'name' when thinking 'depth' turns ahead
 // asserts that 'name' wants to insert a token at (col, row) into the board
-func alphaBeta(depth, alpha, beta, col, row int, board [][]string, name string, maxRows, win int) (int, int) {
+func alphaBeta(depth, alpha, beta, col, row int, board [][]string, name string, maxRows, win int) (int, *IntSet) {
 
 	if depth == 0 {
-		// an axis has a value or is not usable (val = -1)
 		s := scoreInsertAt(col, row, name, board, win, maxRows)
-		if s < 0 {
-			s = -1000 // axis not usable
-		}
-		//fmt.Println("Eval score at", col, row, "for name", name, "score", s)
-		return s, col
+		return s, NewIntSet()
 
 	}
 	// simulate move and aggreate via alpha beta again whats best
 	if name == "computooor" { // maximizer
-		return goMaximizer(depth-1, alpha, beta, board, "player", maxRows, win)
+		return goMinimizer(depth-1, alpha, beta, board, "player", maxRows, win)
 	}
 	return goMaximizer(depth-1, alpha, beta, board, "computooor", maxRows, win)
 }
 
-func goMaximizer(depth, alpha, beta int, board [][]string, name string, maxRows, win int) (int, int) {
+func goMaximizer(depth, alpha, beta int, board [][]string, name string, maxRows, win int) (int, *IntSet) {
 	// until all possible columns examined or alpha gte beta
-	score := -1000
-	posColumns := make(map[int]*IntSet) // for randomness, score -> 'cols with that score'
+	myScore, enemyScore := -1000, 1000
+	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
 	for c := 0; c < len(board); c++ {
 		bCopy := make([][]string, len(board))
 		copy(bCopy, board)
@@ -249,24 +247,55 @@ func goMaximizer(depth, alpha, beta int, board [][]string, name string, maxRows,
 		if err != nil { // column full
 			continue
 		}
-		//fmt.Println("simulate move of", name, "for col", c)
-		s, col := alphaBeta(depth, alpha, beta, c, r, bCopy, name, maxRows, win)
-		if s >= score {
-			score = s
-			posColumns[s] = posColumns[s].Add(col)
-		}
-		if name == "computooor" {
-			alpha = max(alpha, score)
-		} else {
-			beta = max(beta, score)
-		}
-		if beta <= alpha {
+		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, name, maxRows, win)
+		myOptions[s] = myOptions[s].Add(c)
+		enemyOptions[s] = enemyOptions[s].AddAll(choices)
+		myScore = max(myScore, s)
+		enemyScore = min(enemyScore, s)
+		alpha = max(alpha, myScore)
+		if beta < alpha {
 			break
 		}
 	}
-	c := posColumns[score].GetOne()
-	fmt.Println(name, "depth", depth, "rand col", c, "of", posColumns[score], "with score", score, "a b was", alpha, beta)
-	return score, c
+	fmt.Println(name, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
+	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
+		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
+		myOptions[myScore] = enemyOptions[myScore]
+	}
+	fmt.Println("new options for", name, myOptions[myScore])
+	return myScore, myOptions[myScore]
+}
+
+func goMinimizer(depth, alpha, beta int, board [][]string, name string, maxRows, win int) (int, *IntSet) {
+	// until all possible columns examined or alpha gte beta
+	myScore, enemyScore := 1000, -1000
+	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
+
+	for c := 0; c < len(board); c++ {
+		bCopy := make([][]string, len(board))
+		copy(bCopy, board)
+		r, err := apply(bCopy, c, name)
+		if err != nil { // column full
+			continue
+		}
+		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, name, maxRows, win)
+		myOptions[s] = myOptions[s].Add(c)
+		enemyOptions[s] = enemyOptions[s].AddAll(choices)
+		myScore = min(myScore, s)
+		beta = min(beta, myScore)
+		enemyScore = max(enemyScore, s)
+		if beta < alpha {
+			break
+		}
+
+	}
+	fmt.Println(name, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
+	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
+		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
+		myOptions[myScore] = enemyOptions[myScore]
+	}
+	fmt.Println("new options for", name, myOptions[myScore])
+	return myScore, myOptions[myScore]
 }
 
 // checks if the insert at position (c, r) lead to a win for the player with that token
@@ -279,8 +308,13 @@ func setWinner(c int, r int, game *Game) {
 }
 
 func insertWins(c, r int, name string, game *Game) bool {
-	score := scoreInsertAt(c, r, name, game.Board, game.Win, game.Rows) + 1 // count self
-	if score >= game.Win * game.Win {
+	score := scoreInsertAt(c, r, name, game.Board, game.Win, game.Rows)
+	if name == "player" {
+		score = 0 - score
+	}
+	preciseK := float64(game.Win)
+	winScore := ((preciseK+1)/2 + 1) * preciseK * preciseK // k*k + k * sum(1..k)
+	if float64(score) >= winScore {
 		return true
 	}
 	return false
@@ -297,12 +331,16 @@ func scoreInsertAt(c int, r int, name string, board [][]string, dist int, rows i
 	axis := 0
 	for r := range merge(cr, cl, rl, ab) {
 		axis++
-		score = max(score, r)
+		if name == "player" {
+			score = min(score, r)
+		} else {
+			score = max(score, r)
+		}
 		if axis == 4 {
 			break
 		}
 	}
-	//fmt.Println("best score of all 4 axis for insert of", name, "at", c, r, "is", score)
+	fmt.Println("best score of all 4 axis for insert of", name, "at", c, r, "is", score)
 	return score
 }
 
@@ -310,7 +348,7 @@ func scoreInsertAt(c int, r int, name string, board [][]string, dist int, rows i
 // (c, r) is used as center of the axis, scoring takes place for the given 'name' asserting 'k' as
 // necessary amount of similar pieces in a line for winning.
 // 'rows' is needed for boundary checking
-// Scoring function: 
+// Scoring function:
 // the rate of on axis is either -1 if it is not usable
 // or the maximum o.t. sums of all possible-neighbor scores over all lines of length k
 func scoreAxis(c int, r int, name string, board [][]string, k int, rows int, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
@@ -321,24 +359,43 @@ func scoreAxis(c int, r int, name string, board [][]string, k int, rows int, dir
 		scoresPc2 := scoreNeighbors(c, r, name, board, k, rows, pc2, dir)
 		//fmt.Println("distances rated", c, r, dir, "pc1", scoresPc1)
 		//fmt.Println("distances rated", c, r, dir, "pc2", scoresPc2)
-		
-		if len(scoresPc1)+len(scoresPc2)+1 < k {
-			// cannot form k adjacent chips for name, axis is useless
-			//fmt.Println("axis score", dir, "for", name, "at", c, r, -1)
-			res <- -1
-			return
+
+		var mid int
+		if name == "player" {
+			mid = -(k*k + k)
+		} else {
+			mid = k*k + k
 		}
 
-		axis := toAxis(scoresPc1, scoresPc2, k) // use k (own value as chip as middle)
+		axis := toAxis(scoresPc1, scoresPc2, mid)
 
-		maxScore := -1 // holds the maximal score that is possible within a game-winning dist
-		for i := 0; i <= len(axis) - k; i++ {
-			maxScore = max(maxScore, sum(axis, i, i+k))
+		bestScore := 0
+		for i := 0; i <= len(axis)-k; i++ {
+			if name == "player" {
+				bestScore = min(bestScore, straightOrStop(axis, i, i+k, false)) // minimizer
+			} else {
+				bestScore = max(bestScore, straightOrStop(axis, i, i+k, true))
+			}
 		}
-		//fmt.Println("axis score", dir, "for", name, "at", c, r, maxScore)
-		res <- maxScore // axis usable, return rate
+		//fmt.Println("axis score", dir, "for", name, "at", c, r, bestScore)
+		res <- bestScore // axis usable, return rate
 	}()
 	return res
+}
+
+// takes the vals of the slice from start to stop and adds them upp.
+// all numbers must / must not be "positive".
+// As soon as a different number is found, terminate, return 0, else the sum
+func straightOrStop(arr []int, start, stop int, positive bool) int {
+	sum := 0
+	for ; start < stop; start++ {
+		val := arr[start]
+		if (positive && val < 0) || (!positive && val > 0) {
+			return 0
+		}
+		sum += val
+	}
+	return sum
 }
 
 // Scores the neighbors of point (c, r) on the board with bound 'maxRows' and k as necessary amuont to win
@@ -348,20 +405,35 @@ func scoreAxis(c int, r int, name string, board [][]string, k int, rows int, dir
 // scoring function - scores the neighbors based on its property:
 // UNR : 0
 // EMPTY : 1
-// FRIEND : k (k is the win condition on the game, say 4)
-// FOE / OOB : terminate, do not expand result map any more
+// FRIEND : (k-dist) * k
+// FOE : (k-dist) * -k
+// OOB : terminate, do not expand result map any more
 func scoreNeighbors(c, r int, name string, board [][]string, k, maxRows int, pc PointChecker, dir string) map[int]int {
 	scores := make(map[int]int)
 	for dist := 1; dist < k; dist++ {
 		switch pc(c, r, board, name, dist, maxRows) {
-		case OOB, FOE:
+		case OOB:
 			break
 		case UNR:
 			scores[dist] = 0
 		case EMPTY:
-			scores[dist] = 1
+			if name == "player" {
+				scores[dist] = -1 * (k - dist)
+			} else {
+				scores[dist] = 1 * (k - dist)
+			}
 		case FRIEND:
-			scores[dist] = k
+			if name == "player" {
+				scores[dist] = -k*(k-dist) - k
+			} else {
+				scores[dist] = k*(k-dist) + k
+			}
+		case FOE:
+			if name == "player" {
+				scores[dist] = k*(k-dist) + k
+			} else {
+				scores[dist] = -k*(k-dist) - k
+			}
 		}
 	}
 	//fmt.Println("scores for", dir, c, r, scores)
@@ -370,18 +442,18 @@ func scoreNeighbors(c, r int, name string, board [][]string, k, maxRows int, pc 
 
 // result values of a pointcheck
 const (
-	OOB = iota // out of bounds
+	OOB    = iota // out of bounds
 	FRIEND = iota
-	FOE = iota
-	EMPTY = iota
-	UNR = iota // unreachable
+	FOE    = iota
+	EMPTY  = iota
+	UNR    = iota // unreachable
 )
 
 // signature: col, row, board, name, distance
 // checks a point (dc, dr) which is 'd' distance away from the point (col, row)
 // for one specific angle (cross/right etc).
 // Returns a result integer, that indicates if the checked point is
-// out of bounds, un/friendly, empty or unreachable 
+// out of bounds, un/friendly, empty or unreachable
 type PointChecker func(int, int, [][]string, string, int, int) int
 
 func checkCrossRightUp(c int, r int, board [][]string, name string, d, avail int) int {
@@ -547,7 +619,7 @@ func randomNumber(max int) int {
 }
 
 // joins the two maps from one end to the other, uses 'mid' as their middle
-func toAxis(map1, map2 map[int]int, mid int) []int{
+func toAxis(map1, map2 map[int]int, mid int) []int {
 	var result []int
 	for i := len(map1); i >= 0; i-- { // rly want to access the 'len', not 'len-1'
 		val, ok := map1[i]
@@ -592,10 +664,24 @@ func (set *IntSet) Add(i int) *IntSet {
 	return set
 }
 
+func (me *IntSet) AddAll(other *IntSet) *IntSet {
+	if me == nil {
+		me = NewIntSet()
+	}
+	for val := range me.set {
+		other.Add(val)
+	}
+	return other
+}
+
 // returns a random element of the set. returns -1 if the set is empty.
 func (set *IntSet) GetOne() int {
 	for elem := range set.set {
 		return elem // iteration not in order, so :)
 	}
 	return -1
+}
+
+func (set *IntSet) Length() int {
+	return len(set.set)
 }

@@ -183,7 +183,7 @@ func autoPlay(game *Game) (int, int, error) {
 	case "random":
 		return playRandom(game)
 	case "intelligent":
-		return playIntelligent(game, 6)
+		return playIntelligent(game, 4)
 	}
 	return -1, -1, errors.New("Unknown game mode")
 }
@@ -226,7 +226,7 @@ func alphaBeta(depth, alpha, beta, col, row int, board [][]bool, computer bool, 
 
 	if depth == 0 {
 		s := scoreInsertAt(col, row, computer, board, win, maxRows)
-		return s, NewIntSet()
+		return s, NewIntSet().Add(col)
 
 	}
 	// simulate move and aggreate via alpha beta again whats best
@@ -247,12 +247,16 @@ func goMaximizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows,
 		if err != nil { // column full
 			continue
 		}
+		// if s is win score, this option is absolute at this point in time
+		if s := scoreInsertAt(c, r, computer, board, win, maxRows); isWin(s, win) {
+			return s, NewIntSet().Add(c)
+		}
 		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
-		myOptions[s] = myOptions[s].Add(c)
 		enemyOptions[s] = enemyOptions[s].AddAll(choices)
+		myOptions[s] = myOptions[s].Add(c)
 		myScore = max(myScore, s)
-		enemyScore = min(enemyScore, s)
 		alpha = max(alpha, myScore)
+		enemyScore = min(enemyScore, s)
 		if beta < alpha {
 			break
 		}
@@ -277,6 +281,10 @@ func goMinimizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows,
 		r, err := apply(bCopy, c, computer)
 		if err != nil { // column full
 			continue
+		}
+		// if s is win score, this option is absolute at this point in time
+		if s := scoreInsertAt(c, r, computer, board, win, maxRows); isWin(s, win) {
+			return s, NewIntSet().Add(c)
 		}
 		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
 		myOptions[s] = myOptions[s].Add(c)
@@ -313,10 +321,15 @@ func setWinner(c int, r int, game *Game) {
 
 func insertWins(c, r int, computer bool, game *Game) bool {
 	score := scoreInsertAt(c, r, computer, game.Board, game.Win, game.Rows)
-	if computer == false {
+	return isWin(score, game.Win)
+}
+
+// determin if "score" wins the game, where k-fields are needed in a row to win
+func isWin(score, k int) bool {
+	if score < 0 {
 		score = 0 - score
 	}
-	preciseK := float64(game.Win)
+	preciseK := float64(k)
 	winScore := ((preciseK+1)/2 + 1) * preciseK * preciseK // k*k + k * sum(1..k)
 	if float64(score) >= winScore {
 		return true
@@ -409,7 +422,7 @@ func straightOrStop(arr []int, start, stop int, positive bool) int {
 // scoring function - scores the neighbors based on its property:
 // UNR : 0
 // EMPTY : 1
-// FRIEND : k + (k-dist) * k 
+// FRIEND : k + (k-dist) * k
 // FOE : -k - (k-dist) * -k
 // OOB : terminate, do not expand result map any more
 func scoreNeighbors(c, r int, computer bool, board [][]bool, k, maxRows int, pc PointChecker, dir string) map[int]int {

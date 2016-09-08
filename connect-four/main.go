@@ -8,8 +8,8 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"sync"
 	"strconv"
+	"sync"
 )
 
 type GameStore struct {
@@ -49,7 +49,7 @@ func NewGame(cols, rows, win int, mode string, level int) *Game {
 		Cols:   cols,
 		Rows:   rows,
 		Win:    win,
-		Level:  level, 
+		Level:  level,
 	}
 }
 
@@ -78,7 +78,7 @@ func (gs *GameStore) Set(game *Game) bool {
 
 const (
 	COMPUTER = true
-	PLAYER = false
+	PLAYER   = false
 )
 
 var gs = NewGameStore()
@@ -329,17 +329,17 @@ func scoreInsertAt(c int, r int, computer bool, board [][]bool, dist int, rows i
 	rl := scoreAxis(c, r, computer, board, dist, rows, "r-l", checkRightOf, checkLeftOf)
 	ab := scoreAxis(c, r, computer, board, dist, rows, "a-b", checkAbove, checkBelow)
 
+	done := make(chan struct{})
+	defer close(done)
+	res := merge(done, cr, cl, rl, ab)
+
 	score := 0
-	axis := 0
-	for r := range merge(cr, cl, rl, ab) {
-		axis++
+	for ax := 0; ax <= 4; ax++ {
+		r := <-res
 		if computer == COMPUTER {
 			score = max(score, r)
 		} else {
 			score = min(score, r)
-		}
-		if axis == 4 {
-			break
 		}
 	}
 	//fmt.Println("best score of all 4 axis for insert of", computer, "at", c, r, "is", score)
@@ -570,15 +570,19 @@ func checkBelow(c int, r int, board [][]bool, computer bool, d, avail int) int {
 	}
 }
 
-func merge(cs ...<-chan int) <-chan int {
+func merge(done <-chan struct{}, cs ...<-chan int) <-chan int {
 	var wg sync.WaitGroup
 	out := make(chan int)
 
 	output := func(c <-chan int) {
+		defer wg.Done()
 		for n := range c {
-			out <- n
+			select {
+			case out <- n:
+			case <-done:
+				return // wg.Done()
+			}
 		}
-		wg.Done()
 	}
 	wg.Add(len(cs))
 	for _, c := range cs {

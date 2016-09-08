@@ -111,7 +111,7 @@ func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	game := NewGame(7, 6, 4, "intelligent")
+	game := NewGame(8, 8, 5, "intelligent")
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
@@ -138,7 +138,7 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	if game.Winner != "" {
 		return errors.New("Game already ended, winner was " + game.Winner)
 	}
-	pRow, err := apply(game.Board, post.Col, false) // "player" is false, computer is true
+	pRow, err := apply(game.Board, post.Col, false, game.Rows) // "player" is false, computer is true
 	if err != nil {
 		return err
 	}
@@ -169,8 +169,8 @@ func sendResult(w http.ResponseWriter, game *Game, cCol int) error {
 
 // put a token with value "player" into the column "col".
 // Returns the row it was inserted into and an error if the column is already full
-func apply(board [][]bool, col int, computer bool) (int, error) {
-	if len(board[col]) == 6 {
+func apply(board [][]bool, col int, computer bool, maxRows int) (int, error) {
+	if len(board[col]) == maxRows {
 		return -1, errors.New("Column already full")
 	}
 	board[col] = append(board[col], computer)
@@ -190,12 +190,11 @@ func autoPlay(game *Game) (int, int, error) {
 
 func playRandom(game *Game) (int, int, error) {
 	// has to terminate if all cols are full
-	c := randomNumber(7)
-	for i := 0; i < game.Rows; i++ {
-		c = (c + i) % game.Rows
-		r, err := apply(game.Board, c, true)
+	c := randomNumber(game.Cols)
+	for i := 0; i < game.Cols; i++ {
+		c = (c + i) % game.Cols
+		r, err := apply(game.Board, c, true, game.Rows)
 		if err == nil {
-			fmt.Println("")
 			return c, r, nil
 		}
 	}
@@ -209,19 +208,19 @@ func playIntelligent(game *Game, depth int) (int, int, error) {
 	_, choices := goMaximizer(depth-1, alpha, beta, game.Board, true, game.Rows, game.Win)
 
 	col := choices.GetOne()
-	row, err := apply(game.Board, col, true)
+	row, err := apply(game.Board, col, true, game.Rows)
 	if err != nil { // column full
 		panic("column full")
 	}
-	fmt.Println("")
 	return col, row, nil
 }
 
-// alpha is best score for computer so far in seachtree
-// beta is best score for player so far in seachtree
+// alpha is best score for computer so far in searchtree
+// beta is best score for player so far in searchtree
 //
-// returns the best possible score for 'computer' when thinking 'depth' turns ahead
-// asserts that 'computer' wants to insert a token at (col, row) into the board
+// Returns the best possible score and all columns with that score for
+//'computer (true:comp, false:player)' when thinking 'depth' turns ahead.
+// Aserts that 'computer' wants to insert a token at (col, row) into the board
 func alphaBeta(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
 
 	if depth == 0 {
@@ -237,13 +236,12 @@ func alphaBeta(depth, alpha, beta, col, row int, board [][]bool, computer bool, 
 }
 
 func goMaximizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
-	// until all possible columns examined or alpha gte beta
 	myScore, enemyScore := -1000, 1000
 	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
 	for c := 0; c < len(board); c++ {
 		bCopy := make([][]bool, len(board))
 		copy(bCopy, board)
-		r, err := apply(bCopy, c, computer)
+		r, err := apply(bCopy, c, computer, maxRows)
 		if err != nil { // column full
 			continue
 		}
@@ -261,24 +259,23 @@ func goMaximizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows,
 			break
 		}
 	}
-	fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
+	//fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
 	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
 		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
 		myOptions[myScore] = enemyOptions[myScore]
 	}
-	fmt.Println("new options for", computer, myOptions[myScore])
+	//fmt.Println("new options for", computer, myOptions[myScore])
 	return myScore, myOptions[myScore]
 }
 
 func goMinimizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
-	// until all possible columns examined or alpha gte beta
 	myScore, enemyScore := 1000, -1000
 	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
 
 	for c := 0; c < len(board); c++ {
 		bCopy := make([][]bool, len(board))
 		copy(bCopy, board)
-		r, err := apply(bCopy, c, computer)
+		r, err := apply(bCopy, c, computer, maxRows)
 		if err != nil { // column full
 			continue
 		}
@@ -297,12 +294,12 @@ func goMinimizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows,
 		}
 
 	}
-	fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
+	//fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
 	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
 		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
 		myOptions[myScore] = enemyOptions[myScore]
 	}
-	fmt.Println("new options for", computer, myOptions[myScore])
+	//fmt.Println("new options for", computer, myOptions[myScore])
 	return myScore, myOptions[myScore]
 }
 
@@ -330,7 +327,7 @@ func isWin(score, k int) bool {
 		score = 0 - score
 	}
 	preciseK := float64(k)
-	winScore := ((preciseK+1)/2 + 1) * preciseK * preciseK // k*k + k * sum(1..k)
+	winScore := preciseK * preciseK * ((preciseK+1)/2 + preciseK - 3) // k * sum(1..k) + k*k *(k-3)
 	if float64(score) >= winScore {
 		return true
 	}
@@ -363,7 +360,7 @@ func scoreInsertAt(c int, r int, computer bool, board [][]bool, dist int, rows i
 
 // Scores the axis, which is defined by the composition of the provided pointcheckers.
 // (c, r) is used as center of the axis, scoring takes place for the given 'computer' asserting 'k' as
-// necessary amount of similar pieces in a line for winning.
+// necessary amount of similar tokens in a line for winning.
 // 'rows' is needed for boundary checking
 // Scoring function:
 // the rate of on axis is either -1 if it is not usable
@@ -377,21 +374,18 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 		//fmt.Println("distances rated", c, r, dir, "pc1", scoresPc1)
 		//fmt.Println("distances rated", c, r, dir, "pc2", scoresPc2)
 
-		var mid int
+		mid := k*k + k*(k-3)
 		if computer == false {
-			mid = -(k*k + k)
-		} else {
-			mid = k*k + k
+			mid = -mid
 		}
-
 		axis := toAxis(scoresPc1, scoresPc2, mid)
 
 		bestScore := 0
 		for i := 0; i <= len(axis)-k; i++ {
 			if computer == false {
-				bestScore = min(bestScore, straightOrStop(axis, i, i+k, false)) // minimizer
+				bestScore = min(bestScore, straightOrStop(axis, i, i+k, computer)) // minimizer
 			} else {
-				bestScore = max(bestScore, straightOrStop(axis, i, i+k, true))
+				bestScore = max(bestScore, straightOrStop(axis, i, i+k, computer))
 			}
 		}
 		//fmt.Println("axis score", dir, "for", computer, "at", c, r, bestScore)
@@ -401,7 +395,7 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 }
 
 // takes the vals of the slice from start to stop and adds them upp.
-// all numbers must / must not be "positive".
+// all numbers must / must not be 'positive'.
 // As soon as a different number is found, terminate, return 0, else the sum
 func straightOrStop(arr []int, start, stop int, positive bool) int {
 	sum := 0
@@ -422,36 +416,30 @@ func straightOrStop(arr []int, start, stop int, positive bool) int {
 // scoring function - scores the neighbors based on its property:
 // UNR : 0
 // EMPTY : 1
-// FRIEND : k + (k-dist) * k
-// FOE : -k - (k-dist) * -k
+// FRIEND : k + (k-dist) * k*(k-3)
+// FOE : -k - (k-dist) * -k*(k-3)
 // OOB : terminate, do not expand result map any more
 func scoreNeighbors(c, r int, computer bool, board [][]bool, k, maxRows int, pc PointChecker, dir string) map[int]int {
 	scores := make(map[int]int)
+OuterLoop:
 	for dist := 1; dist < k; dist++ {
+		score := 0
 		switch pc(c, r, board, computer, dist, maxRows) {
 		case OOB:
-			break
+			break OuterLoop
 		case UNR:
-			scores[dist] = 0
+			break
 		case EMPTY:
-			if computer == false {
-				scores[dist] = -1 * (k - dist)
-			} else {
-				scores[dist] = 1 * (k - dist)
-			}
+			score = 1 * (k - dist)
 		case FRIEND:
-			if computer == false {
-				scores[dist] = -k*(k-dist) - k
-			} else {
-				scores[dist] = k*(k-dist) + k
-			}
+			score = k*(k-dist) + k*(k-3)
 		case FOE:
-			if computer == false {
-				scores[dist] = k*(k-dist) + k
-			} else {
-				scores[dist] = -k*(k-dist) - k
-			}
+			score = -(k*(k-dist) + k*(k-3))
 		}
+		if computer == false {
+			score = -score
+		}
+		scores[dist] = score
 	}
 	//fmt.Println("scores for", dir, c, r, scores)
 	return scores
@@ -480,7 +468,7 @@ func checkCrossRightUp(c int, r int, board [][]bool, computer bool, d, avail int
 	case r+d > len(board[c+d]):
 		return UNR
 	case r+d == len(board[c+d]):
-		return EMPTY // empty
+		return EMPTY
 	case computer == board[c+d][r+d]:
 		return FRIEND
 	default:
@@ -549,7 +537,6 @@ func checkLeftOf(c int, r int, board [][]bool, computer bool, d, avail int) int 
 }
 
 func checkRightOf(c int, r int, board [][]bool, computer bool, d, avail int) int {
-	//fmt.Println("check right of", c, r, d)
 	switch {
 	case c+d >= len(board) || r >= avail:
 		return OOB
@@ -654,15 +641,6 @@ func toAxis(map1, map2 map[int]int, mid int) []int {
 	return result
 }
 
-// sum of the array from start to stop
-func sum(arr []int, start, stop int) int {
-	sum := 0
-	for ; start < stop; start++ {
-		sum += arr[start]
-	}
-	return sum
-}
-
 type IntSet struct {
 	set map[int]bool
 }
@@ -700,5 +678,8 @@ func (set *IntSet) GetOne() int {
 }
 
 func (set *IntSet) Length() int {
+	if set == nil || set.set == nil {
+		return 0
+	}
 	return len(set.set)
 }

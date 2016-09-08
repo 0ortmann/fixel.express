@@ -73,6 +73,11 @@ func (gs *GameStore) Set(game *Game) bool {
 	return true
 }
 
+const (
+	COMPUTER = true
+	PLAYER = false
+)
+
 var gs = NewGameStore()
 
 func main() {
@@ -111,7 +116,7 @@ func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	game := NewGame(8, 8, 5, "intelligent")
+	game := NewGame(7, 6, 4, "intelligent")
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
@@ -205,7 +210,7 @@ func playRandom(game *Game) (int, int, error) {
 func playIntelligent(game *Game, depth int) (int, int, error) {
 
 	alpha, beta := -1000, 1000
-	_, choices := goMaximizer(depth-1, alpha, beta, game.Board, true, game.Rows, game.Win)
+	_, choices := alphaBeta(depth-1, alpha, beta, game.Board, true, game.Rows, game.Win)
 
 	col := choices.GetOne()
 	row, err := apply(game.Board, col, true, game.Rows)
@@ -221,78 +226,47 @@ func playIntelligent(game *Game, depth int) (int, int, error) {
 // Returns the best possible score and all columns with that score for
 //'computer (true:comp, false:player)' when thinking 'depth' turns ahead.
 // Aserts that 'computer' wants to insert a token at (col, row) into the board
-func alphaBeta(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
+func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
 
-	if depth == 0 {
-		s := scoreInsertAt(col, row, computer, board, win, maxRows)
+	s := scoreInsertAt(col, row, computer, board, win, maxRows)
+	// if I can win by inserting in c, no further eval of alpha/beta, this option is absolute at this point in time
+	if depth == 0 || isWin(s, win, computer) {
 		return s, NewIntSet().Add(col)
 
 	}
-	// simulate move and aggreate via alpha beta again whats best
-	if computer == true { // maximizer
-		return goMinimizer(depth-1, alpha, beta, board, false, maxRows, win)
-	}
-	return goMaximizer(depth-1, alpha, beta, board, true, maxRows, win)
+	return alphaBeta(depth-1, alpha, beta, board, !computer, maxRows, win)
 }
 
-func goMaximizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
-	myScore, enemyScore := -1000, 1000
-	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
-	for c := 0; c < len(board); c++ {
-		bCopy := make([][]bool, len(board))
-		copy(bCopy, board)
-		r, err := apply(bCopy, c, computer, maxRows)
-		if err != nil { // column full
-			continue
-		}
-		// if s is win score, this option is absolute at this point in time
-		if s := scoreInsertAt(c, r, computer, board, win, maxRows); isWin(s, win) {
-			return s, NewIntSet().Add(c)
-		}
-		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
-		enemyOptions[s] = enemyOptions[s].AddAll(choices)
-		myOptions[s] = myOptions[s].Add(c)
-		myScore = max(myScore, s)
-		alpha = max(alpha, myScore)
-		enemyScore = min(enemyScore, s)
-		if beta < alpha {
-			break
-		}
-	}
-	//fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
-	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
-		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
-		myOptions[myScore] = enemyOptions[myScore]
-	}
-	//fmt.Println("new options for", computer, myOptions[myScore])
-	return myScore, myOptions[myScore]
-}
-
-func goMinimizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
+func alphaBeta(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
 	myScore, enemyScore := 1000, -1000
+	if computer == COMPUTER {
+		myScore, enemyScore = -1000, 1000
+	}
 	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
 
 	for c := 0; c < len(board); c++ {
 		bCopy := make([][]bool, len(board))
 		copy(bCopy, board)
 		r, err := apply(bCopy, c, computer, maxRows)
-		if err != nil { // column full
-			continue
+		if err != nil {
+			continue // column full
 		}
-		// if s is win score, this option is absolute at this point in time
-		if s := scoreInsertAt(c, r, computer, board, win, maxRows); isWin(s, win) {
-			return s, NewIntSet().Add(c)
-		}
-		s, choices := alphaBeta(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
+		s, choices := scoreInDepth(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
 		myOptions[s] = myOptions[s].Add(c)
 		enemyOptions[s] = enemyOptions[s].AddAll(choices)
-		myScore = min(myScore, s)
-		beta = min(beta, myScore)
-		enemyScore = max(enemyScore, s)
+		switch computer {
+		case COMPUTER:
+			myScore = max(myScore, s)
+			alpha = max(alpha, myScore)
+			enemyScore = min(enemyScore, s)
+		case PLAYER:
+			myScore = min(myScore, s)
+			beta = min(beta, myScore)
+			enemyScore = max(enemyScore, s)
+		}
 		if beta < alpha {
 			break
 		}
-
 	}
 	//fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
 	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
@@ -308,7 +282,7 @@ func goMinimizer(depth, alpha, beta int, board [][]bool, computer bool, maxRows,
 func setWinner(c int, r int, game *Game) {
 	computer := game.Board[c][r]
 	if insertWins(c, r, computer, game) {
-		if computer == true {
+		if computer == COMPUTER {
 			game.Winner = "computooor"
 		} else {
 			game.Winner = "player"
@@ -318,20 +292,18 @@ func setWinner(c int, r int, game *Game) {
 
 func insertWins(c, r int, computer bool, game *Game) bool {
 	score := scoreInsertAt(c, r, computer, game.Board, game.Win, game.Rows)
-	return isWin(score, game.Win)
+	return isWin(score, game.Win, computer)
 }
 
-// determin if "score" wins the game, where k-fields are needed in a row to win
-func isWin(score, k int) bool {
-	if score < 0 {
-		score = 0 - score
-	}
+// determine if "score" wins the game, where k-fields are needed in a row to win evaluated
+// in the perspective of either "player (false)" or "computer (true)"
+func isWin(score, k int, computer bool) bool {
 	preciseK := float64(k)
 	winScore := preciseK * preciseK * ((preciseK+1)/2 + preciseK - 3) // k * sum(1..k) + k*k *(k-3)
-	if float64(score) >= winScore {
-		return true
+	if computer == COMPUTER {
+		return float64(score) >= winScore
 	}
-	return false
+	return float64(score) <= -winScore
 }
 
 // get max score of insert at pos (c, r), regarding all possible axis on the board
@@ -345,16 +317,16 @@ func scoreInsertAt(c int, r int, computer bool, board [][]bool, dist int, rows i
 	axis := 0
 	for r := range merge(cr, cl, rl, ab) {
 		axis++
-		if computer == false {
-			score = min(score, r)
-		} else {
+		if computer == COMPUTER {
 			score = max(score, r)
+		} else {
+			score = min(score, r)
 		}
 		if axis == 4 {
 			break
 		}
 	}
-	fmt.Println("best score of all 4 axis for insert of", computer, "at", c, r, "is", score)
+	//fmt.Println("best score of all 4 axis for insert of", computer, "at", c, r, "is", score)
 	return score
 }
 
@@ -375,17 +347,17 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 		//fmt.Println("distances rated", c, r, dir, "pc2", scoresPc2)
 
 		mid := k*k + k*(k-3)
-		if computer == false {
+		if computer == PLAYER {
 			mid = -mid
 		}
 		axis := toAxis(scoresPc1, scoresPc2, mid)
 
 		bestScore := 0
 		for i := 0; i <= len(axis)-k; i++ {
-			if computer == false {
-				bestScore = min(bestScore, straightOrStop(axis, i, i+k, computer)) // minimizer
-			} else {
+			if computer == COMPUTER {
 				bestScore = max(bestScore, straightOrStop(axis, i, i+k, computer))
+			} else {
+				bestScore = min(bestScore, straightOrStop(axis, i, i+k, computer)) // minimizer
 			}
 		}
 		//fmt.Println("axis score", dir, "for", computer, "at", c, r, bestScore)
@@ -436,7 +408,7 @@ OuterLoop:
 		case FOE:
 			score = -(k*(k-dist) + k*(k-3))
 		}
-		if computer == false {
+		if computer == PLAYER {
 			score = -score
 		}
 		scores[dist] = score

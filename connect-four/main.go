@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"net/http"
 	"sync"
+	"strconv"
 )
 
 type GameStore struct {
@@ -24,11 +25,12 @@ type Game struct {
 	Cols   int
 	Rows   int
 	Win    int
+	Level  int
 }
 
 // create a (cols x rows) game board. 'win' neighbored pieces are needed to win
 // and mode determines the computer playmode (eg random)
-func NewGame(cols, rows, win int, mode string) *Game {
+func NewGame(cols, rows, win int, mode string, level int) *Game {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -47,6 +49,7 @@ func NewGame(cols, rows, win int, mode string) *Game {
 		Cols:   cols,
 		Rows:   rows,
 		Win:    win,
+		Level:  level, 
 	}
 }
 
@@ -116,11 +119,24 @@ func allowCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 }
 
 func newHandler(w http.ResponseWriter, req *http.Request) {
-	game := NewGame(7, 6, 4, "intelligent")
+	query := req.URL.Query()
+	c := toIntOr(query.Get("c"), 7)
+	r := toIntOr(query.Get("r"), 6)
+	k := toIntOr(query.Get("k"), 4)
+	l := toIntOr(query.Get("l"), 6)
+	game := NewGame(c, r, k, "intelligent", l)
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
 	enc.Encode(game)
+}
+
+func toIntOr(conv string, or int) int {
+	v, err := strconv.Atoi(conv)
+	if err != nil {
+		return or
+	}
+	return v
 }
 
 func playHandler(w http.ResponseWriter, req *http.Request) error {
@@ -188,7 +204,7 @@ func autoPlay(game *Game) (int, int, error) {
 	case "random":
 		return playRandom(game)
 	case "intelligent":
-		return playIntelligent(game, 4)
+		return playIntelligent(game)
 	}
 	return -1, -1, errors.New("Unknown game mode")
 }
@@ -207,11 +223,11 @@ func playRandom(game *Game) (int, int, error) {
 }
 
 // provides a starting point to the alpha beta algorithm, using the computooor player
-func playIntelligent(game *Game, depth int) (int, int, error) {
+func playIntelligent(game *Game) (int, int, error) {
 
 	alpha, beta := -1000, 1000
-	_, choices := alphaBeta(depth-1, alpha, beta, game.Board, true, game.Rows, game.Win)
-
+	_, choices := alphaBeta(game.Level-1, alpha, beta, game.Board, true, game.Rows, game.Win)
+	fmt.Println(choices)
 	col := choices.GetOne()
 	row, err := apply(game.Board, col, true, game.Rows)
 	if err != nil { // column full
@@ -362,6 +378,7 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 		}
 		//fmt.Println("axis score", dir, "for", computer, "at", c, r, bestScore)
 		res <- bestScore // axis usable, return rate
+		close(res)
 	}()
 	return res
 }

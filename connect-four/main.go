@@ -43,13 +43,13 @@ func NewGame(cols, rows, win int, mode string, level int) *Game {
 	}
 	return &Game{
 		Id:     fmt.Sprintf("%X-%X-%X-%X-%X", b[0:4], b[4:6], b[6:8], b[8:10], b[10:]),
-		Mode:   mode, // minmax, heuristics etc..
+		Mode:   mode, // random, inteligent
 		Winner: "",
 		Board:  make([][]bool, cols),
 		Cols:   cols,
 		Rows:   rows,
 		Win:    win,
-		Level:  level,
+		Level:  level, // only relevant when playing intelligent
 	}
 }
 
@@ -123,7 +123,7 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 	c := toIntOr(query.Get("c"), 7)
 	r := toIntOr(query.Get("r"), 6)
 	k := toIntOr(query.Get("k"), 4)
-	l := toIntOr(query.Get("l"), 6)
+	l := toIntOr(query.Get("l"), 8)
 	game := NewGame(c, r, k, "intelligent", l)
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
@@ -226,11 +226,7 @@ func playRandom(game *Game) (int, int, error) {
 func playIntelligent(game *Game) (int, int, error) {
 
 	alpha, beta := -1000, 1000
-	_, choices := alphaBeta(game.Level-1, alpha, beta, game.Board, true, game.Rows, game.Win)
-	fmt.Println("Motherfucking computer choices", choices)
-	fmt.Println("")
-	fmt.Println("")
-	col := choices.GetOne()
+	_, col := alphaBeta(game.Level-1, alpha, beta, game.Board, true, game.Rows, game.Win)
 	row, err := apply(game.Board, col, true, game.Rows)
 	if err != nil { // column full
 		panic("column full")
@@ -238,63 +234,64 @@ func playIntelligent(game *Game) (int, int, error) {
 	return col, row, nil
 }
 
-// alpha is best score for computer so far in searchtree
-// beta is best score for player so far in searchtree
-//
-// Returns the best possible score and all columns with that score for
+// Returns the best possible score and one random with that score for
 //'computer (true:comp, false:player)' when thinking 'depth' turns ahead.
-// Aserts that 'computer' wants to insert a token at (col, row) into the board
-func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
+// Aserts that 'computer' wants to insert a token at (col, row) into the board.
+func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, int) {
 
 	s := scoreInsertAt(col, row, computer, board, win, maxRows)
 	// if I can win by inserting in c, no further eval of alpha/beta, this option is absolute at this point in time
 	if depth == 0 || isWin(s, win, computer) {
-		return s, NewIntSet().Add(col)
+		return s, -1 // no further enemy choices
 
 	}
-	//fmt.Println("When", computer, "inserted in", col, row, "result for AB at", depth-1, "for", !computer, "is", s, choices, "and a b", alpha, beta)
-	return alphaBeta(depth-1, alpha, beta, board, !computer, maxRows, win)
+	s, c := alphaBeta(depth-1, alpha, beta, board, !computer, maxRows, win)
+	//fmt.Println("When", computer, "inserted in", col, row, "result for AB at", depth-1, "for", !computer, "is", s, "and a b", alpha, beta)
+	return s, c
 }
 
-func alphaBeta(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, *IntSet) {
-	myScore, enemyScore := 1000, -1000
-	if computer == COMPUTER {
-		myScore, enemyScore = -1000, 1000
-	}
-	myOptions, enemyOptions := make(map[int]*IntSet), make(map[int]*IntSet) // (score -> c)
 
-	for c := 0; c < len(board); c++ {
+
+// alpha is best score for computer so far in searchtree
+// beta is best score for player so far in searchtree
+//
+// implements alpha beta pruning on minimax algorithm
+func alphaBeta(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, int) {
+	myCol := -1
+	myScore := 1000
+	if computer == COMPUTER {
+		myScore = -1000
+	}
+
+	for _, c := range genShuff(len(board)) {
 		bCopy := make([][]bool, len(board))
 		copy(bCopy, board)
 		r, err := apply(bCopy, c, computer, maxRows)
 		if err != nil {
 			continue // column full
 		}
-		s, choices := scoreInDepth(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
+		s, _ := scoreInDepth(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
 
-		myOptions[s] = myOptions[s].Add(c)
-		enemyOptions[s] = enemyOptions[s].AddAll(choices)
 		switch computer {
 		case COMPUTER:
+			if s > myScore {
+				myCol = c
+			}
 			myScore = max(myScore, s)
 			alpha = max(alpha, myScore)
-			enemyScore = min(enemyScore, s)
 		case PLAYER:
+			if s < myScore {
+				myCol = c
+			}
 			myScore = min(myScore, s)
 			beta = min(beta, myScore)
-			enemyScore = max(enemyScore, s)
 		}
-		if beta < alpha {
+		if beta <= alpha {
 			break
 		}
 	}
-	//fmt.Println(computer, "with options", myOptions[myScore], "enemy options", enemyOptions[myScore], "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
-	if myScore == enemyScore && enemyOptions[myScore].Length() > 1 {
-		// this avoids traps: if the best I could do is best for my opponent, then I at steal one option from him
-		myOptions[myScore] = enemyOptions[myScore]
-	}
-	//fmt.Println("new options for", computer, myOptions[myScore])
-	return myScore, myOptions[myScore]
+	//fmt.Println(computer, "with col", myCol, "at depth", depth, "with myScore", myScore, "a b was", alpha, beta)
+	return myScore, myCol
 }
 
 // checks if the insert at position (c, r) lead to a win for the player with that token
@@ -409,9 +406,10 @@ func straightOrStop(arr []int, start, stop int, positive bool) int {
 // scoring function - scores the neighbors based on its property:
 // UNR : 0
 // EMPTY : 1
-// FRIEND : k + (k-dist) * k*(k-3)
-// FOE : -k - (k-dist) * -k*(k-3)
+// FRIEND : k*(k-dist) + k*(k-3)
+// FOE : -k*(k-dist) - k*(k-3)
 // OOB : terminate, do not expand result map any more
+// The factor k-3 is needed for scoring arbitary k compositions - 3 is the minimal connect count that makes sense in a connect-k game
 func scoreNeighbors(c, r int, computer bool, board [][]bool, k, maxRows int, pc PointChecker, dir string) map[int]int {
 	scores := make(map[int]int)
 OuterLoop:
@@ -638,45 +636,15 @@ func toAxis(map1, map2 map[int]int, mid int) []int {
 	return result
 }
 
-type IntSet struct {
-	set map[int]bool
-}
-
-func NewIntSet() *IntSet {
-	return &IntSet{
-		set: make(map[int]bool),
+// generates a slice with the numbers from 0-max in it, randomly shuffled
+func genShuff(max int) []int {
+	a := make([]int, max)
+	for i := 0; i < max; i++ {
+		a[i] = i
 	}
-}
-
-func (set *IntSet) Add(i int) *IntSet {
-	if set == nil {
-		set = NewIntSet()
+	for i := range a {
+		j := randomNumber(i+1)
+		a[i], a[j] = a[j], a[i]
 	}
-	set.set[i] = true
-	return set
-}
-
-func (me *IntSet) AddAll(other *IntSet) *IntSet {
-	if me == nil {
-		me = NewIntSet()
-	}
-	for val := range me.set {
-		other.Add(val)
-	}
-	return other
-}
-
-// returns a random element of the set. returns -1 if the set is empty.
-func (set *IntSet) GetOne() int {
-	for elem := range set.set {
-		return elem // iteration not in order, so :)
-	}
-	return -1
-}
-
-func (set *IntSet) Length() int {
-	if set == nil || set.set == nil {
-		return 0
-	}
-	return len(set.set)
+	return a
 }

@@ -2,11 +2,11 @@ import ACTIONS from '../constants/Constants.js';
 
 const initialState = {
 	gameId: undefined,
-	board: [[], [], [], [], [], [], [], []],
+	board: [[], [], [], [], [], [], []],
 	isPlaying: false,
 	playError: false,
-	columns: 8,
-	rows: 8,
+	columns: 7,
+	rows: 6,
 	winner: ''
 };
 

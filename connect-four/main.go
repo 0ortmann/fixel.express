@@ -227,7 +227,9 @@ func playIntelligent(game *Game) (int, int, error) {
 
 	alpha, beta := -1000, 1000
 	_, choices := alphaBeta(game.Level-1, alpha, beta, game.Board, true, game.Rows, game.Win)
-	fmt.Println(choices)
+	fmt.Println("Motherfucking computer choices", choices)
+	fmt.Println("")
+	fmt.Println("")
 	col := choices.GetOne()
 	row, err := apply(game.Board, col, true, game.Rows)
 	if err != nil { // column full
@@ -250,6 +252,7 @@ func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer boo
 		return s, NewIntSet().Add(col)
 
 	}
+	//fmt.Println("When", computer, "inserted in", col, row, "result for AB at", depth-1, "for", !computer, "is", s, choices, "and a b", alpha, beta)
 	return alphaBeta(depth-1, alpha, beta, board, !computer, maxRows, win)
 }
 
@@ -268,6 +271,7 @@ func alphaBeta(depth, alpha, beta int, board [][]bool, computer bool, maxRows, w
 			continue // column full
 		}
 		s, choices := scoreInDepth(depth, alpha, beta, c, r, bCopy, computer, maxRows, win)
+
 		myOptions[s] = myOptions[s].Add(c)
 		enemyOptions[s] = enemyOptions[s].AddAll(choices)
 		switch computer {

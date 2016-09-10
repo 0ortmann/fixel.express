@@ -1,4 +1,4 @@
-.connectFourBoard {
+.connectKBoard {
 	width: 85%;
 	max-width: 868px;
 	display: inline-block;
@@ -9,11 +9,11 @@
 	column-rule: 5px outset black;
 }
 
-.connectFourBoard__column {
+.connectKBoard__column {
 	text-align: center;
 }
 
-.connectFourBoard__row {
+.connectKBoard__row {
 	min-height: 70px;
 	border-bottom: 5px solid black;
 }

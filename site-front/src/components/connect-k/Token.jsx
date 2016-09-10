@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 
-import './ConnectFourToken.scss';
+import './Token.scss';
 
-export default class ConnectFourToken extends Component {
+export default class Token extends Component {
 
 	constructor(props) {
 		super(props);
@@ -22,13 +22,13 @@ export default class ConnectFourToken extends Component {
 		if (typeof player === 'undefined') {
 			return null;
 		}
-		const classes = classNames('connectFourToken', { red: player == 'player', blue: player == 'computer' } );
+		const classes = classNames('token', { red: player == 'player', blue: player == 'computer' } );
 		return (
 			<div className={classes} />
 		);
 	}
 }
 
-ConnectFourToken.propTypes = {
+Token.propTypes = {
 	player: React.PropTypes.string,
 }

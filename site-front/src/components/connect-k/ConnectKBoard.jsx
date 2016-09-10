@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
-import ConnectFourToken from './ConnectFourToken.jsx';
+import Token from './Token.jsx';
 
-import './ConnectFourBoard.scss';
+import './ConnectKBoard.scss';
 
-export default class ConnectFourBoard extends Component {
+export default class ConnectKBoard extends Component {
 
 	constructor(props) {
 		super(props);
@@ -21,14 +21,14 @@ export default class ConnectFourBoard extends Component {
 	render() {
 		const { board, cols, rows } = this.props;
 		return (
-			<div className='connectFourBoard'>
+			<div className='connectKBoard'>
 				{[...Array(cols)].map((x, c) => {
 					return (
-						<div data-col={c} key={c} className='connectFourBoard__column' onClick={this.insert}>
+						<div data-col={c} key={c} className='connectKBoard__column'>
 							{[...Array(rows)].map((y, r) => {
 								return (
-									<div data-col={c} key={r} className='connectFourBoard__row'>
-										<ConnectFourToken player={board[c][rows - r -1]} />
+									<div data-col={c} key={r} className='connectKBoard__row' onClick={this.insert}>
+										<Token player={board[c][rows - r -1]} />
 									</div>
 								);
 							})}
@@ -41,7 +41,7 @@ export default class ConnectFourBoard extends Component {
 	}
 }
 
-ConnectFourBoard.propTypes = {
+ConnectKBoard.propTypes = {
 	cols: React.PropTypes.number.isRequired,
 	rows: React.PropTypes.number.isRequired,
 	play: React.PropTypes.func.isRequired,

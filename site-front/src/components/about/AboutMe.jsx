@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import LanguageSelector from './LanguageSelector.jsx';
 import FixHeaderBox from './FixHeaderBox.jsx';
 
-import './Main.scss';
+import './AboutMe.scss';
 
 const langs = ['german', 'english']
 
-export default class Main extends Component {
+export default class AboutMe extends Component {
 	
 	constructor(props) {
 		super(props);
@@ -45,7 +45,7 @@ export default class Main extends Component {
 			return null;
 		}
 		return (
-			<main className='about'>
+			<div className='about'>
 				<LanguageSelector selectCallback={this.switchLanguage} langs={langs}/>
 				<h1>FELIX ORTMANN</h1>
 				<div className='about__subtitle'>
@@ -59,12 +59,12 @@ export default class Main extends Component {
 					})}
 				</div>
 				<object className='gopher__left'/>
-			</main>
+			</div>
 		);
 	}
 }
 
-Main.propTypes = {
+AboutMe.propTypes = {
 	content: React.PropTypes.object.isRequired,
 	fixHeader: React.PropTypes.func.isRequired
 }

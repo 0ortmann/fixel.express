@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
 // dont import the connected ('wrapped') component, but the pure one
-import { Main } from '../src/components/main/Main.jsx';
+import AboutMe from '../src/components/about/AboutMe.jsx';
 
-describe('Main', () => {
+describe('AboutMe', () => {
 
 	const gerCont = { 
 		description: ['foo', 'bar'],
@@ -30,39 +30,38 @@ describe('Main', () => {
 	const gameId = '123';
 	const board = [[], [], [], [], [], [], []];
 
-	let main;
+	let about;
 
 
 	beforeEach(function() {
-		main = TestUtils.renderIntoDocument(
-			<Main content={content} fixHeader={fixHeader} newGame={newGame} 
-				cols={cols} rows={rows} board={board} gameId={gameId} />
+		about = TestUtils.renderIntoDocument(
+			<AboutMe content={content} fixHeader={fixHeader} />
 		);
 	});
 
 	it('should render', () => {
-		const mainNode = ReactDOM.findDOMNode(main);
-		expect(mainNode).toBeDefined();
-		expect(main.state.content).toEqual(gerCont);
-		const paragraphs = TestUtils.scryRenderedDOMComponentsWithTag(main, 'p');
+		const aboutNode = ReactDOM.findDOMNode(about);
+		expect(aboutNode).toBeDefined();
+		expect(about.state.content).toEqual(gerCont);
+		const paragraphs = TestUtils.scryRenderedDOMComponentsWithTag(about, 'p');
 		expect(paragraphs.length).toEqual(2);
 		expect(paragraphs[0].textContent).toEqual('foo');
 		expect(paragraphs[1].textContent).toEqual('bar');
 	});
 
 	it('should switch language correctly', () => {
-		main.switchLanguage('english');
-		expect(main.state.content).toEqual(engCont);
+		about.switchLanguage('english');
+		expect(about.state.content).toEqual(engCont);
 
-		main.switchLanguage('foobar'); // shouldnt change
-		expect(main.state.content).toEqual(engCont);
+		about.switchLanguage('foobar'); // shouldnt change
+		expect(about.state.content).toEqual(engCont);
 	});
 
 	it('should fix header', () => {
-		expect(main.state.hideFixHint).toEqual(false);
+		expect(about.state.hideFixHint).toEqual(false);
 		
-		main.fixHeader();
-		expect(main.state.hideFixHint).toEqual(true);
+		about.fixHeader();
+		expect(about.state.hideFixHint).toEqual(true);
 		expect(fixHeader).toBeCalled();
 	});
 });

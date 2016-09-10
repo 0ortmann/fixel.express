@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import Ugly from '../components/header/Ugly.jsx';
 import Hammer from '../components/header/Hammer.jsx';
 import Shiny from '../components/header/Shiny.jsx';
-import Main from '../components/main/Main.jsx';
+import AboutMe from '../components/about/AboutMe.jsx';
 
 const CONTENT = require('../content/content.json');
 
-export default class App extends Component {
+export default class About extends Component {
 	
 	constructor(props) {
 		super(props);
@@ -39,7 +39,7 @@ export default class App extends Component {
 		return (
 			<div className='about'>
 				{this.getHeader()}
-				<Main content={CONTENT} fixHeader={this.hammerHeader} />
+				<AboutMe content={CONTENT} fixHeader={this.hammerHeader} />
 			</div>
 		);
 	}

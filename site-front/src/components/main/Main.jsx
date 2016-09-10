@@ -26,7 +26,7 @@ export class Main extends Component {
 
     componentWillMount() {
         this.switchLanguage('german');
-        this.props.newGame();
+        //this.props.newGame();
     }
 
     switchLanguage(lang) {
@@ -71,7 +71,6 @@ export class Main extends Component {
                 </div>
                 <object className='gopher__left'/>
                 <button onClick={newGame}>Ding Dong</button>
-                <ConnectFourBoard play={this.play} board={board} rows={rows} cols={cols} />
             </main>
         );
     }

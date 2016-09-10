@@ -1,13 +1,16 @@
 import React from 'react';
-import Root from '../src/containers/Root.jsx';
-import configureStore from '../src/store/configureStore.js';
-
 import path from 'path';
 import Express from 'express';
 import webpack from 'webpack';
-const config = require(path.resolve(__dirname, '../webpack.config.' + process.env.NODE_ENV + '.js'));
-
 import { renderToString } from 'react-dom/server';
+import { Provider } from 'react-redux';
+import { createMemoryHistory, match, RouterContext } from 'react-router';
+import { syncHistoryWithStore } from 'react-router-redux';
+
+import configureStore from '../src/store/configureStore.js';
+import routes from '../routes.js';
+
+const config = require(path.resolve(__dirname, '../webpack.config.' + process.env.NODE_ENV + '.js'));
 
 const compiler = webpack(config);
 const app = new Express();
@@ -15,22 +18,37 @@ const app = new Express();
 if(process.env.NODE_ENV == 'development') {
 	app.use(require('webpack-dev-middleware')(compiler, {
 		publicPath: config.output.publicPath,
-		noInfo: true 
+		noInfo: true
 	}));
 
 	app.use(require('webpack-hot-middleware')(compiler));
-	app.use(Express.static('public'));
 }
-else {
-	app.use(Express.static('public'));
-}
+
+app.use(Express.static('public'));
 
 
 function handleRender(req, res) {
-	const store = configureStore();
-	var html = renderToString(<Root store={store}/>);
+	const memoryHistory = createMemoryHistory(req.url);
+	const store = configureStore(memoryHistory);
+	const history = syncHistoryWithStore(memoryHistory, store);
 
-	res.send(renderFullPage(html, store.getState()));
+	match({ history, routes, location: req.url }, (error, redirectLocation, renderProps) => {
+		if (error) {
+			res.status(500).send(error.message);
+		}
+		else if (redirectLocation) {
+			res.redirect(302, redirectLocation.pathname + redirectLocation.search);
+		}
+		else if (renderProps) {
+			const html = renderToString(
+				<Provider store={store}>
+					<RouterContext {...renderProps} />
+				</Provider>
+			);
+			res.send(renderFullPage(html, store.getState()));
+		}
+	});
+
 }
 
 function renderFullPage(html, preloadedState) {
@@ -57,7 +75,7 @@ function renderFullPage(html, preloadedState) {
 	`;
 }
 
-app.get('/', handleRender);
+app.use(handleRender);
 
 const server = app.listen(3300, function() {
 	const host = server.address().address;

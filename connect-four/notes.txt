@@ -1,0 +1,77 @@
+this is a competing game, u dont expect to get what u want!
+
+max	2	      / \
+		     /   \
+min	1	   ²x    ¹x
+		   / \   / \
+		  2   7 1   8
+
+
+min sie für die knoten unter sich 2, 7, 8 & 1. davon sind 2 und 1 die mins
+max sieht für knoten unter sich 2 & 1, davon ist 2 das max
+
+lets have a celebration of learning
+
+
+
+rating eines feldes:
+
+alle achsen im umkreis, bei 4 gewinnt also 3 in jede richtung
+wenn 4 auf achse erreichbar:
+	schon besetzt
+
+	wert 0 : kein 4er machbar
+	wert x : x # der machbaren 4er
+	 + die anzahl der chips gleicher sorte in der machbaren reihe zum quadrat
+
+
+rate point:
+	rate point for axis
+		axis not completable -> 0
+		else #chips of same kind in pos. row pow 2
+		maximum of all
+
+max >= threshold (t = g.Win pow2)
+
+
+
+eine achse hat unterschiedliche werte, je nach dem ob ich sie aus sicht des players oder des computers betrachte.
+
+eine achse hat keinen wert wenn keiner da was bauen kann
+
+bilde alle k-langen ketten auf achse: 
+	schaue, ob einer was bauen kann:
+		das ist möglich, wenn kein gegner auf dieser kette liegt -- sobald ich einmal wieder runter gezählt hab, stop -> unusable
+	wenn ich nicht runter gezählt hab, hab ich einen wert (der ist + oder -)
+	daraus ergibt sich: wie wertvoll ist diese achse für mich?
+
+
+wenn es für den gegner keinen schlechtesten move gibt, dann gibt es für mich keinen besten und ich wähle random. das ist scheiße.
+wichtung mit beachtung von consekutiven kettenlängen
+
+unerreichbare felder (z.B. in der luft schwebende) : 0
+leer: 1
+mein token : k*(k-dist) + k*(k-3)
+anderer token : -k*(k-dist) - k*(k-3)
+außerhalb des feldes : garnicht werten!
+
+je nach tiefe über "3 gewinnt" - gibt einen faktor mehr zu K bei additiver punktwertung
+3 gewinnt --> score == score + (3-3)*k
+
+	insert bei 0 x 0 wiegt 6 + 9 + 6 = 21 und 0 0 x wiegt 3+6+9 == 18
+	wiegt auf jeden fall mehr weil leere felder am ende scheiß egal sind, bei k=3 liegen da ja eh token
+
+4 gewinnt --> score+k == score + (4-3)*k
+
+	insert bei 0 0 x 0 wiegt 8+12+16+12 + 16*1 == 64  und 0 0 0 x wiegt 4+8+12+16 + 16*1 == 56
+	während bei _ 0 x 0  -- 2+12+16-12 + 12 == 54 was kleiner 56 ist!!
+
+5 gewinnt --> score+2k == score +(5-3)*k
+
+	insert bei 0 0 x 0 0 wiegt 15+20+25+20+15 + 25*2 == 145  und 0 0 0 x 0 wiegt 10+15+20+25+20 + 25*2 == 140 und 0 0 0 0 x wiegt 5+10+15+20+25 + 25*2 == 125
+	während bei _ 0 x 0 0  --  2+20+25+20+15 + 2*20 == 122 was kleiner 125 ist!!
+
+6 gewinnt --> score+3k == score +(6-3)*k
+
+	insert bei 0 0 x 0 0 0 wiegt 30+36+30+24+18 + 36*3 == 270  und 0 x 0 0 0 0 wiegt 30+36+30+24+18+12 + 36*3 == 258 und x 0 0 0 0 0 wiegt 36+30+24+18+12+6 + 36*3 == 234
+	während bei _ 0 x 0 0 0  --  2+30+36+30+24+18 + 3*30 == 230 was kleiner 234 ist!!

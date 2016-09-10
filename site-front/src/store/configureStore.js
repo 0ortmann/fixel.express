@@ -1,14 +1,23 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
+import { routerReducer, routerMiddleware } from 'react-router-redux';
+
 import api from '../middleware/Api.js';
 import board from '../reducer/BoardReducer.js';
 
+const reducer = combineReducers({
+	routing: routerReducer,
+	board: board
+});
 
-export default function configureStore(preloadedState) {
+
+export default function configureStore(history, preloadedState) {
 	return createStore(
-		board, 
+		reducer, 
 		preloadedState, 
-		applyMiddleware(thunk, api, createLogger())
+		compose( // need me?
+			applyMiddleware(thunk, api, createLogger(), routerMiddleware(history))
+		)
 	);
 }

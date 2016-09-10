@@ -123,7 +123,7 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 	c := toIntOr(query.Get("c"), 7)
 	r := toIntOr(query.Get("r"), 6)
 	k := toIntOr(query.Get("k"), 4)
-	l := toIntOr(query.Get("l"), 8)
+	l := toIntOr(query.Get("l"), 4)
 	game := NewGame(c, r, k, "intelligent", l)
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")

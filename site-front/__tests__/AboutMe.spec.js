@@ -24,11 +24,6 @@ describe('AboutMe', () => {
 	};
 
 	const fixHeader = jest.genMockFunction();
-	const newGame = jest.genMockFunction();
-	const cols = 7;
-	const rows = 6;
-	const gameId = '123';
-	const board = [[], [], [], [], [], [], []];
 
 	let about;
 

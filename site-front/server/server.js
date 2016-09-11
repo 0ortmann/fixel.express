@@ -18,7 +18,8 @@ const app = new Express();
 if(process.env.NODE_ENV == 'development') {
 	app.use(require('webpack-dev-middleware')(compiler, {
 		publicPath: config.output.publicPath,
-		noInfo: true
+		noInfo: true,
+		serverSideRender: true
 	}));
 
 	app.use(require('webpack-hot-middleware')(compiler));
@@ -47,6 +48,9 @@ function handleRender(req, res) {
 			);
 			res.send(renderFullPage(html, store.getState()));
 		}
+		else {
+			res.status(404).send('Not found');
+		}
 	});
 
 }
@@ -60,15 +64,15 @@ function renderFullPage(html, preloadedState) {
 			<meta charset='utf-8'>
 			<meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable=yes" />
 			<title>Fixel Express</title>
-			<link rel='stylesheet' type='text/css' href='assets/bundle.css'>
+			<link rel='stylesheet' type='text/css' href='/assets/bundle.css'>
 			<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-			<link sizes="96x96" href="img/favicon.ico" type="image/png" rel="icon">
+			<link sizes="96x96" href="/favicon.ico" type="image/png" rel="icon">
 		</head>
 
 		<body>
 			<div id='content'>${html}</div>
 			<script>window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState)}</script>
-			<script type='text/javascript' src='assets/bundle.js' charset='utf-8'></script>
+			<script type='text/javascript' src='/assets/bundle.js' charset='utf-8'></script>
 		</body>
 
 		</html>

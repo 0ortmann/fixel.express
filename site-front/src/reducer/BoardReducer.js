@@ -38,11 +38,15 @@ export default function board(state = initialState, action) {
 			...state,
 			gameId: undefined
 		};
-	case ACTIONS.NEW_GAME_SUCCESS:
+	case ACTIONS.NEW_GAME_SUCCESS: {
+		let newBoard = [];
+		action.response['board'].map(() => {
+			newBoard.push([]);
+		});
 		return { 
 			...state,
 			gameId: action.response['id'],
-			board: initialState.board,
+			board: newBoard,
 			isPlaying: initialState.isPlaying,
 			playError: initialState.playError,
 			columns: action.response['cols'],
@@ -51,6 +55,7 @@ export default function board(state = initialState, action) {
 			level: action.response['level'],
 
 		};
+	}
 	default:
 		return state;
 	}

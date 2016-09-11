@@ -8,6 +8,8 @@ export default class PropertyPanel extends Component {
 		super(props);
 		
 		this.difficultyChange = this.difficultyChange.bind(this);
+		this.columnChange = this.columnChange.bind(this);
+		this.rowChange = this.rowChange.bind(this);
 		this.newGame = this.newGame.bind(this);
 	}
 
@@ -15,21 +17,41 @@ export default class PropertyPanel extends Component {
 		this.props.newGame();
 	}
 
-	newGame() {
+	newGame(props) {
 		const { newGame, cols, rows, k, level  } = this.props;
-		newGame({
+		let query = {
 			c: cols,
 			r: rows, 
 			k: k,
 			l: level
-		});
-
+		};
+		for (const prop in props) {
+			query[prop] = props[prop];
+		}
+		newGame(query);
 	}
 
 	difficultyChange(evt) {
+		evt.preventDefault();
 		const level = evt.target.value;
 		if (level) {
-			this.props.newGame( { l: parseInt(level) } );
+			this.newGame( { l: parseInt(level) } );
+		}
+	}
+
+	columnChange(evt) {
+		evt.preventDefault();
+		const column = evt.target.value;
+		if (column) {
+			this.newGame( { c: parseInt(column) } );
+		}
+	}
+
+	rowChange(evt) {
+		evt.preventDefault();
+		const row = evt.target.value;
+		if (row) {
+			this.newGame( { r: parseInt(row) } );
 		}
 	}
 
@@ -39,6 +61,8 @@ export default class PropertyPanel extends Component {
 			<div className='game__properties'>
 				<button className='game__new' onClick={this.newGame}>Ding Dong</button>
 				<input className='range game__difficulty' type='range' min={2} max={8} step={2} defaultValue={level} onChange={this.difficultyChange} />
+				<input type='number' min={7} max={20} step={1} defaultValue={cols} onChange={this.columnChange} />
+				<input type='number' min={6} max={20} step={1} defaultValue={rows} onChange={this.rowChange} />
 			</div>
 		);
 	}

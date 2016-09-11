@@ -1,7 +1,6 @@
 import 'isomorphic-fetch';
 import ACTIONS from '../constants/Constants';
 
-
 const API = 'http://localhost:5000';
 const CALL_API = ACTIONS.CALL_API;
 
@@ -44,12 +43,10 @@ function actionWith(origAction, newData) {
 
 function buildQueryString(obj) {
 	let query = '?';
-	console.log(obj)
 	for (const prop in obj) {
-		console.log(prop, obj, obj[prop])
 		query += prop + '=' + obj[prop] + '&';
 	}
-	return query
+	return query;
 }
 
 export default () => next => action => {

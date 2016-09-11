@@ -10,7 +10,7 @@ export default class ConnectK extends Component {
 
 	render() {
 		return (
-			<div className='connectK'>
+			<div>
 				<Game />
 			</div>
 		);

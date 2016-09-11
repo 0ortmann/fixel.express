@@ -1,14 +1,21 @@
 .token {
-	display: inline-block;
 	border-radius: 50%;
-	width: 60px;
-	height: 60px;
+	width: 68px;
+	height: 68px;
+	margin: 0 auto;
 }
 
 .red {
-	background-color: salmon;
+	background: #b20505;
+	background: -moz-linear-gradient(-45deg,  #b20505 0%, #e57b7b 51%, #ef0b07 100%);
+	background: -webkit-linear-gradient(-45deg,  #b20505 0%,#e57b7b 51%,#ef0b07 100%);
+	background: linear-gradient(135deg,  #b20505 0%,#e57b7b 51%,#ef0b07 100%);
+
 }
 
 .blue {
-	background-color: cornflowerblue;
+	background: #1e5799;
+	background: -moz-linear-gradient(-45deg,  #1e5799 0%, #7db9e8 49%, #7db9e8 49%, #0687e2 100%);
+	background: -webkit-linear-gradient(-45deg,  #1e5799 0%,#7db9e8 49%,#7db9e8 49%,#0687e2 100%);
+	background: linear-gradient(135deg,  #1e5799 0%,#7db9e8 49%,#7db9e8 49%,#0687e2 100%);
 }

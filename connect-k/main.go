@@ -18,14 +18,14 @@ type GameStore struct {
 }
 
 type Game struct {
-	Id     string
-	Mode   string
-	Winner string
-	Board  [][]bool
-	Cols   int
-	Rows   int
-	Win    int
-	Level  int
+	Id     string `json:"id"`
+	Mode   string `json:"mode"`
+	Winner string `json:"winner"`
+	Board  [][]bool `json:"board"`
+	Cols   int `json:"cols"`
+	Rows   int `json:"rows"`
+	Win    int `json:"win"`
+	Level  int `json:"level"`
 }
 
 // create a (cols x rows) game board. 'win' neighbored pieces are needed to win
@@ -123,11 +123,12 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 	c := toIntOr(query.Get("c"), 7)
 	r := toIntOr(query.Get("r"), 6)
 	k := toIntOr(query.Get("k"), 4)
-	l := toIntOr(query.Get("l"), 6)
+	l := toIntOr(query.Get("l"), 4)
 	game := NewGame(c, r, k, "intelligent", l)
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
+	fmt.Println("Created new game", game.Id, "level", game.Level, "board:", game.Cols, "x", game.Rows)
 	enc.Encode(game)
 }
 

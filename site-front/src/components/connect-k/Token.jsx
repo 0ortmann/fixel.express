@@ -18,17 +18,18 @@ export default class Token extends Component {
 	// TODO: dynamic column counts
 
 	render() {
-		const player = this.props.player;
+		const { player, col } = this.props;
 		if (typeof player === 'undefined') {
 			return null;
 		}
 		const classes = classNames('token', { red: player == 'player', blue: player == 'computer' } );
 		return (
-			<div className={classes} />
+			<div className={classes} data-col={col}/>
 		);
 	}
 }
 
 Token.propTypes = {
 	player: React.PropTypes.string,
+	col: React.PropTypes.number
 }

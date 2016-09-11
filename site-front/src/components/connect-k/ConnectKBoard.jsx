@@ -13,7 +13,9 @@ export default class ConnectKBoard extends Component {
 
 	insert(evt) {
 		const col = evt.target.dataset['col'];
-		this.props.play(parseInt(col));
+		if (col) {
+			this.props.play(parseInt(col));
+		}
 	}
 
 	// TODO: dynamic column counts
@@ -28,7 +30,7 @@ export default class ConnectKBoard extends Component {
 							{[...Array(rows)].map((y, r) => {
 								return (
 									<div data-col={c} key={r} className='connectKBoard__row' onClick={this.insert}>
-										<Token player={board[c][rows - r -1]} />
+										<Token player={board[c][rows - r -1]} col={c} />
 									</div>
 								);
 							})}

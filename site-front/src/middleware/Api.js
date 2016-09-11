@@ -42,20 +42,30 @@ function actionWith(origAction, newData) {
 	return withoutCallApi;
 }
 
+function buildQueryString(obj) {
+	let query = '?';
+	console.log(obj)
+	for (const prop in obj) {
+		console.log(prop, obj, obj[prop])
+		query += prop + '=' + obj[prop] + '&';
+	}
+	return query
+}
+
 export default () => next => action => {
 	const apiCall = action[CALL_API];
 
 	if (typeof apiCall === 'undefined') {
 		return next(action);
 	}
-	const { endpoint, method, types, body } = apiCall;
+	const { endpoint, method, types, body, properties } = apiCall;
 
 	// mark as pending
 	const [ requestType, successType, failureType ] = types;
 	next( actionWith( action, { type: requestType }));
 	if (method != 'Post') {
 		
-		return getApi(endpoint).then(
+		return getApi(endpoint + buildQueryString(properties)).then(
 			response => next(actionWith( {
 				response,
 				type: successType

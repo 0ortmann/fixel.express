@@ -7,6 +7,8 @@ const initialState = {
 	playError: false,
 	columns: 7,
 	rows: 6,
+	k: 4,
+	level: 4,
 	winner: ''
 };
 
@@ -39,13 +41,14 @@ export default function board(state = initialState, action) {
 	case ACTIONS.NEW_GAME_SUCCESS:
 		return { 
 			...state,
-			gameId: action.response['Id'],
+			gameId: action.response['id'],
 			board: initialState.board,
 			isPlaying: initialState.isPlaying,
 			playError: initialState.playError,
-			columns: initialState.columns,
-			rows: initialState.rows,
-			winner: initialState.winner
+			columns: action.response['cols'],
+			rows: action.response['rows'],
+			k: action.response['win'],
+			level: action.response['level'],
 
 		};
 	default:

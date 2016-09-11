@@ -2,22 +2,22 @@
 @import '../components/header/Header.scss';
 
 .app {
-    width: 100%;
-    overflow: hidden;
-    padding: 20px 0;
-    font-family: 'Raleway', sans-serif;
-    font-size: 16px;
+	width: 100%;
+	overflow: hidden;
+	padding: 20px 0;
+	font-family: 'Raleway', arial, sans-serif;
+	font-size: 16px;
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {
-    .app {
-        padding: 0;
-    }
+	.app {
+		padding: 0;
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Raleway', sans-serif;
-    font-weight: normal;
+	font-family: 'Raleway', sans-serif;
+	font-weight: normal;
 }
 
 h1 {
@@ -26,12 +26,24 @@ h1 {
 
 /* Preload image(s), so I have no flicker on hover */
 body:after{
-    position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
-    content: url('/img/profile.jpg') url('/img/gopher_straight_look_rotated.svg') 
-        url('/img/arrow.svg') url('/img/gopher_hammer_right.svg') url('/img/gopher_hammer_right_2.svg')
-        url('/img/gopher_hammer_left.svg') url('/img/gopher_hammer_left_2.svg');
+	position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
+	content: url('/img/profile.jpg') url('/img/gopher_straight_look_rotated.svg') 
+		url('/img/arrow.svg') url('/img/gopher_hammer_right.svg') url('/img/gopher_hammer_right_2.svg')
+		url('/img/gopher_hammer_left.svg') url('/img/gopher_hammer_left_2.svg');
 }
 
 .hide {
-    display: none;
+	display: none;
+}
+
+.range:focus, .range:active, .range:hover {
+	outline: none;
+}
+
+.range::-webkit-slider-thumb:active {
+	cursor: -webkit-grabbing;
+}
+
+.range::-moz-range-thumb:active {
+	cursor: -moz-grabbing;
 }

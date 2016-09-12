@@ -4,8 +4,6 @@ import Hammer from '../components/header/Hammer.jsx';
 import Shiny from '../components/header/Shiny.jsx';
 import AboutMe from '../components/about/AboutMe.jsx';
 
-const CONTENT = require('../content/content.json');
-
 export default class About extends Component {
 	
 	constructor(props) {
@@ -39,7 +37,7 @@ export default class About extends Component {
 		return (
 			<div className='about'>
 				{this.getHeader()}
-				<AboutMe content={CONTENT} fixHeader={this.hammerHeader} />
+				<AboutMe fixHeader={this.hammerHeader} />
 			</div>
 		);
 	}

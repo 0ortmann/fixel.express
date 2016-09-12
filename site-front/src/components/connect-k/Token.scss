@@ -1,21 +1,23 @@
 .token {
 	border-radius: 50%;
-	width: 68px;
-	height: 68px;
+	width: 54px;
+	height: 54px;
 	margin: 0 auto;
 }
 
 .red {
-	background: #b20505;
-	background: -moz-linear-gradient(-45deg,  #b20505 0%, #e57b7b 51%, #ef0b07 100%);
-	background: -webkit-linear-gradient(-45deg,  #b20505 0%,#e57b7b 51%,#ef0b07 100%);
-	background: linear-gradient(135deg,  #b20505 0%,#e57b7b 51%,#ef0b07 100%);
+	border: 7px solid #dd0b07;
+	background: #dd0b07;
+	background: -moz-linear-gradient(-45deg, #b20505 0%, #e57b7b 49%, #ef0b07 100%);
+	background: -webkit-linear-gradient(-45deg, #b20505 0%, #e57b7b 49%,#ef0b07 100%);
+	background: linear-gradient(135deg,  #b20505 0%,#e57b7b 49%,#ef0b07 100%);
 
 }
 
 .blue {
-	background: #1e5799;
-	background: -moz-linear-gradient(-45deg,  #1e5799 0%, #7db9e8 49%, #7db9e8 49%, #0687e2 100%);
-	background: -webkit-linear-gradient(-45deg,  #1e5799 0%,#7db9e8 49%,#7db9e8 49%,#0687e2 100%);
-	background: linear-gradient(135deg,  #1e5799 0%,#7db9e8 49%,#7db9e8 49%,#0687e2 100%);
+	border: 7px solid #0687d0;
+	background: #0687d0;
+	background: -moz-linear-gradient(-45deg, #1e5799 0%, #7db9e8 49%, #0687e2 100%);
+	background: -webkit-linear-gradient(-45deg, #1e5799 0%, #7db9e8 49%, #0687e2 100%);
+	background: linear-gradient(135deg,  #1e5799 0%, #7db9e8 49%, #0687e2 100%);
 }

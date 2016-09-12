@@ -61,8 +61,8 @@ export default class PropertyPanel extends Component {
 			<div className='game__properties'>
 				<button className='game__new' onClick={this.newGame}>Ding Dong</button>
 				<input className='range game__difficulty' type='range' min={2} max={8} step={2} defaultValue={level} onChange={this.difficultyChange} />
-				<input type='number' min={7} max={20} step={1} defaultValue={cols} onChange={this.columnChange} />
-				<input type='number' min={6} max={20} step={1} defaultValue={rows} onChange={this.rowChange} />
+				<input className='number' type='number' min={7} max={20} step={1} defaultValue={cols} onChange={this.columnChange} />
+				<input className='number' type='number' min={6} max={20} step={1} defaultValue={rows} onChange={this.rowChange} />
 			</div>
 		);
 	}

@@ -47,3 +47,8 @@ body:after{
 .range::-moz-range-thumb:active {
 	cursor: -moz-grabbing;
 }
+
+.number::-webkit-inner-spin-button, .number::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}

@@ -2,7 +2,7 @@
 
 .fixHeaderBox {
 	position: absolute;
-	top: 30px;
+	top: calc(80px + #{$headerHeight});
 	right: 20px;
 	border: 2px dashed  $lightGrey;
 	border-radius: 10px;
@@ -10,8 +10,10 @@
 	width: 200px;
 	height: 120px;
 	transform: rotate(10deg);
+	text-align: center;
 	animation-name: fade-in;
 	animation-duration: 2.5s;
+	z-index: 5;
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 480px) {

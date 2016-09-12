@@ -2,15 +2,15 @@ import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 
 import App from './src/containers/App.jsx';
-import About from './src/containers/About.jsx';
+import AboutMe from './src/components/about/AboutMe.jsx';
 
-import ConnectK from './src/containers/ConnectK.jsx';
+import Game from './src/components/connect-k/Game.jsx';
 
 
 const routes = (
 	<Route path='/' component={App}>
-		<IndexRoute component={About} />
-		<Route path='ai' component={ConnectK} />
+		<IndexRoute component={AboutMe} />
+		<Route path='ai' component={Game} />
 	</Route>
 );
 

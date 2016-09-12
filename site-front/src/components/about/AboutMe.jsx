@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { getLanguage } from '../../actions/LanguageActionCreators.js';
 
 import LanguageSelector from './LanguageSelector.jsx';
-import FixHeaderBox from './FixHeaderBox.jsx';
 
 import './AboutMe.scss';
 
@@ -17,16 +16,6 @@ export class AboutMe extends Component {
 		this.state = { 
 			hideFixHint: false
 		};
-		this.fixHeader = this.fixHeader.bind(this);
-	}
-
-	componentWillMount() {
-		this.props.getLanguage('german');
-	}
-
-	fixHeader() {
-		this.setState({ hideFixHint: true });
-		this.props.fixHeader();
 	}
 
 	render() {
@@ -42,7 +31,6 @@ export class AboutMe extends Component {
 				<div className='about__subtitle'>
 					&mdash; {langProps.title} &mdash;
 				</div>
-				<FixHeaderBox fixIt={this.fixHeader} hide={hideFixHint} displayText={langProps.box} />
 				<img className='about__img'/>
 				<div className='about__description'>
 					{langProps.description.map((paragraph, i) => {
@@ -53,10 +41,6 @@ export class AboutMe extends Component {
 			</div>
 		);
 	}
-}
-
-AboutMe.propTypes = {
-	fixHeader: React.PropTypes.func.isRequired
 }
 
 function mapStateToProps(state) {

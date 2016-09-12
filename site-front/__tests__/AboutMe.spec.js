@@ -34,19 +34,9 @@ describe('AboutMe', () => {
 		const aboutNode = ReactDOM.findDOMNode(about);
 		expect(aboutNode).toBeDefined();
 		
-		expect(getLanguage).toBeCalledWith('german');
-
 		const paragraphs = TestUtils.scryRenderedDOMComponentsWithTag(about, 'p');
 		expect(paragraphs.length).toEqual(2);
 		expect(paragraphs[0].textContent).toEqual('foo');
 		expect(paragraphs[1].textContent).toEqual('bar');
-	});
-
-	it('should fix header', () => {
-		expect(about.state.hideFixHint).toEqual(false);
-		
-		about.fixHeader();
-		expect(about.state.hideFixHint).toEqual(true);
-		expect(fixHeader).toBeCalled();
 	});
 });

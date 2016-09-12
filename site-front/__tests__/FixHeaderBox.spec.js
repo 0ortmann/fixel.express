@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
-import FixHeaderBox from '../src/components/about/FixHeaderBox.jsx';
+import FixHeaderBox from '../src/components/header/FixHeaderBox.jsx';
 
 describe('FixHeaderBox', () => {
 

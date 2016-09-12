@@ -16,8 +16,8 @@ export class Game extends Component {
 	}
 
 	play(column) {
-		const { gameId, insertToken } = this.props;
-		insertToken(gameId, column);
+		const { id, insertToken } = this.props;
+		insertToken(id, column);
 	}
 
 	render() {
@@ -33,12 +33,12 @@ export class Game extends Component {
 
 function mapStateToProps(state, ownProps) {
 	return {
-		gameId: state.board.gameId,
-		board: state.board.board,
-		cols: state.board.columns,
-		rows: state.board.rows,
-		k: state.board.k,
-		level: state.board.level
+		id: state.game.gameId,
+		board: state.game.board,
+		cols: state.game.columns,
+		rows: state.game.rows,
+		k: state.game.k,
+		level: state.game.level
 	}
 }
 

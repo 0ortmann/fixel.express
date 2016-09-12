@@ -4,11 +4,11 @@ import createLogger from 'redux-logger';
 import { routerReducer, routerMiddleware } from 'react-router-redux';
 
 import api from '../middleware/Api.js';
-import board from '../reducer/BoardReducer.js';
+import game from '../reducer/GameReducer.js';
 
 const reducer = combineReducers({
 	routing: routerReducer,
-	board: board
+	game: game
 });
 
 

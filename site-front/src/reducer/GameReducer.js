@@ -12,7 +12,7 @@ const initialState = {
 	winner: ''
 };
 
-export default function board(state = initialState, action) {
+export default function game(state = initialState, action) {
 	switch(action.type) {
 	case ACTIONS.INSERT_TOKEN:
 		return {

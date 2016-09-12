@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import ConnectKBoard from './ConnectKBoard.jsx';
 import PropertyPanel from './PropertyPanel.jsx';
 
-import { newGame, insertToken } from '../../actions/ConnectFourActionCreators.js';
+import { newGame, insertToken } from '../../actions/ConnectKActionCreators.js';
 import './Game.scss';
 
 export class Game extends Component {
@@ -33,7 +33,7 @@ export class Game extends Component {
 
 function mapStateToProps(state, ownProps) {
 	return {
-		id: state.game.gameId,
+		id: state.game.id,
 		board: state.game.board,
 		cols: state.game.columns,
 		rows: state.game.rows,

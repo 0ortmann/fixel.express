@@ -5,7 +5,7 @@ const API = 'http://localhost:5000';
 const CALL_API = ACTIONS.CALL_API;
 
 function getApi(endpoint) {
-	const fullUrl = API + endpoint;
+	const fullUrl = endpoint.startsWith('http://')? endpoint : API + endpoint;
 
 	return fetch( fullUrl )
 		.then( res => {

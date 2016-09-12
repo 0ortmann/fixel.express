@@ -5,10 +5,12 @@ import { routerReducer, routerMiddleware } from 'react-router-redux';
 
 import api from '../middleware/Api.js';
 import game from '../reducer/GameReducer.js';
+import lang from '../reducer/LanguageReducer.js';
 
 const reducer = combineReducers({
 	routing: routerReducer,
-	game: game
+	game: game,
+	lang: lang
 });
 
 

@@ -7,7 +7,10 @@ const ACTIONS = keyMirror({
 	NEW_GAME: null,
 	NEW_GAME_SUCCESS: null,
 	NEW_GAME_ERROR: null,
-	CALL_API: null
+	CALL_API: null,
+	GET_LANGUAGE: null,
+	GET_LANGUAGE_SUCCESS: null,
+	GET_LANGUAGE_ERROR: null
 });
 
 export default ACTIONS;

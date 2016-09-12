@@ -1,7 +1,7 @@
 import ACTIONS from '../constants/Constants.js';
 
 const initialState = {
-	gameId: undefined,
+	id: undefined,
 	board: [[], [], [], [], [], [], []],
 	isPlaying: false,
 	playError: false,
@@ -36,7 +36,7 @@ export default function game(state = initialState, action) {
 	case ACTIONS.NEW_GAME_ERROR:
 		return {
 			...state,
-			gameId: undefined
+			id: undefined
 		};
 	case ACTIONS.NEW_GAME_SUCCESS: {
 		let newBoard = [];
@@ -45,7 +45,7 @@ export default function game(state = initialState, action) {
 		});
 		return { 
 			...state,
-			gameId: action.response['id'],
+			id: action.response['id'],
 			board: newBoard,
 			isPlaying: initialState.isPlaying,
 			playError: initialState.playError,

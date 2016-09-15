@@ -2,15 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
-import { Header } from '../src/components/header/Header.jsx';
+import Header from '../src/components/header/Header.jsx';
 
 describe('Header', () => {
 
-	const langProps = { box: 'BOX TEXT'};
+	const boxText = 'BOX TEXT';
 	let header;
 
 	beforeEach(function() {
-		header = TestUtils.renderIntoDocument( <Header langProps={langProps} /> );
+		header = TestUtils.renderIntoDocument( <Header boxText={boxText} /> );
 	});
 
 	it('should render with ugly header as default', () => {

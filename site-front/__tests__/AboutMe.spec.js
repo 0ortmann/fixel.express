@@ -7,16 +7,11 @@ import { AboutMe } from '../src/components/about/AboutMe.jsx';
 
 describe('AboutMe', () => {
 
-	const gerCont = { 
+	const langProps = {
 		description: ['foo', 'bar'],
 		title: 't1',
 		box: 'box'
 	}; 
-	const engCont = {
-		description: ['ping', 'pong'],
-		title: 't2',
-		box: 'box'
-	};
 
 	const fixHeader = jest.genMockFunction();
 	const getLanguage = jest.genMockFunction();
@@ -26,7 +21,7 @@ describe('AboutMe', () => {
 
 	beforeEach(function() {
 		about = TestUtils.renderIntoDocument(
-			<AboutMe langProps={gerCont} getLanguage={getLanguage} fixHeader={fixHeader} />
+			<AboutMe langProps={langProps} getLanguage={getLanguage} fixHeader={fixHeader} />
 		);
 	});
 

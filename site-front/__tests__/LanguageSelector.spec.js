@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
-import LanguageSelector from '../src/components/about/LanguageSelector.jsx';
+import LanguageSelector from '../src/components/language/LanguageSelector.jsx';
 
 describe('LanguageSelector', () => {
 

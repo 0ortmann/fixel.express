@@ -128,7 +128,7 @@ func newHandler(w http.ResponseWriter, req *http.Request) {
 	gs.Set(game)
 	w.Header().Set("Content-type", "application/json")
 	enc := json.NewEncoder(w)
-	fmt.Println("Created new game", game.Id, "level", game.Level, "board:", game.Cols, "x", game.Rows)
+	fmt.Println("Created new game", game.Id, "level", game.Level, "board:", game.Cols, "x", game.Rows, "with", k, "wins.")
 	enc.Encode(game)
 }
 

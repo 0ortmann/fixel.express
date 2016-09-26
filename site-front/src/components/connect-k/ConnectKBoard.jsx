@@ -22,9 +22,9 @@ export default class ConnectKBoard extends Component {
 
 	render() {
 		const { board, cols, rows } = this.props;
-		const boardCols = { columnCount: cols };
+		const boardStyle = { columnCount: cols, 'max-width': cols * 85, 'min-width': cols * 75 };
 		return (
-			<div className='connectKBoard' style={boardCols}>
+			<div className='connectKBoard' style={boardStyle}>
 				{[...Array(cols)].map((x, c) => {
 					return (
 						<div data-col={c} key={c} className='connectKBoard__column'>

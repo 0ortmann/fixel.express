@@ -22,7 +22,7 @@ export default class ConnectKBoard extends Component {
 
 	render() {
 		const { board, cols, rows } = this.props;
-		const boardStyle = { columnCount: cols, 'max-width': cols * 85, 'min-width': cols * 75 };
+		const boardStyle = { columnCount: cols, 'maxWidth': cols * 85, 'minWidth': cols * 75 };
 		return (
 			<div className='connectKBoard' style={boardStyle}>
 				{[...Array(cols)].map((x, c) => {

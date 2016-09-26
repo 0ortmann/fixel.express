@@ -4,8 +4,8 @@ import ACTIONS from '../constants/Constants';
 const API = 'http://localhost:5000';
 const CALL_API = ACTIONS.CALL_API;
 
-function getApi(endpoint) {
-	const fullUrl = endpoint.startsWith('http://')? endpoint : API + endpoint;
+function getApi(endpoint, host) {
+	const fullUrl = host == 'local'? endpoint : API + endpoint;
 
 	return fetch( fullUrl )
 		.then( res => {
@@ -55,14 +55,14 @@ export default () => next => action => {
 	if (typeof apiCall === 'undefined') {
 		return next(action);
 	}
-	const { endpoint, method, types, body, properties } = apiCall;
+	const { endpoint, method, types, body, properties, host } = apiCall;
 
 	// mark as pending
 	const [ requestType, successType, failureType ] = types;
 	next( actionWith( action, { type: requestType }));
 	if (method != 'Post') {
 		
-		return getApi(endpoint + buildQueryString(properties)).then(
+		return getApi(endpoint + buildQueryString(properties), host).then(
 			response => next(actionWith( {
 				response,
 				type: successType

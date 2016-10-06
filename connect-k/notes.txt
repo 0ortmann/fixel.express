@@ -1,89 +1,79 @@
 this is a competing game, u dont expect to get what u want!
 
-max	2	      / \
-		     /   \
-min	1	   ²x    ¹x
-		   / \   / \
-		  2   7 1   8
-
-
-min sie für die knoten unter sich 2, 7, 8 & 1. davon sind 2 und 1 die mins
-max sieht für knoten unter sich 2 & 1, davon ist 2 das max
-
 lets have a celebration of learning
 
 
 
-rating eines feldes:
+rating of a field:
 
-alle achsen im umkreis, bei 4 gewinnt also 3 in jede richtung
-wenn 4 auf achse erreichbar:
-	schon besetzt
+naive: my token gets a val, opponent gets the neg. val and empty fields are 0.
+now: if there is no worst move for the opponent, then there is no best pick for me ("traps"). This results in random column picking. that heuristic is far to simple when playing against humans.
 
-	wert 0 : kein 4er machbar
-	wert x : x # der machbaren 4er
-	 + die anzahl der chips gleicher sorte in der machbaren reihe zum quadrat
+solution: consecutive lines of tokens of same kind have to weigh more!
 
+all axis around - in case of "connect-4" the rating involves 3 fields in each possible direction
+distinguish empty fields: are they reachable?
 
-rate point:
-	rate point for axis
-		axis not completable -> 0
-		else #chips of same kind in pos. row pow 2
-		maximum of all
+5 kinds of value for a field: 
+field does not exist on the board
+field exists but is not reachable ("somewhere in the air")
+field is reachable + empty
+field is used by fried
+field is used by opponent
 
-max >= threshold (t = g.Win pow2)
+k=3 is the minimum connect-k that makes sense.
+depending on the depth over 3 one can build the rating
 
+rate point == rate point for axis
+	axis not completable for my kind of token (because out of bounds, enemy token blocks etc) -> 0
+	axis generally completable -> regard distance to self:
+		unreachable: 0
+		empty: k - dist
+		used by me: k*(k-dist) + k*(k-3)
+	if exactly this insert leads to win axis gets:
+		k^4
+maximum of all axis scores => score(point)
 
+win condition: k^4
 
-eine achse hat unterschiedliche werte, je nach dem ob ich sie aus sicht des players oder des computers betrachte.
+=> an axis (around a point) has a different value for either player
+=> an axis has no value if it is not usable for anyone 
 
-eine achse hat keinen wert wenn keiner da was bauen kann
+algorithmic problem: find all connections of length k around point for arbitrary k and arbitrary board sizes
 
-bilde alle k-langen ketten auf achse: 
-	schaue, ob einer was bauen kann:
-		das ist möglich, wenn kein gegner auf dieser kette liegt -- sobald ich einmal wieder runter gezählt hab, stop -> unusable
-	wenn ich nicht runter gezählt hab, hab ich einen wert (der ist + oder -)
-	daraus ergibt sich: wie wertvoll ist diese achse für mich?
+connect 3 --> score == score + (3-3)*k
 
+	insert at 0 x 0 => 6 + 9 + 6 = 21 and 0 0 x => 3+6+9 == 18
 
-wenn es für den gegner keinen schlechtesten move gibt, dann gibt es für mich keinen besten und ich wähle random. das ist scheiße.
-wichtung mit beachtung von consekutiven kettenlängen
+connect 4 --> score+k == score + (4-3)*k
 
-unerreichbare felder (z.B. in der luft schwebende) : 0
-leer: 1
-mein token : k*(k-dist) + k*(k-3)
-anderer token : -k*(k-dist) - k*(k-3)
-außerhalb des feldes : garnicht werten!
+	insert at 0 0 x 0 => 8+12+16+12 + 4*4*1 == 64  and 0 0 0 x => 4+8+12+16 + 4*4*1 == 56
+	but at _ 0 x 0  -- 2+12+16-12 + 4*3*1 == 54 (which is smaller than the win cond. 4^4)
 
-je nach tiefe über "3 gewinnt" - gibt einen faktor mehr zu K bei additiver punktwertung
-3 gewinnt --> score == score + (3-3)*k
+connect 5 --> score+2k == score +(5-3)*k
 
-	insert bei 0 x 0 wiegt 6 + 9 + 6 = 21 und 0 0 x wiegt 3+6+9 == 18
-	wiegt auf jeden fall mehr weil leere felder am ende scheiß egal sind, bei k=3 liegen da ja eh token
+	insert at 0 0 x 0 0 => 15+20+25+20+15 + 5*5*2 == 145  and 0 0 0 x 0 => 10+15+20+25+20 + 5*5*2 == 140 and 0 0 0 0 x => 5+10+15+20+25 + 5*5*2 == 125
+	but at _ 0 x 0 0  --  2+20+25+20+15 + 4*5*2 == 122 < 5^4 
 
-4 gewinnt --> score+k == score + (4-3)*k
+connect 6 --> score+3k == score +(6-3)*k
 
-	insert bei 0 0 x 0 wiegt 8+12+16+12 + 4*4*1 == 64  und 0 0 0 x wiegt 4+8+12+16 + 4*4*1 == 56
-	während bei _ 0 x 0  -- 2+12+16-12 + 4*3*1 == 54 was kleiner 56 ist!!
+	insert at 0 0 x 0 0 0 => 30+36+30+24+18 + 6*6*3 == 270  and 0 x 0 0 0 0 => 30+36+30+24+18+12 + 6*6*3 == 258 and x 0 0 0 0 0 => 36+30+24+18+12+6 + 6*6*3 == 234
+	but at _ 0 x 0 0 0  --  2+30+36+30+24+18 + 5*6*3 == 230 < 6^4 
 
-5 gewinnt --> score+2k == score +(5-3)*k
+connect 7 --> score+4k == score +(7-3)*k
 
-	insert bei 0 0 x 0 0 wiegt 15+20+25+20+15 + 5*5*2 == 145  und 0 0 0 x 0 wiegt 10+15+20+25+20 + 5*5*2 == 140 und 0 0 0 0 x wiegt 5+10+15+20+25 + 5*5*2 == 125
-	während bei _ 0 x 0 0  --  2+20+25+20+15 + 4*5*2 == 122 was kleiner 125 ist!!
+	insert at 0 0 0 x 0 0 0 => 28+35+42+49+42+35+28 + 7*7*4 == 445  and 0 0 x 0 0 0 0 => 35+42+49+42+35+28+21 + 7*7*4 == 448 and 0 x 0 0 0 0 0 => 42+49+42+35+28+21+14 + 7*7*4 == 427 and
+	0 0 0 0 0 0 x => 49+42+35+28+21+14+7 + 7*7*4 == 392
+	but at _ 0 0 x 0 0 0  --  4+35+42+49+42+35+28 + 6*7*4 == 403 < 7^4
 
-6 gewinnt --> score+3k == score +(6-3)*k
+connect 8 --> score+5k == score +(8-3)*k
 
-	insert bei 0 0 x 0 0 0 wiegt 30+36+30+24+18 + 6*6*3 == 270  und 0 x 0 0 0 0 wiegt 30+36+30+24+18+12 + 6*6*3 == 258 und x 0 0 0 0 0 wiegt 36+30+24+18+12+6 + 6*6*3 == 234
-	während bei _ 0 x 0 0 0  --  2+30+36+30+24+18 + 5*6*3 == 230 was kleiner 234 ist!!
-
-7 gewinnt --> score+4k == score +(7-3)*k
-
-	insert bei 0 0 0 x 0 0 0 wiegt 28+35+42+49+42+35+28 + 7*7*4 == 445  und 0 0 x 0 0 0 0 wiegt 35+42+49+42+35+28+21 + 7*7*4 == 448 und 0 x 0 0 0 0 0 wiegt 42+49+42+35+28+21+14 + 7*7*4 == 427 und
-	49+42+35+28+21+14+7 + 7*7*4 == 392
-	während bei _ 0 0 x 0 0 0  --  4+35+42+49+42+35+28 + 6*7*4 == 403. Scheiße
-
-8 gewinnt --> score+5k == score +(8-3)*k
-
-	insert bei 0 0 0 x 0 0 0 0 wiegt 40+48+56+64+56+48+40+32 + 8*8*5 == 704 und ..... und
+	insert at 0 0 0 x 0 0 0 0 => 40+48+56+64+56+48+40+32 + 8*8*5 == 704 and ..... and
 	64+56+48+40+32+24+16+8 + 8*8*5 == 608
-	während bei _ 0 0 x 0 0 0 0  --  5+48+56+64+56+48+40+32 + 7*8*5 == 629. Scheiße!!!!!!
+	but at _ 0 0 x 0 0 0 0  --  5+48+56+64+56+48+40+32 + 7*8*5 == 629 < 8^4
+
+
+Prolem arises for connect-7 and more:
+	
+	inserting at a line like _ 0 0 x 0 0 0 is considered better than inserting in a line like 0 0 0 0 0 0 x
+	thats why the winning score is set to k^4 -- yet the problem remains when speaking of connecting non-consectutive lines of greater length - which should be more important! (think of the above k=7 example in a connect-8 context).

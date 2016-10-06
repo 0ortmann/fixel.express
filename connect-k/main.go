@@ -18,14 +18,14 @@ type GameStore struct {
 }
 
 type Game struct {
-	Id     string `json:"id"`
-	Mode   string `json:"mode"`
-	Winner string `json:"winner"`
+	Id     string   `json:"id"`
+	Mode   string   `json:"mode"`
+	Winner string   `json:"winner"`
 	Board  [][]bool `json:"board"`
-	Cols   int `json:"cols"`
-	Rows   int `json:"rows"`
-	Win    int `json:"win"`
-	Level  int `json:"level"`
+	Cols   int      `json:"cols"`
+	Rows   int      `json:"rows"`
+	Win    int      `json:"win"`
+	Level  int      `json:"level"`
 }
 
 // create a (cols x rows) game board. 'win' neighbored pieces are needed to win
@@ -85,6 +85,7 @@ var gs = NewGameStore()
 
 func main() {
 	http.HandleFunc("/new", allowCors(newHandler))
+	http.HandleFunc("/inspect", allowCors(inspectHandler))
 	http.HandleFunc("/play", allowCors(errorHandler(playHandler)))
 
 	http.ListenAndServe(":5000", nil)
@@ -176,6 +177,15 @@ func playHandler(w http.ResponseWriter, req *http.Request) error {
 	return sendResult(w, game, cCol)
 }
 
+func inspectHandler(w http.ResponseWriter, req *http.Request) {
+	query := req.URL.Query()
+	game := gs.Get(query.Get("id"))
+	if game != nil {
+		enc := json.NewEncoder(w)
+		enc.Encode(&game)
+	}
+}
+
 // fomulate a response with game winner (may be empty) and the column picked by the computer
 func sendResult(w http.ResponseWriter, game *Game, cCol int) error {
 	type Resp struct {
@@ -235,7 +245,7 @@ func playIntelligent(game *Game) (int, int, error) {
 	return col, row, nil
 }
 
-// Returns the best possible score and one random with that score for
+// Returns the best possible score and one random column with that score for
 //'computer (true:comp, false:player)' when thinking 'depth' turns ahead.
 // Aserts that 'computer' wants to insert a token at (col, row) into the board.
 func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer bool, maxRows, win int) (int, int) {
@@ -251,12 +261,11 @@ func scoreInDepth(depth, alpha, beta, col, row int, board [][]bool, computer boo
 	return s, c
 }
 
-
-
-// alpha is best score for computer so far in searchtree
-// beta is best score for player so far in searchtree
+// alpha is best score for computer so far in searchtree.
+// beta is best score for player so far in searchtree.
 //
-// implements alpha beta pruning on minimax algorithm
+// implements alpha beta pruning on negamax algorithm.
+// returns two arguments: first the score and second a column at which to insert for best result.
 func alphaBeta(depth, alpha, beta int, board [][]bool, computer bool, maxRows, win int) (int, int) {
 	myCol := -1
 	myScore := 1000
@@ -313,15 +322,14 @@ func insertWins(c, r int, computer bool, game *Game) bool {
 	return isWin(score, game.Win, computer)
 }
 
-// determine if "score" wins the game, where k-fields are needed in a row to win evaluated
-// in the perspective of either "player (false)" or "computer (true)"
+// Determine if "score" wins the game, where k-fields are needed in a row to win.
+// Winning is evaluated from the perspective of either "player (false)" or "computer (true)"
 func isWin(score, k int, computer bool) bool {
-	preciseK := float64(k)
-	winScore := preciseK * preciseK * ((preciseK+1)/2 + preciseK - 3) // k * sum(1..k) + k*k *(k-3)
-	if computer == COMPUTER {
-		return float64(score) >= winScore
+	winScore := k * k * k * k
+	if computer == PLAYER {
+		winScore = -winScore
 	}
-	return float64(score) <= -winScore
+	return score == winScore
 }
 
 // get max score of insert at pos (c, r), regarding all possible axis on the board
@@ -353,16 +361,26 @@ func scoreInsertAt(c int, r int, computer bool, board [][]bool, dist int, rows i
 // necessary amount of similar tokens in a line for winning.
 // 'rows' is needed for boundary checking
 // Scoring function:
-// the rate of on axis is either -1 if it is not usable
-// or the maximum o.t. sums of all possible-neighbor scores over all lines of length k
+// the rate of on axis is either 0 if it is not usable
+// or the maximum o.t. sums of all possible-neighbor scores over all lines of length k or k^4 if k tokens are found in a row.
 func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir string, pc1 PointChecker, pc2 PointChecker) <-chan int {
 	res := make(chan int)
 	go func() {
 
-		scoresPc1 := scoreNeighbors(c, r, computer, board, k, rows, pc1, dir)
-		scoresPc2 := scoreNeighbors(c, r, computer, board, k, rows, pc2, dir)
+		scoresPc1, afc1 := scoreNeighbors(c, r, computer, board, k, rows, pc1, dir)
+		scoresPc2, afc2 := scoreNeighbors(c, r, computer, board, k, rows, pc2, dir)
 		//fmt.Println("distances rated", c, r, dir, "pc1", scoresPc1)
 		//fmt.Println("distances rated", c, r, dir, "pc2", scoresPc2)
+		if afc1+afc2+1 >= k {
+			// immediate win cause k in a row
+			score := k * k * k * k
+			if computer == PLAYER {
+				score = -score
+			}
+			res <- score
+			close(res)
+			return
+		}
 
 		mid := k*k + k*(k-3)
 		if computer == PLAYER {
@@ -373,9 +391,9 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 		bestScore := 0
 		for i := 0; i <= len(axis)-k; i++ {
 			if computer == COMPUTER {
-				bestScore = max(bestScore, straightOrStop(axis, i, i+k, computer))
+				bestScore = max(bestScore, sum(axis, i, i+k))
 			} else {
-				bestScore = min(bestScore, straightOrStop(axis, i, i+k, computer)) // minimizer
+				bestScore = min(bestScore, sum(axis, i, i+k)) // minimizer
 			}
 		}
 		//fmt.Println("axis score", dir, "for", computer, "at", c, r, bestScore)
@@ -386,16 +404,9 @@ func scoreAxis(c int, r int, computer bool, board [][]bool, k int, rows int, dir
 }
 
 // takes the vals of the slice from start to stop and adds them upp.
-// all numbers must / must not be 'positive'.
-// As soon as a different number is found, terminate, return 0, else the sum
-func straightOrStop(arr []int, start, stop int, positive bool) int {
-	sum := 0
+func sum(arr []int, start, stop int) (sum int) {
 	for ; start < stop; start++ {
-		val := arr[start]
-		if (positive && val < 0) || (!positive && val > 0) {
-			return 0
-		}
-		sum += val
+		sum += arr[start]
 	}
 	return sum
 }
@@ -403,30 +414,34 @@ func straightOrStop(arr []int, start, stop int, positive bool) int {
 // Scores the neighbors of point (c, r) on the board with bound 'maxRows' and k as necessary amuont to win
 // The provided Pointchecker is used for checking the state of the neighbors up to a distance of 'k'.
 // The Pointchecker itself guarantees staying in a correct angle.
-// Returns the scores for the neighbors as map of dist(neighbor) -> score(neighbor)
+// Returns the scores for the neighbors as map of dist(neighbor) -> score(neighbor) and the count of adjacent friendly neighbors as second argument.
 // scoring function - scores the neighbors based on its property:
 // UNR : 0
-// EMPTY : 1
+// EMPTY : k - dist
 // FRIEND : k*(k-dist) + k*(k-3)
-// FOE : -k*(k-dist) - k*(k-3)
-// OOB : terminate, do not expand result map any more
+// OOB / FOE : terminate, do not expand result map any more
 // The factor k-3 is needed for scoring arbitary k compositions - 3 is the minimal connect count that makes sense in a connect-k game
-func scoreNeighbors(c, r int, computer bool, board [][]bool, k, maxRows int, pc PointChecker, dir string) map[int]int {
+func scoreNeighbors(c, r int, computer bool, board [][]bool, k, maxRows int, pc PointChecker, dir string) (map[int]int, int) {
 	scores := make(map[int]int)
+	afc := 0 // adjacent friend count
+	connected := true
 OuterLoop:
 	for dist := 1; dist < k; dist++ {
 		score := 0
 		switch pc(c, r, board, computer, dist, maxRows) {
-		case OOB:
+		case OOB, FOE:
 			break OuterLoop
 		case UNR:
+			connected = false
 			break
 		case EMPTY:
-			score = 1 * (k - dist)
+			score = k - dist
+			connected = false
 		case FRIEND:
 			score = k*(k-dist) + k*(k-3)
-		case FOE:
-			score = -(k*(k-dist) + k*(k-3))
+			if connected {
+				afc++
+			}
 		}
 		if computer == PLAYER {
 			score = -score
@@ -434,7 +449,7 @@ OuterLoop:
 		scores[dist] = score
 	}
 	//fmt.Println("scores for", dir, c, r, scores)
-	return scores
+	return scores, afc
 }
 
 // result values of a pointcheck
@@ -644,7 +659,7 @@ func genShuff(max int) []int {
 		a[i] = i
 	}
 	for i := range a {
-		j := randomNumber(i+1)
+		j := randomNumber(i + 1)
 		a[i], a[j] = a[j], a[i]
 	}
 	return a

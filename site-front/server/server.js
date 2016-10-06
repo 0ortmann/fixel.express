@@ -30,7 +30,7 @@ app.use(Express.static('public'));
 
 function handleRender(req, res) {
 	const memoryHistory = createMemoryHistory(req.url);
-	const store = configureStore(memoryHistory);
+	let store = configureStore(memoryHistory);
 	const history = syncHistoryWithStore(memoryHistory, store);
 
 	match({ history, routes, location: req.url }, (error, redirectLocation, renderProps) => {
@@ -41,18 +41,29 @@ function handleRender(req, res) {
 			res.redirect(302, redirectLocation.pathname + redirectLocation.search);
 		}
 		else if (renderProps) {
-			const html = renderToString(
-				<Provider store={store}>
-					<RouterContext {...renderProps} />
-				</Provider>
-			);
-			res.send(renderFullPage(html, store.getState()));
+			fetchData(store, renderProps).then( () => {
+				store = configureStore(memoryHistory, store.getState());
+				const html = renderToString(
+					<Provider store={store}>
+						<RouterContext {...renderProps} />
+					</Provider>
+				);
+				res.send(renderFullPage(html, store.getState()));
+			});
 		}
 		else {
 			res.status(404).send('Not found');
 		}
 	});
+}
 
+function fetchData(store, renderProps) {
+	return new Promise((resolve) => {
+		// delegate fetching the language inside app component (which is the root / wrapper comp)
+		// it will always be accessable on index 0:
+		let comp = renderProps.components[0].WrappedComponent;
+		resolve(comp.fetchData(store));
+	});
 }
 
 function renderFullPage(html, preloadedState) {

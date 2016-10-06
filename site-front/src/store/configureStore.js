@@ -18,7 +18,7 @@ export default function configureStore(history, preloadedState) {
 	return createStore(
 		reducer, 
 		preloadedState, 
-		compose( // need me?
+		compose(
 			applyMiddleware(thunk, api, createLogger(), routerMiddleware(history))
 		)
 	);

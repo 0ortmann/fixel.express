@@ -12,6 +12,10 @@ import './App.scss';
 const langs = ['german', 'english'];
 
 export class App extends Component {
+
+	static fetchData(store) {
+		return store.dispatch(getLanguage('german'));
+	}
 	
 	constructor(props) {
 		super(props);

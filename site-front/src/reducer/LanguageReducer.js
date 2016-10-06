@@ -14,6 +14,7 @@ export default function lang(state = initialState, action) {
 			isFetching: true
 		};
 	case ACTIONS.GET_LANGUAGE_ERROR:
+		console.error('Error getting language:', action.error);
 		return {
 			...state,
 			fetchError: true,

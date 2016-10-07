@@ -4,7 +4,6 @@ import ACTIONS from '../constants/Constants';
 const CALL_API = ACTIONS.CALL_API;
 
 function getApi(url) {
-	console.log("now fetch", url)
 	return fetch( url )
 		.then( res => {
 			if (res.status >= 400) {
@@ -46,7 +45,6 @@ function buildQueryString(obj) {
 }
 
 function buildUrl(resourcesHost, connectKHost, endpoint, host) {
-	console.log(resourcesHost, connectKHost, endpoint, host)
 	let url = connectKHost;
 	if (host == 'local') {
 		url = resourcesHost;
@@ -66,10 +64,9 @@ export default function configureApiMiddlware(resourcesHost, connectKHost) {
 
 		// mark as pending
 		const [ requestType, successType, failureType ] = types;
-		next( actionWith( action, { type: 1 }));
+		next( actionWith( action, { type: requestType }));
 		if (method != 'Post') {
-			const url = buildUrl(resourcesHost, connectKHost, endpoint, host)
-			console.log("heyo", url)
+			const url = buildUrl(resourcesHost, connectKHost, endpoint, host);
 			return getApi(url + buildQueryString(properties)).then(
 				response => next(actionWith( {
 					response,
@@ -82,7 +79,7 @@ export default function configureApiMiddlware(resourcesHost, connectKHost) {
 			);
 		}
 		else if (method == 'Post') {
-			const url = buildUrl(resourcesHost, connectKHost, endpoint, host)
+			const url = buildUrl(resourcesHost, connectKHost, endpoint, host);
 			return postApi(url, body).then(
 				response => next(actionWith( {
 					body,

@@ -202,7 +202,12 @@ func sendResult(w http.ResponseWriter, game *Game, cCol int) error {
 // put a token with value "player" into the column "col".
 // Returns the row it was inserted into and an error if the column is already full
 func apply(board [][]bool, col int, computer bool, maxRows int) (int, error) {
-	if len(board[col]) == maxRows {
+	//fmt.Println("Applying", col, computer, board)
+	if col < 0 || col > len(board) {
+		errMsg := fmt.Sprintf("Column out of board-boundaries %d", col)
+		return -1, errors.New(errMsg)
+	}
+	if len(board[col]) >= maxRows {
 		return -1, errors.New("Column already full")
 	}
 	board[col] = append(board[col], computer)
@@ -314,12 +319,26 @@ func setWinner(c int, r int, game *Game) {
 		} else {
 			game.Winner = "player"
 		}
+	} else if boardFull(game) {
+		game.Winner = "tie";
 	}
 }
 
 func insertWins(c, r int, computer bool, game *Game) bool {
 	score := scoreInsertAt(c, r, computer, game.Board, game.Win, game.Rows)
 	return isWin(score, game.Win, computer)
+}
+
+func boardFull(game *Game) bool {
+	if len(game.Board) != game.Cols {
+		return false
+	} 
+	for c := range game.Board {
+		if len(game.Board[c]) != game.Rows {
+			return false
+		}
+	}
+	return true
 }
 
 // Determine if "score" wins the game, where k-fields are needed in a row to win.

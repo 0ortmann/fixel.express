@@ -1,13 +1,11 @@
 import 'isomorphic-fetch';
 import ACTIONS from '../constants/Constants';
 
-const API = 'http://localhost:5000';
 const CALL_API = ACTIONS.CALL_API;
 
-function getApi(endpoint, host) {
-	const fullUrl = host == 'local'? endpoint : API + endpoint;
-
-	return fetch( fullUrl )
+function getApi(url) {
+	console.log("now fetch", url)
+	return fetch( url )
 		.then( res => {
 			if (res.status >= 400) {
 				return Promise.reject(res);
@@ -16,10 +14,8 @@ function getApi(endpoint, host) {
 		});
 }
 
-function postApi(endpoint, body) {
-	const fullUrl = API + endpoint;
-
-	return fetch( fullUrl, {
+function postApi(url, body) {
+	return fetch( url, {
 		method: 'POST',
 		body: JSON.stringify(body),
 		headers: {
@@ -49,41 +45,55 @@ function buildQueryString(obj) {
 	return query;
 }
 
-export default () => next => action => {
-	const apiCall = action[CALL_API];
+function buildUrl(resourcesHost, connectKHost, endpoint, host) {
+	console.log(resourcesHost, connectKHost, endpoint, host)
+	let url = connectKHost;
+	if (host == 'local') {
+		url = resourcesHost;
+	}
+	url = url.endsWith('/')? url.substring(0, url.length -1) : url;
+	return url + endpoint;
+}
 
-	if (typeof apiCall === 'undefined') {
-		return next(action);
-	}
-	const { endpoint, method, types, body, properties, host } = apiCall;
+export default function configureApiMiddlware(resourcesHost, connectKHost) {
+	return () => next => action => {
+		const apiCall = action[CALL_API];
 
-	// mark as pending
-	const [ requestType, successType, failureType ] = types;
-	next( actionWith( action, { type: requestType }));
-	if (method != 'Post') {
-		
-		return getApi(endpoint + buildQueryString(properties), host).then(
-			response => next(actionWith( {
-				response,
-				type: successType
-			})), 
-			error => next(actionWith({
-				type: failureType,
-				error: error.message || 'Unable to get API'
-			}))
-		);
-	}
-	else if (method == 'Post') {
-		return postApi(endpoint, body).then(
-			response => next(actionWith( {
-				body,
-				response,
-				type: successType
-			})), 
-			error => next(actionWith({
-				type: failureType,
-				error: error.message || 'Unable to post to API'
-			}))
-		);
-	}
-};
+		if (typeof apiCall === 'undefined') {
+			return next(action);
+		}
+		const { endpoint, method, types, body, properties, host } = apiCall;
+
+		// mark as pending
+		const [ requestType, successType, failureType ] = types;
+		next( actionWith( action, { type: 1 }));
+		if (method != 'Post') {
+			const url = buildUrl(resourcesHost, connectKHost, endpoint, host)
+			console.log("heyo", url)
+			return getApi(url + buildQueryString(properties)).then(
+				response => next(actionWith( {
+					response,
+					type: successType
+				})), 
+				error => next(actionWith({
+					type: failureType,
+					error: error.message || 'Unable to get API'
+				}))
+			);
+		}
+		else if (method == 'Post') {
+			const url = buildUrl(resourcesHost, connectKHost, endpoint, host)
+			return postApi(url, body).then(
+				response => next(actionWith( {
+					body,
+					response,
+					type: successType
+				})), 
+				error => next(actionWith({
+					type: failureType,
+					error: error.message || 'Unable to post to API'
+				}))
+			);
+		}
+	};
+}

@@ -12,6 +12,7 @@ export function insertToken(game, column) {
 }
 
 export function newGame(properties) {
+	console.log("gimme game")
 	return {
 		[ACTIONS.CALL_API]: {
 			types: [ACTIONS.NEW_GAME, ACTIONS.NEW_GAME_SUCCESS, ACTIONS.NEW_GAME_ERROR],

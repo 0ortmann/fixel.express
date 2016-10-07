@@ -8,12 +8,15 @@ import { createMemoryHistory, match, RouterContext } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import configureStore from '../src/store/configureStore.js';
-import routes from '../routes.js';
+import configureRoutes from '../routes.js';
 
 const config = require(path.resolve(__dirname, '../webpack.config.' + process.env.NODE_ENV + '.js'));
+const appConfig = require('../config.' + process.env.NODE_ENV + '.js');
 
 const compiler = webpack(config);
 const app = new Express();
+
+const routes = configureRoutes(appConfig.routes);
 
 if(process.env.NODE_ENV == 'development') {
 	app.use(require('webpack-dev-middleware')(compiler, {
@@ -30,7 +33,7 @@ app.use(Express.static('public'));
 
 function handleRender(req, res) {
 	const memoryHistory = createMemoryHistory(req.url);
-	let store = configureStore(memoryHistory);
+	let store = configureStore(memoryHistory, undefined, appConfig.api);
 	const history = syncHistoryWithStore(memoryHistory, store);
 
 	match({ history, routes, location: req.url }, (error, redirectLocation, renderProps) => {
@@ -42,7 +45,7 @@ function handleRender(req, res) {
 		}
 		else if (renderProps) {
 			fetchData(store, renderProps).then( () => {
-				store = configureStore(memoryHistory, store.getState());
+				store = configureStore(memoryHistory, store.getState(), appConfig.api);
 				const html = renderToString(
 					<Provider store={store}>
 						<RouterContext {...renderProps} />

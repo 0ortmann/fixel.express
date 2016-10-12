@@ -1,7 +1,7 @@
 module.exports = {
 	routes: [ ],
 	api: {
-		resourcesHost: 'https://fixel.express:3300',
+		resourcesHost: 'https://fixel.express',
 		connectKHost: 'http://connectK:5000'
 	}
 };

@@ -1,4 +1,3 @@
-import TestUtils from 'react-addons-test-utils';
 import ACTIONS from '../../src/constants/Constants';
 
 import { newGame, insertToken } from '../../src/actions/ConnectKActionCreators.js';
@@ -11,7 +10,7 @@ describe('ConnectKActionCreators', () => {
 			foo: 'foo',
 			bar: 'bar',
 			batz: 1234
-		}
+		};
 
 		const action = newGame(properties);
 
@@ -21,7 +20,7 @@ describe('ConnectKActionCreators', () => {
 				endpoint: '/new',
 				properties
 			}
-		}
+		};
 		expect(action).toEqual(expectedAction);
 	});
 
@@ -39,7 +38,7 @@ describe('ConnectKActionCreators', () => {
 				method: 'Post',
 				body: { gameId: game, col: column }
 			}
-		}
+		};
 		expect(action).toEqual(expectedAction);
 	});
 });

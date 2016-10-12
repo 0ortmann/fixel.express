@@ -1,4 +1,3 @@
-import TestUtils from 'react-addons-test-utils';
 import ACTIONS from '../../src/constants/Constants';
 
 import { getLanguage } from '../../src/actions/LanguageActionCreators.js';
@@ -17,7 +16,7 @@ describe('LanguageActionCreators', () => {
 				endpoint: expectedUrl,
 				host: 'local'
 			}
-		}
+		};
 		expect(action).toEqual(expectedAction);
 	});
 });

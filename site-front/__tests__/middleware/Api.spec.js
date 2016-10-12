@@ -1,4 +1,3 @@
-import TestUtils from 'react-addons-test-utils';
 import fetchMock from 'fetch-mock';
 
 import ACTIONS from '../../src/constants/Constants';
@@ -16,14 +15,13 @@ const dispatchWith = (api, action) => {
 	const dispatch = api()(actionAttempt => dispatched = actionAttempt);
 	dispatch(action);
 	return dispatched;
-}
+};
 
 const awaitDispatch = (api, action) => {
-	let dispatched = null;
 	// "mock" of the dispatch function
-	const dispatch = api()(actionAttempt => dispatched = actionAttempt);
+	const dispatch = api()(() => {});
 	return dispatch(action);
-}
+};
 
 // globally path the result of all requests
 fetchMock.get('http://CONNECT-K/succ', { get: 'success' });
@@ -56,7 +54,7 @@ describe('API middleware', () => {
 		};
 		const expectedDispatch = {
 			type: 'NEW'
-		}
+		};
 		expect(dispatchWith(api, action)).toEqual(expectedDispatch);
 	});
 
@@ -71,7 +69,7 @@ describe('API middleware', () => {
 		};
 		const expectedDispatch = {
 			type: 'NEW'
-		}
+		};
 		expect(dispatchWith(api, action)).toEqual(expectedDispatch);
 	});
 
@@ -86,7 +84,7 @@ describe('API middleware', () => {
 		const expectedSuccessDispatch = {
 			type: 'SUCCESS',
 			other: 'some property'
-		}
+		};
 		
 		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedSuccessDispatch)));
 	});
@@ -103,7 +101,7 @@ describe('API middleware', () => {
 		const expectedSuccessDispatch = {
 			type: 'SUCCESS',
 			other: 'some property'
-		}
+		};
 		
 		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedSuccessDispatch)));
 	});
@@ -119,7 +117,7 @@ describe('API middleware', () => {
 		const expectedErrorDispatch = {
 			type: 'ERROR',
 			other: 'some property'
-		}
+		};
 		
 		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedErrorDispatch)));
 	});
@@ -136,7 +134,7 @@ describe('API middleware', () => {
 		const expectedErrorDispatch = {
 			type: 'ERROR',
 			other: 'some property'
-		}
+		};
 		
 		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedErrorDispatch)));
 	});
@@ -177,7 +175,7 @@ describe('API query / url builder', () => {
 				endpoint: '/endpoint',
 				properties: { foo: 'bar' }
 			}
-		}
+		};
 		
 		const modifiedAction = actionWith(action, { type: 'NEW_TYPE', bla: 'blub' } );
 
@@ -185,7 +183,7 @@ describe('API query / url builder', () => {
 			some: 'property',
 			type: 'NEW_TYPE',
 			bla: 'blub'
-		}
+		};
 		expect(modifiedAction).toEqual(expectedAction);
 	});
 
@@ -195,29 +193,29 @@ describe('API calls', () => {
 
 	it('should reject on GET requests with erroneous stati', () => {
 		return getApi('http://CONNECT-K/notfound').then(
-			() => { throw 'Reached then branch, but should have failed' }, 
+			() => { throw 'Reached then branch, but should have failed'; }, 
 			() => {}
 		);
 	});
 
 	it('should reject on POST requests with erroneous stati', () => {
 		return postApi('http://CONNECT-K/notfound', { post: 'body' }).then(
-			() => { throw 'Reached then branch, but should have failed' }, 
+			() => { throw 'Reached then branch, but should have failed'; }, 
 			() => {}
 		);
 	});
 
 	it('should return server response on GET requests', () => {
 		return getApi('http://CONNECT-K/succ').then(
-			res => { expect(res).toEqual({ get: 'success' })}, 
-			() => { throw 'Request should not have failed'}
+			res => { expect(res).toEqual({ get: 'success' }); }, 
+			() => { throw 'Request should not have failed'; }
 		);
 	});
 
 	it('should return server response on GET requests', () => {
 		return postApi('http://CONNECT-K/succ', { post: 'body' }).then(
-			res => { expect(res).toEqual({ post: 'success' })}, 
-			() => { throw 'Request should not have failed'}
+			res => { expect(res).toEqual({ post: 'success' }); }, 
+			() => { throw 'Request should not have failed'; }
 		);
 	});
 

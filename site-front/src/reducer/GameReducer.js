@@ -9,7 +9,8 @@ const initialState = {
 	rows: 6,
 	k: 4,
 	level: 4,
-	winner: ''
+	winner: '',
+	isFetching: false
 };
 
 export default function game(state = initialState, action) {
@@ -29,10 +30,15 @@ export default function game(state = initialState, action) {
 		return { 
 			...state, 
 			board: apply(state.board, action.body, action.response),
-			winner: action.body.winner,
+			winner: action.response.winner,
 			playError: false,
 			isPlaying: false
 		};
+	case ACTIONS.NEW_GAME:
+		return {
+			...state,
+			isFetching: true
+		}
 	case ACTIONS.NEW_GAME_ERROR:
 		return {
 			...state,

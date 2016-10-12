@@ -38,7 +38,7 @@ export default function game(state = initialState, action) {
 		return {
 			...state,
 			isFetching: true
-		}
+		};
 	case ACTIONS.NEW_GAME_ERROR:
 		return {
 			...state,

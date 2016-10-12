@@ -43,7 +43,7 @@ describe('LanguageReducer', () => {
 			properties: response,
 			isFetching: false,
 			fetchError: false
-		}
+		};
 
 		expect(lang(previousState, fetchAction)).toEqual(expectedNextState);
 	});
@@ -61,7 +61,7 @@ describe('LanguageReducer', () => {
 			properties: { some: 'prop'},
 			isFetching: false,
 			fetchError: true
-		}
+		};
 
 		expect(lang(previousState, fetchAction)).toEqual(expectedNextState);
 	});

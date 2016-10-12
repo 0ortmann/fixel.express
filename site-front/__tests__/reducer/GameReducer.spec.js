@@ -68,7 +68,7 @@ describe('GameReducer new game', () => {
 			level: 8,
 			winner: '',
 			isFetching: false
-		}
+		};
 
 		expect(game(previousState, fetchAction)).toEqual(expectedNextState);
 	});
@@ -92,7 +92,7 @@ describe('GameReducer new game', () => {
 		const expectedNextState = {
 			...previousState,
 			id: undefined
-		}
+		};
 
 		expect(game(previousState, fetchAction)).toEqual(expectedNextState);
 	});
@@ -133,7 +133,7 @@ describe('GameReducer new game', () => {
 			...previousState,
 			board: [[], ['player'], [], [], [], ['computer'], [], []],
 			isPlaying: false,
-		}
+		};
 
 		expect(game(previousState, insertAction)).toEqual(expectedNextState);
 	});
@@ -166,7 +166,7 @@ describe('GameReducer new game', () => {
 			board: [[], ['player'], [], [], [], [], [], []],
 			isPlaying: false,
 			winner: 'player',
-		}
+		};
 
 		expect(game(previousState, insertAction)).toEqual(expectedNextState);
 	});
@@ -191,7 +191,7 @@ describe('GameReducer new game', () => {
 			...previousState,
 			isPlaying: false,
 			playError: true
-		}
+		};
 
 		expect(game(previousState, fetchAction)).toEqual(expectedNextState);
 	});

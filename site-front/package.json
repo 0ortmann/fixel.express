@@ -49,6 +49,7 @@
     "babel-preset-react-hmre": "*",
     "eslint": "^3.4.0",
     "eslint-plugin-react": "^6.2.0",
+    "fetch-mock": "^5.5.0",
     "jest-cli": "*",
     "react-addons-test-utils": "*",
     "redux-devtools": "^3.3.1",

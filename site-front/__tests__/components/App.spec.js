@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
-import { App } from '../src/containers/App.jsx';
+import { App } from '../../src/containers/App.jsx';
 
 describe('App', () => {
 

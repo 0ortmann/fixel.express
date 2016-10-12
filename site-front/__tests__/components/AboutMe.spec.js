@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
 // dont import the connected ('wrapped') component, but the pure one
-import { AboutMe } from '../src/components/about/AboutMe.jsx';
+import { AboutMe } from '../../src/components/about/AboutMe.jsx';
 
 describe('AboutMe', () => {
 

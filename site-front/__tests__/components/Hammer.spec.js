@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
-import Hammer from '../src/components/header/Hammer.jsx';
+import Hammer from '../../src/components/header/Hammer.jsx';
 
 describe('Hammer', () => {
 

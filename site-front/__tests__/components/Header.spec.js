@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
-import Header from '../src/components/header/Header.jsx';
+import Header from '../../src/components/header/Header.jsx';
 
 describe('Header', () => {
 

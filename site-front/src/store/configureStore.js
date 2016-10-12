@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 import { routerReducer, routerMiddleware } from 'react-router-redux';
 
-import configureApiMiddlware from '../middleware/Api.js';
+import configureApiMiddleware from '../middleware/Api.js';
 import game from '../reducer/GameReducer.js';
 import lang from '../reducer/LanguageReducer.js';
 
@@ -14,7 +14,7 @@ const reducer = combineReducers({
 });
 
 export default function configureStore(history, preloadedState, apiConfig) {
-	const api = configureApiMiddlware(apiConfig.resourcesHost, apiConfig.connectKHost);
+	const api = configureApiMiddleware(apiConfig.resourcesHost, apiConfig.connectKHost);
 	return createStore(
 		reducer, 
 		preloadedState, 

@@ -3,7 +3,7 @@ import ACTIONS from '../constants/Constants';
 
 const CALL_API = ACTIONS.CALL_API;
 
-function getApi(url) {
+export function getApi(url) {
 	return fetch( url )
 		.then( res => {
 			if (res.status >= 400) {
@@ -13,7 +13,7 @@ function getApi(url) {
 		});
 }
 
-function postApi(url, body) {
+export function postApi(url, body) {
 	return fetch( url, {
 		method: 'POST',
 		body: JSON.stringify(body),
@@ -30,13 +30,13 @@ function postApi(url, body) {
 }
 
 
-function actionWith(origAction, newData) {
+export function actionWith(origAction, newData) {
 	let withoutCallApi = Object.assign({}, origAction, newData);
 	delete withoutCallApi[CALL_API];
 	return withoutCallApi;
 }
 
-function buildQueryString(obj) {
+export function buildQueryString(obj) {
 	let query = '?';
 	for (const prop in obj) {
 		query += prop + '=' + obj[prop] + '&';
@@ -44,7 +44,7 @@ function buildQueryString(obj) {
 	return query;
 }
 
-function buildUrl(resourcesHost, connectKHost, endpoint, host) {
+export function buildUrl(resourcesHost, connectKHost, endpoint, host) {
 	let url = connectKHost;
 	if (host == 'local') {
 		url = resourcesHost;
@@ -53,7 +53,7 @@ function buildUrl(resourcesHost, connectKHost, endpoint, host) {
 	return url + endpoint;
 }
 
-export default function configureApiMiddlware(resourcesHost, connectKHost) {
+export default function configureApiMiddleware(resourcesHost, connectKHost) {
 	return () => next => action => {
 		const apiCall = action[CALL_API];
 

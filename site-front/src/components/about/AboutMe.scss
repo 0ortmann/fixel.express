@@ -5,7 +5,7 @@
 }
 
 .about__img {
-    background-image: url('/img/little-me.jpg');
+    background-image: url('/img/little-me-small.jpg');
     border-radius: 450px / 600px;
     height: 395px;
     margin-top: 2em;
@@ -16,7 +16,7 @@
 }
 
 .about__img:hover {
-    background-image: url('/img/profile.jpg');
+    background-image: url('/img/profile-small.jpg');
     transition: 300ms ease-in-out;
 }
 

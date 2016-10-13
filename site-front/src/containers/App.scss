@@ -26,7 +26,7 @@ h1 {
 /* Preload image(s), so I have no flicker on hover */
 body:after{
 	position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
-	content: url('/img/profile.jpg') url('/img/gopher_straight_look_rotated.svg') 
+	content: url('/img/little-me-small.jpg') url('/img/profile-small.jpg') url('/img/gopher_straight_look_rotated.svg') 
 		url('/img/arrow.svg') url('/img/gopher_hammer_right.svg') url('/img/gopher_hammer_right_2.svg')
 		url('/img/gopher_hammer_left.svg') url('/img/gopher_hammer_left_2.svg');
 }

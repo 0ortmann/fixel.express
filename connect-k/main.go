@@ -320,7 +320,7 @@ func setWinner(c int, r int, game *Game) {
 			game.Winner = "player"
 		}
 	} else if boardFull(game) {
-		game.Winner = "tie";
+		game.Winner = "tie"
 	}
 }
 
@@ -332,7 +332,7 @@ func insertWins(c, r int, computer bool, game *Game) bool {
 func boardFull(game *Game) bool {
 	if len(game.Board) != game.Cols {
 		return false
-	} 
+	}
 	for c := range game.Board {
 		if len(game.Board[c]) != game.Rows {
 			return false

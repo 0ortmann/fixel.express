@@ -1,13 +1,9 @@
 this is a competing game, u dont expect to get what u want!
 
-lets have a celebration of learning
-
-
-
 rating of a field:
 
 naive: my token gets a val, opponent gets the neg. val and empty fields are 0.
-now: if there is no worst move for the opponent, then there is no best pick for me ("traps"). This results in random column picking. that heuristic is far to simple when playing against humans.
+now: if there is no worst move for the opponent, then there is no best pick for me ("traps"). This results in random column picking. that heuristic is far too simple when playing against humans.
 
 solution: consecutive lines of tokens of same kind have to weigh more!
 
@@ -18,7 +14,7 @@ distinguish empty fields: are they reachable?
 field does not exist on the board
 field exists but is not reachable ("somewhere in the air")
 field is reachable + empty
-field is used by fried
+field is used by friend
 field is used by opponent
 
 k=3 is the minimum connect-k that makes sense.
@@ -26,10 +22,10 @@ depending on the depth over 3 one can build the rating
 
 rate point == rate point for axis
 	axis not completable for my kind of token (because out of bounds, enemy token blocks etc) -> 0
-	axis generally completable -> regard distance to self:
+	axis generally completable -> regard distance to self, per field:
 		unreachable: 0
 		empty: k - dist
-		used by me: k*(k-dist) + k*(k-3)
+		used by friend: k*(k-dist) + k*(k-3)
 	if exactly this insert leads to win axis gets:
 		k^4
 maximum of all axis scores => score(point)

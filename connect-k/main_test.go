@@ -1,8 +1,29 @@
 package main
 
 import "testing"
-
 //import "fmt"
+
+func boardEmpty(board [][]bool, cols int) bool {
+	for i := 0; i < cols; i++ {
+		if len(board[i]) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func fillBoard(cols, rows int, t *testing.T) [][]bool {
+	// fillup!
+	board := make([][]bool, cols)
+	token := false
+	for i := 0; i < cols; i++ {
+		for j := 0; j < rows; j++ {
+			board[i] = append(board[i], token)
+			token = !token
+		}
+	}
+	return board
+}
 
 func TestNewGame(t *testing.T) {
 	cols, rows, k, mode, level := 7, 6, 4, "intelligent", 4
@@ -11,6 +32,10 @@ func TestNewGame(t *testing.T) {
 	if g.Id == "" || g.Mode != mode || g.Winner != "" || len(g.Board) != 7 || g.Cols != cols || g.Rows != rows || g.Win != k || g.Level != level {
 		t.Error("Game not properly initialized")
 	}
+	if !boardEmpty(g.Board, g.Cols) {
+		t.Error("Expected game board to be empty after init, but have", g.Board)
+	}
+
 }
 
 func TestNewGameStore(t *testing.T) {
@@ -62,7 +87,7 @@ func TestApplySimple(t *testing.T) {
 	}
 }
 
-func TestApplyFullBoard(t *testing.T) {
+func TestApplyFillBoard(t *testing.T) {
 	// test apply return value
 
 	cols, rows := 10, 8
@@ -92,18 +117,10 @@ func TestApplyFullBoard(t *testing.T) {
 func TestApplyOverflow(t *testing.T) {
 	// test apply return value
 	cols, rows := 10, 8
-	board := make([][]bool, cols)
 	token := false
-	// fillup!
-	for i := 0; i < cols; i++ {
-		for j := 0; j < rows; j++ {
-			_, err := apply(board, i, token, rows)
-			if err != nil {
-				t.Error("Unexpected error when applying", err)
-			}
-			token = !token
-		}
-	}
+
+	board := fillBoard(cols, rows, t)
+	
 	// cause overflow in each row
 	for i := 0; i < cols; i++ {
 		row, err := apply(board, i, token, rows)
@@ -111,7 +128,7 @@ func TestApplyOverflow(t *testing.T) {
 			t.Error("Expected full row to not be applicable any more. Applied", row, i)
 		}
 	}
-
+	// cause overflow left/right out of board
 	row, err := apply(board, -1, token, rows)
 	if row != -1 || err == nil {
 		t.Error("Expected error when applying to col -1, but no error was thrown")
@@ -119,6 +136,69 @@ func TestApplyOverflow(t *testing.T) {
 	row, err = apply(board, cols+1, token, rows)
 	if row != -1 || err == nil {
 		t.Error("Expected error when applying to cols+1, but no error was thrown")
+	}
+}
+
+func TestAutoPlay(t *testing.T) {
+	cols, rows, k, mode, level := 7, 6, 4, "intelligent", 4
+
+	g := NewGame(cols, rows, k, mode, level)
+
+	c, r, err := autoPlay(g)
+	if boardEmpty(g.Board, cols) {
+		t.Error("Autoplay failed to insert token on board, got", g.Mode, g.Board)
+	}
+	if err != nil {
+		t.Error("Unexpected error during autoplay", g.Mode, err)
+	}
+
+	mode = "random"
+	g = NewGame(cols, rows, k, mode, level)
+	c, r, err = autoPlay(g)
+
+	if boardEmpty(g.Board, cols) {
+		t.Error("Autoplay failed to insert token on board, got", g.Mode, g.Board)
+	}
+	if err != nil {
+		t.Error("Unexpected error during autoplay", g.Mode, err)
+	}
+
+	mode = "UNKNOWN"
+	g = NewGame(cols, rows, k, mode, level)
+	c, r, err = autoPlay(g)
+
+	if !boardEmpty(g.Board, cols) {
+		t.Error("Autoplay inserted token with unknown playmode. Expected error", g.Mode, g.Board)
+	}
+	if c != -1 || r != -1 || err == nil {
+		t.Error("Exptected error on autoplay with unknonw playmode, but got", c, r, g.Board)
+	}
+}
+
+
+func TestPlayRandom(t *testing.T) {
+	cols, rows, k, mode, level := 7, 6, 4, "random", 4
+	game := NewGame(cols, rows, k, mode, level)
+	playRandom(game)
+	if boardEmpty(game.Board, cols) {
+		t.Error("Board empty after playing random mode")
+	}
+	game.Board = fillBoard(cols, rows, t)
+
+	//delete last elm
+	game.Board[cols-1] = game.Board[cols-1][:rows-1]
+
+	// playrandom has to fill that last col without errors
+	c, r, err := playRandom(game)
+
+	if c != cols-1 || r != rows-1 || err != nil {
+		t.Error("Play random encountered unexpected error", c, r, err)
+	}
+
+	for i := 0; i < cols; i++ {
+		if len(game.Board[i]) != rows {
+			t.Error("Play random did not fill last place on board accordingly", game.Board)
+		}
 	}
 
 }

@@ -227,9 +227,9 @@ func autoPlay(game *Game) (int, int, error) {
 
 func playRandom(game *Game) (int, int, error) {
 	// has to terminate if all cols are full
-	c := randomNumber(game.Cols)
+	offset := randomNumber(game.Cols)
 	for i := 0; i < game.Cols; i++ {
-		c = (c + i) % game.Cols
+		c := (offset + i) % game.Cols
 		r, err := apply(game.Board, c, true, game.Rows)
 		if err == nil {
 			return c, r, nil

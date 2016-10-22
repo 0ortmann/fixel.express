@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import RangeInput from './RangeInput.jsx';
 
 import './PropertyPanel.scss';
+
 
 export default class PropertyPanel extends Component {
 	
@@ -26,7 +28,7 @@ export default class PropertyPanel extends Component {
 	}
 
 	newGame(props) {
-		const { newGame, cols, rows, k, level  } = this.props;
+		const { newGame, cols, rows, k, level } = this.props;
 		let query = {
 			c: cols,
 			r: rows, 
@@ -41,9 +43,7 @@ export default class PropertyPanel extends Component {
 		newGame(query);
 	}
 
-	handleChange(evt, key) {
-		evt.preventDefault();
-		const val = evt.target.value;
+	handleChange(val, key) {
 		if (val) {
 			let q = {};
 			q[key] = parseInt(val);
@@ -51,31 +51,31 @@ export default class PropertyPanel extends Component {
 		}
 	}
 
-	difficultyChange(evt) {
-		this.handleChange(evt, 'l');
+	difficultyChange(val) {
+		this.handleChange(val, 'l');
 	}
 
-	columnChange(evt) {
-		this.handleChange(evt, 'c');
+	columnChange(val) {
+		this.handleChange(val, 'c');
 	}
 
-	rowChange(evt) {
-		this.handleChange(evt, 'r');
+	rowChange(val) {
+		this.handleChange(val, 'r');
 	}
 
-	kChange(evt) {
-		this.handleChange(evt, 'k');
+	kChange(val) {
+		this.handleChange(val, 'k');
 	}
 
 	render() {
-		const { cols, rows, level, k } = this.props;
+		const { cols, rows, level, k, propertyLabels } = this.props;
 		return (
 			<div className='game__properties'>
-				<button className='game__new' onClick={this.newButton}>Ding Dong</button>
-				<input className='range game__difficulty' type='range' min={2} max={8} step={2} defaultValue={level} onChange={this.difficultyChange} />
-				<input className='number' type='number' min={7} max={20} step={1} defaultValue={cols} onChange={this.columnChange} />
-				<input className='number' type='number' min={6} max={20} step={1} defaultValue={rows} onChange={this.rowChange} />
-				<input className='number' type='number' min={3} max={8} step={1} defaultValue={k} onChange={this.kChange} />
+				<button className='game__new' onClick={this.newButton}>{propertyLabels.new}</button>
+				<RangeInput step={2} min={2} max={8} callback={this.difficultyChange} defaultValue={level} label={propertyLabels.level}/>
+				<RangeInput step={1} min={3} max={11} callback={this.columnChange} defaultValue={cols} label={propertyLabels.cols}/>
+				<RangeInput step={1} min={3} max={11} callback={this.rowChange} defaultValue={rows} label={propertyLabels.rows}/>
+				<RangeInput step={1} min={3} max={8} callback={this.kChange} defaultValue={k} label={propertyLabels.k}/>
 			</div>
 		);
 	}
@@ -86,5 +86,6 @@ PropertyPanel.propTypes = {
 	cols: React.PropTypes.number.isRequired,
 	rows: React.PropTypes.number.isRequired,
 	level: React.PropTypes.number.isRequired,
-	k: React.PropTypes.number.isRequired
+	k: React.PropTypes.number.isRequired,
+	propertyLabels: React.PropTypes.object
 }

@@ -21,24 +21,25 @@ export class Game extends Component {
 	}
 
 	render() {
-		const { board, cols, rows, newGame, k, level } = this.props;
+		const { board, cols, rows, newGame, k, level, propertyLabels } = this.props;
 		return (
 			<div className='game'>
 				<ConnectKBoard board={board} cols={cols} rows={rows} play={this.play} />
-				<PropertyPanel newGame={newGame} cols={cols} rows={rows} k={k} level={level} />
+				<PropertyPanel newGame={newGame} cols={cols} rows={rows} k={k} level={level} propertyLabels={propertyLabels}/>
 			</div>
 		);
 	}
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
 	return {
 		id: state.game.id,
 		board: state.game.board,
 		cols: state.game.columns,
 		rows: state.game.rows,
 		k: state.game.k,
-		level: state.game.level
+		level: state.game.level,
+		propertyLabels: state.lang.properties['connect-k']
 	}
 }
 

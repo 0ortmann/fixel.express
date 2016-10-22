@@ -35,18 +35,6 @@ body:after{
 	display: none;
 }
 
-.range:focus, .range:active, .range:hover {
-	outline: none;
-}
-
-.range::-webkit-slider-thumb:active {
-	cursor: -webkit-grabbing;
-}
-
-.range::-moz-range-thumb:active {
-	cursor: -moz-grabbing;
-}
-
 .number::-webkit-inner-spin-button, .number::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;

@@ -6,5 +6,12 @@
 		"I love being on the move in the nature, either with backpack & tent or I go fishing on local lakes and rivers.",
 		"I do a lot of fun coding as well, make sure to check out my github page!"
 	],
-	"box": "Looks super shitty?"
+	"box": "Looks super shitty?",
+	"connect-k": {
+		"new": "new game",
+		"level": "level",
+		"rows": "rows",
+		"cols": "columns",
+		"k": "connect-k"
+	}
 }

@@ -1,7 +1,10 @@
 package main
 
-import "testing"
-//import "fmt"
+import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func boardEmpty(board [][]bool, cols int) bool {
 	for i := 0; i < cols; i++ {
@@ -12,7 +15,8 @@ func boardEmpty(board [][]bool, cols int) bool {
 	return true
 }
 
-func fillBoard(cols, rows int, t *testing.T) [][]bool {
+// first row is filled with true, second false, alternating..
+func getDummyBoard(cols, rows int) [][]bool {
 	// fillup!
 	board := make([][]bool, cols)
 	token := false
@@ -119,8 +123,8 @@ func TestApplyOverflow(t *testing.T) {
 	cols, rows := 10, 8
 	token := false
 
-	board := fillBoard(cols, rows, t)
-	
+	board := getDummyBoard(cols, rows)
+
 	// cause overflow in each row
 	for i := 0; i < cols; i++ {
 		row, err := apply(board, i, token, rows)
@@ -175,7 +179,6 @@ func TestAutoPlay(t *testing.T) {
 	}
 }
 
-
 func TestPlayRandom(t *testing.T) {
 	cols, rows, k, mode, level := 7, 6, 4, "random", 4
 	game := NewGame(cols, rows, k, mode, level)
@@ -183,7 +186,7 @@ func TestPlayRandom(t *testing.T) {
 	if boardEmpty(game.Board, cols) {
 		t.Error("Board empty after playing random mode")
 	}
-	game.Board = fillBoard(cols, rows, t)
+	game.Board = getDummyBoard(cols, rows)
 
 	//delete last elm
 	game.Board[cols-1] = game.Board[cols-1][:rows-1]
@@ -200,5 +203,73 @@ func TestPlayRandom(t *testing.T) {
 			t.Error("Play random did not fill last place on board accordingly", game.Board)
 		}
 	}
+}
+
+func TestToAxis(t *testing.T) {
+	map1, map2 := make(map[int]int, 5), make(map[int]int, 5)
+	for i := 0; i < 5; i++ {
+		map1[i] = i + 1
+		map2[i] = i + 1
+	}
+	axis := toAxis(map1, map2, 0)
+	expected := []int{5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5}
+	assert.Equal(t, axis, expected, "Axis creation failed")
+}
+
+func TestPointCheckers(t *testing.T) {
+	// board looks like: first row filled with true, second with false, alternating...
+	cols, rows := 7, 6
+	board := getDummyBoard(cols, rows)
+
+	// self reflexity
+	assert.Equal(t, FRIEND, checkCrossRightUp(0, 0, board, false, 0, rows), "CRU 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkCrossRightDown(0, 0, board, false, 0, rows), "CRD 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkCrossLeftUp(0, 0, board, false, 0, rows), "CLU 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkCrossLeftDown(0, 0, board, false, 0, rows), "CLD 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkRightOf(0, 0, board, false, 0, rows), "CR 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkLeftOf(0, 0, board, false, 0, rows), "CL 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkAbove(0, 0, board, false, 0, rows), "CA 0 0 Checking point with same value should result in 'FRIEND'")
+	assert.Equal(t, FRIEND, checkBelow(0, 0, board, false, 0, rows), "CB 0 0 Checking point with same value should result in 'FRIEND'")
+
+	// sanity: defined & reachable point
+	fmt.Println(board)
+	assert.Equal(t, FOE, checkCrossRightUp(3, 2, board, false, 1, rows), "CRU 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FOE, checkCrossRightDown(3, 2, board, false, 1, rows), "CRD 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FOE, checkCrossLeftUp(3, 2, board, false, 1, rows), "CLU 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FOE, checkCrossLeftDown(3, 2, board, false, 1, rows), "CLD 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FRIEND, checkRightOf(3, 2, board, false, 1, rows), "CR 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FRIEND, checkLeftOf(3, 2, board, false, 1, rows), "CL 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FOE, checkAbove(3, 2, board, false, 1, rows), "CA 3 2 Checking reachable point did not match expected token")
+	assert.Equal(t, FOE, checkBelow(3, 2, board, false, 1, rows), "CB 3 2 Checking reachable point did not match expected token")
+
+	// sanity: defined (on board) but unreachable point (nothing there to put a token onto)
+	board = make([][]bool, 7)
+	assert.Equal(t, UNR, checkCrossRightUp(3, 2, board, false, 1, rows), "CRU 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkCrossRightDown(3, 2, board, false, 1, rows), "CRD 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkCrossLeftUp(3, 2, board, false, 1, rows), "CLU 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkCrossLeftDown(3, 2, board, false, 1, rows), "CLD 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkRightOf(3, 2, board, false, 1, rows), "CR 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkLeftOf(3, 2, board, false, 1, rows), "CL 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkAbove(3, 2, board, false, 1, rows), "CA 3 2 Checking unreachable point did not match expected token")
+	assert.Equal(t, UNR, checkBelow(3, 2, board, false, 1, rows), "CB 3 2 Checking unreachable point did not match expected token")
+
+	// sanity: columns out of bounds
+	assert.Equal(t, OOB, checkCrossRightUp(6, 2, board, false, 1, rows), "CRU 6 2 Checking columns out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossRightDown(6, 2, board, false, 1, rows), "CRD 6 2 Checking columns out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossLeftUp(0, 2, board, false, 1, rows), "CLU 0 2 Checking columns out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossLeftDown(0, 2, board, false, 1, rows), "CLD 0 2 Checking columns out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkRightOf(6, 2, board, false, 1, rows), "CR 6 2 Checking columns out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkLeftOf(0, 2, board, false, 1, rows), "CL 0 2 Checking columns out-of-bound point did not match expected token")
+
+	// sanity: rows out of bounds
+	assert.Equal(t, OOB, checkCrossRightUp(3, 5, board, false, 1, rows), "CRU 3 5 Checking rows out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossRightDown(3, 0, board, false, 1, rows), "CRD 3 0 Checking rows out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossLeftUp(3, 5, board, false, 1, rows), "CLU 3 5 Checking rows out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkCrossLeftDown(3, 0, board, false, 1, rows), "CLD 3 0 Checking rows out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkAbove(0, 5, board, false, 1, rows), "CA 0 5 Checking rows out-of-bound point did not match expected token")
+	assert.Equal(t, OOB, checkBelow(0, 0, board, false, 1, rows), "CB 0 0 Checking rows out-of-bound point did not match expected token")
+
+	// sanity: empty fields:
+	// construct board...
 
 }

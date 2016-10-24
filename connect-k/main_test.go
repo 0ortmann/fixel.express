@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -232,7 +232,6 @@ func TestPointCheckers(t *testing.T) {
 	assert.Equal(t, FRIEND, checkBelow(0, 0, board, false, 0, rows), "CB 0 0 Checking point with same value should result in 'FRIEND'")
 
 	// sanity: defined & reachable point
-	fmt.Println(board)
 	assert.Equal(t, FOE, checkCrossRightUp(3, 2, board, false, 1, rows), "CRU 3 2 Checking reachable point did not match expected token")
 	assert.Equal(t, FOE, checkCrossRightDown(3, 2, board, false, 1, rows), "CRD 3 2 Checking reachable point did not match expected token")
 	assert.Equal(t, FOE, checkCrossLeftUp(3, 2, board, false, 1, rows), "CLU 3 2 Checking reachable point did not match expected token")
@@ -241,6 +240,20 @@ func TestPointCheckers(t *testing.T) {
 	assert.Equal(t, FRIEND, checkLeftOf(3, 2, board, false, 1, rows), "CL 3 2 Checking reachable point did not match expected token")
 	assert.Equal(t, FOE, checkAbove(3, 2, board, false, 1, rows), "CA 3 2 Checking reachable point did not match expected token")
 	assert.Equal(t, FOE, checkBelow(3, 2, board, false, 1, rows), "CB 3 2 Checking reachable point did not match expected token")
+
+	//delete last two rows of elms
+	for c := 0; c < cols; c++ {
+		board[c] = board[c][:rows-2]
+	}
+	// sanity: empty fields:
+	assert.Equal(t, EMPTY, checkCrossRightUp(3, 3, board, false, 1, rows), "CRU 3 3 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkCrossRightDown(3, 5, board, false, 1, rows), "CRD 3 5 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkCrossLeftUp(3, 3, board, false, 1, rows), "CLU 3 3 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkCrossLeftDown(3, 5, board, false, 1, rows), "CLD 3 5 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkRightOf(3, 4, board, false, 1, rows), "CR 3 4 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkLeftOf(3, 4, board, false, 1, rows), "CL 3 4 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkAbove(3, 3, board, false, 1, rows), "CA 3 3 Checking reachable but empty point did not match expected token")
+	assert.Equal(t, EMPTY, checkBelow(3, 5, board, false, 1, rows), "CB 3 5 Checking reachable but empty point did not match expected token")
 
 	// sanity: defined (on board) but unreachable point (nothing there to put a token onto)
 	board = make([][]bool, 7)
@@ -268,8 +281,4 @@ func TestPointCheckers(t *testing.T) {
 	assert.Equal(t, OOB, checkCrossLeftDown(3, 0, board, false, 1, rows), "CLD 3 0 Checking rows out-of-bound point did not match expected token")
 	assert.Equal(t, OOB, checkAbove(0, 5, board, false, 1, rows), "CA 0 5 Checking rows out-of-bound point did not match expected token")
 	assert.Equal(t, OOB, checkBelow(0, 0, board, false, 1, rows), "CB 0 0 Checking rows out-of-bound point did not match expected token")
-
-	// sanity: empty fields:
-	// construct board...
-
 }

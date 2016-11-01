@@ -1,92 +1,92 @@
 @import '../../variables.scss';
 
 footer {
-    margin-top: 20px;
-    height: 80px;
-    width: 100%;
-    float: left;
-    line-height: 40px;
-    overflow: hidden;
+	margin-top: 20px;
+	height: 80px;
+	width: 100%;
+	float: left;
+	line-height: 40px;
+	overflow: hidden;
 }
 
 .social {
-    background: #EDEDED;
-    border: 2px solid $lightGrey;
-    border-radius: 9px;
-    position: relative;
-    float: left;
-    text-align: center;
-    width: 50%;
-    left: 25%;
+	background: #EDEDED;
+	border: 2px solid $lightGrey;
+	border-radius: 9px;
+	position: relative;
+	float: left;
+	text-align: center;
+	width: 50%;
+	left: 25%;
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
-    .social {
-        width: $handheldContentWidth;
-        left: $handheldContentLeft;
-    }
+	.social {
+		width: $handheldContentWidth;
+		left: $handheldContentLeft;
+	}
 }
 
 .social__link {
-    display: inline-block;
-    margin: 20px 20px 0 20px;
+	display: inline-block;
+	margin: 20px 20px 0 20px;
 }
 
 svg {
-    width: 40px;
-    height: 40px;
+	width: 40px;
+	height: 40px;
 }
 
 svg:hover {
-    border: none !important;
-    display: block;
-    transform: scale(1.1);
-    transition: $footerTransitionTime;
+	border: none !important;
+	display: block;
+	transform: scale(1.1);
+	transition: $footerTransitionTime;
 }
 
 .social__svg:hover {
-    background-color: #EDEDED;
-    transition-timing-function: ease-in-out;
-    transition: $footerTransitionTime;
+	background-color: #EDEDED;
+	transition-timing-function: ease-in-out;
+	transition: $footerTransitionTime;
 
-    .xing__animated__white {
-        fill: white;
-    }
-    
-    .xing__animated__green {
-        fill: $xingGreen;
-    }
+	.animated__white {
+		fill: white;
+	}
+	
+	.xing__animated__green {
+		fill: $xingGreen;
+	}
 
-    .github__animated__blue {
-        fill: $githubBlue;
-    }
+	.github__animated__blue {
+		fill: $githubBlue;
+	}
 
-    .facebook__animated__blue {
-        fill: $facebookBlue;
-    }
+	.facebook__animated__blue {
+		fill: $facebookBlue;
+	}
 
-    .facebook__animated__white {
-        fill: white;
-    }
+	.linkedin__animated__blue {
+		fill: $linkedInBlue;
+	}
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
-    .xing__animated__white {
-        fill: white;
-    }
-    .xing__animated__green {
-        fill: $xingGreen;
-    }
+	.animated__white {
+		fill: white;
+	}
+	.xing__animated__green {
+		fill: $xingGreen;
+	}
 
-    .github__animated__blue {
-        fill: $githubBlue;
-    }
+	.github__animated__blue {
+		fill: $githubBlue;
+	}
 
-    .facebook__animated__blue {
-        fill: $facebookBlue;
-    }
+	.facebook__animated__blue {
+		fill: $facebookBlue;
+	}
 
-    .facebook__animated__white {
-        fill: white;
-    }
+	.animated__white {
+		fill: white;
+	}
 }

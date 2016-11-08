@@ -30,10 +30,10 @@ func getDummyBoard(cols, rows int) [][]bool {
 }
 
 func TestNewGame(t *testing.T) {
-	cols, rows, k, mode, level := 7, 6, 4, "intelligent", 4
+	cols, rows, k, mode, level := 10, 10, 5, "intelligent", 8
 	g := NewGame(cols, rows, k, mode, level)
 
-	if g.Id == "" || g.Mode != mode || g.Winner != "" || len(g.Board) != 7 || g.Cols != cols || g.Rows != rows || g.Win != k || g.Level != level {
+	if g.Id == "" || g.Mode != mode || g.Winner != "" || len(g.Board) != cols || g.Cols != cols || g.Rows != rows || g.Win != k || g.Level != level {
 		t.Error("Game not properly initialized")
 	}
 	if !boardEmpty(g.Board, g.Cols) {
@@ -68,6 +68,30 @@ func TestGameStoreAccess(t *testing.T) {
 	}
 }
 
+func TestErrorHandler(t *testing.T) {
+	t.Fail()
+}
+
+func TestAllowCors(t *testing.T) {
+	t.Fail()
+}
+
+func TestNewHandler(t *testing.T) {
+	t.Fail()
+}
+
+func TestPlayHandler(t *testing.T) {
+	t.Fail()
+}
+
+func TestInspectHandler(t *testing.T) {
+	t.Fail()
+}
+
+func TestSendResult(t *testing.T) {
+	t.Fail()
+}
+
 func TestToIntOr(t *testing.T) {
 
 	a := toIntOr("123", 0)
@@ -93,7 +117,6 @@ func TestApplySimple(t *testing.T) {
 
 func TestApplyFillBoard(t *testing.T) {
 	// test apply return value
-
 	cols, rows := 10, 8
 	board := make([][]bool, cols)
 	token := false
@@ -205,15 +228,62 @@ func TestPlayRandom(t *testing.T) {
 	}
 }
 
-func TestToAxis(t *testing.T) {
-	map1, map2 := make(map[int]int, 5), make(map[int]int, 5)
-	for i := 0; i < 5; i++ {
-		map1[i] = i + 1
-		map2[i] = i + 1
-	}
-	axis := toAxis(map1, map2, 0)
-	expected := []int{5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5}
-	assert.Equal(t, axis, expected, "Axis creation failed")
+func TestPlayIntelligent(t *testing.T) {
+	t.Fail()
+}
+
+func TestScoreInDepth(t *testing.T) {
+	t.Fail()
+}
+
+func TestAlphaBeta(t *testing.T) {
+	t.Fail()
+}
+
+func TestInsertWins(t *testing.T) {
+	t.Fail()
+}
+
+func TestBoardFull(t *testing.T) {
+	game := NewGame(7, 6, 4, "intelligent", 4)
+	game.Board = getDummyBoard(7, 6)
+	assert.True(t, boardFull(game))
+	game.Board[6] = game.Board[6][:5]
+	assert.False(t, boardFull(game))
+	game.Board = game.Board[:6]
+	assert.False(t, boardFull(game))
+}
+
+func TestScoreInsertAt(t *testing.T) {
+	t.Fail()
+}
+
+func TestScoreAxis(t *testing.T) {
+	t.Fail()
+}
+
+func TestSumArray(t *testing.T) {
+	arr := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	assert.Equal(t, sum(arr, 0, 10), 45)
+	assert.Equal(t, sum(arr, 10, 0), 0)
+	assert.Equal(t, sum(arr, 5, 5), 0)
+	assert.Equal(t, sum(arr, 3, 7), 18)
+}
+
+func getPointCheckers() (pcs map[string]PointChecker) {
+	pcs["a"] = checkAbove
+	pcs["b"] = checkBelow
+	pcs["r"] = checkRightOf
+	pcs["l"] = checkLeftOf
+	pcs["cru"] = checkCrossRightUp
+	pcs["clu"] = checkCrossLeftUp
+	pcs["crd"] = checkCrossRightDown
+	pcs["cld"] = checkCrossLeftDown
+	return
+}
+
+func TestScoreNeighbors(t *testing.T) {
+	t.Fail()
 }
 
 func TestPointCheckers(t *testing.T) {
@@ -281,4 +351,30 @@ func TestPointCheckers(t *testing.T) {
 	assert.Equal(t, OOB, checkCrossLeftDown(3, 0, board, false, 1, rows), "CLD 3 0 Checking rows out-of-bound point did not match expected token")
 	assert.Equal(t, OOB, checkAbove(0, 5, board, false, 1, rows), "CA 0 5 Checking rows out-of-bound point did not match expected token")
 	assert.Equal(t, OOB, checkBelow(0, 0, board, false, 1, rows), "CB 0 0 Checking rows out-of-bound point did not match expected token")
+}
+
+func TestToAxis(t *testing.T) {
+	map1, map2 := make(map[int]int, 5), make(map[int]int, 5)
+	for i := 0; i < 5; i++ {
+		map1[i] = i + 1
+		map2[i] = i + 1
+	}
+	axis := toAxis(map1, map2, 0)
+	expected := []int{5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5}
+	assert.Equal(t, axis, expected, "Axis creation failed")
+}
+
+func TestGenShuff(t *testing.T) {
+
+	max := 10
+	randomSlice := genShuff(max)
+
+	for i := 0; i < max; i++ {
+		if !(randomSlice[i] < 10 && randomSlice[i] >= 0) {
+			t.Error("Generated Shuffled slice contained unexpected number", randomSlice[i])
+		}
+	}
+
+	randomSlice = genShuff(0)
+	assert.Equal(t, randomSlice, make([]int, 0), "Expected empty slice")
 }

@@ -427,7 +427,7 @@ func sum(arr []int, start, stop int) (sum int) {
 	for ; start < stop; start++ {
 		sum += arr[start]
 	}
-	return sum
+	return
 }
 
 // Scores the neighbors of point (c, r) on the board with bound 'maxRows' and k as necessary amuont to win

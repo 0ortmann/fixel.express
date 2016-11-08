@@ -71,6 +71,11 @@ svg:hover {
 }
 
 @media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
+
+	svg {
+		width: 30px;
+		height: 30px;
+	}
 	.animated__white {
 		fill: white;
 	}
@@ -88,5 +93,9 @@ svg:hover {
 
 	.animated__white {
 		fill: white;
+	}
+
+	.linkedin__animated__blue {
+		fill: $linkedInBlue;
 	}
 }

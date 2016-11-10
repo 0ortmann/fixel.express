@@ -271,25 +271,25 @@ func TestAlphaBeta(t *testing.T) {
 func TestInsertWins(t *testing.T) {
 	game := NewGame(7, 6, 4, "intelligent", 4)
 
-	game.Board = getBoardFromFile("insertWins_3_0_clu")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_0_clu")
 	assert.True(t, insertWins(3, 0, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_0_cru")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_0_cru")
 	assert.True(t, insertWins(3, 0, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_3_below")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_3_below")
 	assert.True(t, insertWins(3, 3, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_3_cld")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_3_cld")
 	assert.True(t, insertWins(3, 3, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_3_crd")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_3_crd")
 	assert.True(t, insertWins(3, 3, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_3_left")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_3_left")
 	assert.True(t, insertWins(3, 3, true, game))
 
-	game.Board = getBoardFromFile("insertWins_3_3_right")
+	game.Board = getBoardFromFile("insertWins/insertWins_3_3_right")
 	assert.True(t, insertWins(3, 3, true, game))
 }
 
@@ -332,7 +332,49 @@ func getPointCheckers() (pcs map[string]PointChecker) {
 }
 
 func TestScoreNeighbors(t *testing.T) {
-	t.Fail()
+	directions00 := []string{"right"} //, "below", "above", "cru"}
+	neighborValues := map[string]map[int]int{
+		"empty-empty-empty":   map[int]int{1: 3, 2: 2, 3: 1},
+		"empty-empty-foe":     map[int]int{1: 3, 2: 2},
+		"empty-empty-friend":  map[int]int{1: 3, 2: 2, 3: 8},
+		"empty-foe":           map[int]int{1: 3},
+		"empty-friend-empty":  map[int]int{1: 3, 2: 12, 3: 1},
+		"empty-friend-foe":    map[int]int{1: 3, 2: 12},
+		"empty-friend-friend": map[int]int{1: 3, 2: 12, 3: 8},
+		"foe":                  map[int]int{},
+		"friend-empty-empty":   map[int]int{1: 16, 2: 2, 3: 1},
+		"friend-empty-foe":     map[int]int{1: 16, 2: 2},
+		"friend-empty-friend":  map[int]int{1: 16, 2: 2, 3: 8},
+		"friend-friend-empty":  map[int]int{1: 16, 2: 12, 3: 1},
+		"friend-friend-foe":    map[int]int{1: 16, 2: 12},
+		"friend-friend-friend": map[int]int{1: 16, 2: 12, 3: 8},
+	}
+	//directions40 := []string{"left", "clu"}
+	//directions44 := []string{"crd", "cld"}
+
+	check := func(expS, s map[int]int, expAfc, afc int, dir, neighbors string) {
+		assert.Equal(t, s, expS, "Unexpected neighbor scoring for "+dir+"_"+neighbors)
+		assert.Equal(t, afc, expAfc, "Unexpected friendcount for "+dir+"_"+neighbors)
+	}
+	var board [][]bool
+	for _, dir := range directions00 {
+		adjFriends := 0 // this will be so for a while.
+
+		for neighbors, expScores := range neighborValues {
+			if strings.HasPrefix(neighbors, "friend-friend-friend") {
+				adjFriends = 3
+			} else if strings.HasPrefix(neighbors, "friend-friend") {
+				adjFriends = 2
+			} else if strings.HasPrefix(neighbors, "friend") {
+				adjFriends = 1
+			} else {
+				adjFriends = 0
+			}
+			board = getBoardFromFile("scoreNeighbors/" + dir + "_" + neighbors)
+			s, afc := scoreNeighbors(0, 0, true, board, 4, 1, checkRightOf, "r")
+			check(expScores, s, adjFriends, afc, dir, neighbors)
+		}
+	}
 }
 
 func TestPointCheckers(t *testing.T) {

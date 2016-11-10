@@ -1,8 +1,10 @@
 package main
 
 import (
-	//"fmt"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -13,6 +15,32 @@ func boardEmpty(board [][]bool, cols int) bool {
 		}
 	}
 	return true
+}
+
+func getBoardFromFile(fileName string) [][]bool {
+	// not meant to handle mal-formed files.
+	file, _ := os.Open("testboards/" + fileName)
+	defer file.Close()
+	b, _ := ioutil.ReadAll(file)
+	rows := strings.Split(string(b), "\n")
+	//reverse
+	for i, j := 0, len(rows)-1; i < j; i, j = i+1, j-1 {
+		rows[i], rows[j] = rows[j], rows[i]
+	}
+	board := make([][]bool, len(strings.Split(rows[0], "|")))
+	for _, row := range rows {
+		entries := strings.Split(row, "|")
+		for c, e := range entries {
+			val := false
+			if e == "1" {
+				val = true
+			}
+			if e != " " {
+				board[c] = append(board[c], val)
+			}
+		}
+	}
+	return board
 }
 
 // first row is filled with true, second false, alternating..
@@ -241,7 +269,28 @@ func TestAlphaBeta(t *testing.T) {
 }
 
 func TestInsertWins(t *testing.T) {
-	t.Fail()
+	game := NewGame(7, 6, 4, "intelligent", 4)
+
+	game.Board = getBoardFromFile("insertWins_3_0_clu")
+	assert.True(t, insertWins(3, 0, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_0_cru")
+	assert.True(t, insertWins(3, 0, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_3_below")
+	assert.True(t, insertWins(3, 3, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_3_cld")
+	assert.True(t, insertWins(3, 3, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_3_crd")
+	assert.True(t, insertWins(3, 3, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_3_left")
+	assert.True(t, insertWins(3, 3, true, game))
+
+	game.Board = getBoardFromFile("insertWins_3_3_right")
+	assert.True(t, insertWins(3, 3, true, game))
 }
 
 func TestBoardFull(t *testing.T) {

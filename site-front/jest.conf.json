@@ -1,5 +1,5 @@
 {
 	"name": "Frontend Tests",
 	"verbose": "true",
-	"scriptPreprocessor": "<rootDir>/node_modules/webpack-babel-jest"
+	"transform": {".*": "<rootDir>/node_modules/webpack-babel-jest"}
 }

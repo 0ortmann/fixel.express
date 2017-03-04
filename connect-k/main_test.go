@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"strings"
+	"strconv"
 	"testing"
 )
 
@@ -35,7 +37,7 @@ func getBoardFromFile(fileName string) [][]bool {
 			if e == "1" {
 				val = true
 			}
-			if e != " " {
+			if e != " " && (e == "0" || e == "1") {
 				board[c] = append(board[c], val)
 			}
 		}
@@ -332,7 +334,7 @@ func getPointCheckers() (pcs map[string]PointChecker) {
 }
 
 func TestScoreNeighbors(t *testing.T) {
-	directions00 := []string{"right"} //, "below", "above", "cru"}
+	directions := map[string]string{"0:0": "right", "0:4": "below"}//, "cru"}
 	neighborValues := map[string]map[int]int{
 		"empty-empty-empty":   map[int]int{1: 3, 2: 2, 3: 1},
 		"empty-empty-foe":     map[int]int{1: 3, 2: 2},
@@ -349,18 +351,22 @@ func TestScoreNeighbors(t *testing.T) {
 		"friend-friend-foe":    map[int]int{1: 16, 2: 12},
 		"friend-friend-friend": map[int]int{1: 16, 2: 12, 3: 8},
 	}
-	//directions40 := []string{"left", "clu"}
-	//directions44 := []string{"crd", "cld"}
 
 	check := func(expS, s map[int]int, expAfc, afc int, dir, neighbors string) {
-		assert.Equal(t, s, expS, "Unexpected neighbor scoring for "+dir+"_"+neighbors)
-		assert.Equal(t, afc, expAfc, "Unexpected friendcount for "+dir+"_"+neighbors)
+		assert.Equal(t, expS, s, "Unexpected neighbor scoring for "+dir+"_"+neighbors)
+		assert.Equal(t, expAfc, afc, "Unexpected friendcount for "+dir+"_"+neighbors)
 	}
 	var board [][]bool
-	for _, dir := range directions00 {
+	for pos, dir := range directions {
 		adjFriends := 0 // this will be so for a while.
+		poss := strings.Split(pos, ":")
+		x, _ := strconv.Atoi(poss[0])
+		y, _ := strconv.Atoi(poss[1])
 
 		for neighbors, expScores := range neighborValues {
+			fmt.Println(dir + neighbors)
+			board = getBoardFromFile("scoreNeighbors/" + dir + "_" + neighbors)
+			fmt.Println(board)
 			if strings.HasPrefix(neighbors, "friend-friend-friend") {
 				adjFriends = 3
 			} else if strings.HasPrefix(neighbors, "friend-friend") {
@@ -370,8 +376,7 @@ func TestScoreNeighbors(t *testing.T) {
 			} else {
 				adjFriends = 0
 			}
-			board = getBoardFromFile("scoreNeighbors/" + dir + "_" + neighbors)
-			s, afc := scoreNeighbors(0, 0, true, board, 4, 1, checkRightOf, "r")
+			s, afc := scoreNeighbors(x, y, true, board, 4, 1, checkRightOf, "r")
 			check(expScores, s, adjFriends, afc, dir, neighbors)
 		}
 	}

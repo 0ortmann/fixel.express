@@ -1,5 +1,5 @@
 {
 	"name": "Frontend Tests",
-	"verbose": "true",
+	"verbose": true,
 	"transform": {".*": "<rootDir>/node_modules/webpack-babel-jest"}
 }

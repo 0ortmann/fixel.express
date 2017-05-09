@@ -20,7 +20,7 @@ footer {
 	left: 25%;
 }
 
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
+@media screen and (max-device-width: 580px) {
 	.social {
 		width: $handheldContentWidth;
 		left: $handheldContentLeft;
@@ -70,7 +70,7 @@ svg:hover {
 	}
 }
 
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 520px) {
+@media screen and (min-device-width: 320px) and (max-device-width: 720px) {
 
 	svg {
 		width: 30px;

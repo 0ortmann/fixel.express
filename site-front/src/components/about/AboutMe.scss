@@ -55,7 +55,7 @@
     100%   {left: -290px; }
 }
 
-@media screen and (min-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2), (max-width: 540px) {
+@media screen and (min-device-width: 320px) and (max-device-width: 540px) {
     .about__description {
         width: $handheldContentWidth;
         left: $handheldContentLeft;

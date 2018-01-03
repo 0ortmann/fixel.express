@@ -7,7 +7,6 @@ import configureApiMiddleware, {
 } from '../../src/middleware/Api.js';
 
 const resourcesEndpoint = 'http://RESOURCES';
-const connectKEndpoint = 'http://CONNECT-K';
 
 const dispatchWith = (api, action) => {
 	let dispatched = null;
@@ -23,17 +22,9 @@ const awaitDispatch = (api, action) => {
 	return dispatch(action);
 };
 
-// globally path the result of all requests
-fetchMock.get('http://CONNECT-K/succ', { get: 'success' });
-fetchMock.get('http://CONNECT-K/succ?', { get: 'success' });
-fetchMock.post('http://CONNECT-K/succ', { post: 'success' });
-fetchMock.post('http://CONNECT-K/succ?', { post: 'success' });
-fetchMock.mock('http://CONNECT-K/notfound', 404 );
-fetchMock.mock('http://CONNECT-K/notfound?', 404 );
-
 describe('API middleware', () => {
 	
-	const api = configureApiMiddleware(resourcesEndpoint, connectKEndpoint);
+	const api = configureApiMiddleware(resourcesEndpoint);
 
 	it('should dispatch any kind of action', () => {
 		const action = {
@@ -149,71 +140,38 @@ describe('API query / url builder', () => {
 		expect(qs).toEqual('?c=1&r=5&l=super-duper&k=foobar&'); 
 	});
 
-	it('should construct a URL that points to connect-k API by default', () => {
+	it('should be taken care of double slashes during URL construction', () => {
 		const endpoint = '/endpoint?foo=bar';
-		const url = buildUrl(resourcesEndpoint, connectKEndpoint, endpoint);
-		expect(url).toEqual(connectKEndpoint + endpoint);
-	});
-
-	it('should be taken care of slashes during URL construction', () => {
-		const endpoint = '/endpoint?foo=bar';
-		const url = buildUrl(resourcesEndpoint, connectKEndpoint + '/', endpoint);
-		expect(url).toEqual(connectKEndpoint + endpoint);
-	});
-
-	it('should construct a URL that points to local API if host is local', () => {
-		const endpoint = '/endpoint?foo=bar';
-		const url = buildUrl(resourcesEndpoint, connectKEndpoint, endpoint, 'local');
+		const url = buildUrl(resourcesEndpoint + '/', endpoint);
 		expect(url).toEqual(resourcesEndpoint + endpoint);
 	});
-
-	it('should construct a new valid action object', () => {
-		const action = {
-			some: 'property',
-			[ACTIONS.CALL_API]: {
-				types: [ACTIONS.NEW_GAME, ACTIONS.NEW_GAME_SUCCESS, ACTIONS.NEW_GAME_ERROR],
-				endpoint: '/endpoint',
-				properties: { foo: 'bar' }
-			}
-		};
-		
-		const modifiedAction = actionWith(action, { type: 'NEW_TYPE', bla: 'blub' } );
-
-		const expectedAction = {
-			some: 'property',
-			type: 'NEW_TYPE',
-			bla: 'blub'
-		};
-		expect(modifiedAction).toEqual(expectedAction);
-	});
-
 });
 
 describe('API calls', () => {
 
 	it('should reject on GET requests with erroneous stati', () => {
-		return getApi('http://CONNECT-K/notfound').then(
+		return getApi(resourcesEndpoint + '/notfound').then(
 			() => { throw 'Reached then branch, but should have failed'; }, 
 			() => {}
 		);
 	});
 
 	it('should reject on POST requests with erroneous stati', () => {
-		return postApi('http://CONNECT-K/notfound', { post: 'body' }).then(
+		return postApi(resourcesEndpoint + '/notfound', { post: 'body' }).then(
 			() => { throw 'Reached then branch, but should have failed'; }, 
 			() => {}
 		);
 	});
 
 	it('should return server response on GET requests', () => {
-		return getApi('http://CONNECT-K/succ').then(
+		return getApi(resourcesEndpoint + '/succ').then(
 			res => { expect(res).toEqual({ get: 'success' }); }, 
 			() => { throw 'Request should not have failed'; }
 		);
 	});
 
 	it('should return server response on GET requests', () => {
-		return postApi('http://CONNECT-K/succ', { post: 'body' }).then(
+		return postApi(resourcesEndpoint + '/succ', { post: 'body' }).then(
 			res => { expect(res).toEqual({ post: 'success' }); }, 
 			() => { throw 'Request should not have failed'; }
 		);

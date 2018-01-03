@@ -44,16 +44,12 @@ export function buildQueryString(obj) {
 	return query;
 }
 
-export function buildUrl(resourcesHost, connectKHost, endpoint, host) {
-	let url = connectKHost;
-	if (host == 'local') {
-		url = resourcesHost;
-	}
-	url = url.endsWith('/')? url.substring(0, url.length -1) : url;
-	return url + endpoint;
+export function buildUrl(resourcesHost, endpoint, host) {
+	resourcesHost = resourcesHost.endsWith('/')? resourcesHost.substring(0, resourcesHost.length -1) : resourcesHost;
+	return resourcesHost + endpoint;
 }
 
-export default function configureApiMiddleware(resourcesHost, connectKHost) {
+export default function configureApiMiddleware(resourcesHost) {
 	return () => next => action => {
 		const apiCall = action[CALL_API];
 
@@ -66,7 +62,7 @@ export default function configureApiMiddleware(resourcesHost, connectKHost) {
 		const [ requestType, successType, failureType ] = types;
 		next( actionWith( action, { type: requestType }));
 		if (method != 'Post') {
-			const url = buildUrl(resourcesHost, connectKHost, endpoint, host);
+			const url = buildUrl(resourcesHost, endpoint, host);
 			return getApi(url + buildQueryString(properties)).then(
 				response => next(actionWith( {
 					response,
@@ -79,7 +75,7 @@ export default function configureApiMiddleware(resourcesHost, connectKHost) {
 			);
 		}
 		else if (method == 'Post') {
-			const url = buildUrl(resourcesHost, connectKHost, endpoint, host);
+			const url = buildUrl(resourcesHost, endpoint, host);
 			return postApi(url, body).then(
 				response => next(actionWith( {
 					body,

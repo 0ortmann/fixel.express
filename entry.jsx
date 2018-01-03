@@ -14,11 +14,11 @@ const config = require('./config.' + process.env.NODE_ENV + '.js');
 
 const store = configureStore(browserHistory, window.__PRELOADED_STATE__, config.api);
 const history = syncHistoryWithStore(browserHistory, store);
-const routes = configureRoutes(config.routes);
+const routes = configureRoutes();
 
 render(
 	<Provider store={store}>
 		<Router routes={routes} history={history} />
 	</Provider>,
 	document.getElementById('content')
-)
+);

@@ -5,7 +5,6 @@ export function getLanguage(name) {
 		[ACTIONS.CALL_API]: {
 			types: [ACTIONS.GET_LANGUAGE, ACTIONS.GET_LANGUAGE_SUCCESS, ACTIONS.GET_LANGUAGE_ERROR],
 			endpoint: '/lang/' + name + '.json',
-			host: 'local'
 		}
 	};
 }

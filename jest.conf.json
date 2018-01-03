@@ -1,5 +1,3 @@
 {
-	"name": "Frontend Tests",
-	"verbose": true,
-	"transform": {".*": "<rootDir>/node_modules/webpack-babel-jest"}
+	"transform": {".*": "<rootDir>/node_modules/jest-css-modules"}
 }

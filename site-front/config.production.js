@@ -3,5 +3,6 @@ module.exports = {
 	api: {
 		resourcesHost: 'https://fixel.express',
 		connectKHost: 'http://connectK:5000'
-	}
+	},
+	logging: false
 };

@@ -14,26 +14,17 @@ parserOptions:
 plugins:
   - react
 rules:
-  no-undef:
+  sort-imports:
     - warn
-  no-unused-vars:
-    - warn
+    - ignoreCase: false
+      ignoreMemberSort: false
+      memberSyntaxSortOrder:
+        - none
+        - all
+        - single
+        - multiple
   no-console:
     - warn
-  indent:
-    - warn
-    - tab
-  linebreak-style:
-    - warn
-    - unix
-  quotes:
-    - warn
-    - single
-  semi:
-    - warn
-    - always
-  react/no-find-dom-node: 
-    - off 
 globals:
   describe: true
   it: true

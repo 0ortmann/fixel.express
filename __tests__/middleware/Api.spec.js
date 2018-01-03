@@ -77,7 +77,7 @@ describe('API middleware', () => {
 			other: 'some property'
 		};
 		
-		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedSuccessDispatch)));
+		awaitDispatch(api, action).then(result => expect(result).toEqual(expectedSuccessDispatch));
 	});
 
 	it('should dispatch success for POST "CALL_API" action that resolved', () => {
@@ -94,7 +94,7 @@ describe('API middleware', () => {
 			other: 'some property'
 		};
 		
-		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedSuccessDispatch)));
+		awaitDispatch(api, action).then(result => expect(result).toEqual(expectedSuccessDispatch));
 	});
 
 	it('should dispatch error for GET "CALL_API" action that rejects', () => {
@@ -110,7 +110,7 @@ describe('API middleware', () => {
 			other: 'some property'
 		};
 		
-		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedErrorDispatch)));
+		awaitDispatch(api, action).then(result => expect(result).toEqual(expectedErrorDispatch));
 	});
 
 	it('should dispatch error for POST "CALL_API" action that rejects', () => {
@@ -127,7 +127,7 @@ describe('API middleware', () => {
 			other: 'some property'
 		};
 		
-		awaitDispatch(api, action).then(result => expect(result.toEqual(expectedErrorDispatch)));
+		awaitDispatch(api, action).then(result => expect(result).toEqual(expectedErrorDispatch));
 	});
 	
 });

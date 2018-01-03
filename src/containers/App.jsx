@@ -26,7 +26,6 @@ export class App extends Component {
 		this.props.getLanguage('german');
 	}
 
-
 	render() {
 		const { langProps, getLanguage, children } = this.props;
 		if (langProps == undefined || langProps == null) {
@@ -47,7 +46,7 @@ function mapStateToProps(state, ownProps) {
 	return {
 		langProps: state.lang.properties,
 		children: ownProps.children
-	}
+	};
 }
 
 export default connect(mapStateToProps, {

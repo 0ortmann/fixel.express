@@ -5,7 +5,7 @@ var webpack = require('webpack');
 module.exports = {
 	devtool: 'source-map',
 	entry: [
-		'./entry.jsx'
+		'./src/entry.jsx'
 	],
 	output: {
 		filename: 'bundle.js',

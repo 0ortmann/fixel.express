@@ -4,14 +4,14 @@ import Express from 'express';
 import webpack from 'webpack';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { createMemoryHistory, match, RouterContext } from 'react-router';
+import { RouterContext, createMemoryHistory, match } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import configureStore from '../src/store/configureStore.js';
-import configureRoutes from '../routes.js';
+import configureRoutes from '../src/routes.jsx';
 
 const config = require(path.resolve(__dirname, '../webpack.config.' + process.env.NODE_ENV + '.js'));
-const appConfig = require('../config.' + process.env.NODE_ENV + '.js');
+const appConfig = require('../config/config.' + process.env.NODE_ENV + '.js');
 
 const compiler = webpack(config);
 const app = new Express();

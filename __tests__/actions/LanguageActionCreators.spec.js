@@ -12,6 +12,7 @@ describe('LanguageActionCreators', () => {
 
 		const expectedAction = {
 			[ACTIONS.CALL_API]: {
+				method: 'Get',
 				types: [ACTIONS.GET_LANGUAGE, ACTIONS.GET_LANGUAGE_SUCCESS, ACTIONS.GET_LANGUAGE_ERROR],
 				endpoint: expectedUrl
 			}

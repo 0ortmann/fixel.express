@@ -6,7 +6,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { routerMiddleware, routerReducer } from 'react-router-redux';
 
 
-const appConfig = require('../../config.' + process.env.NODE_ENV + '.js');
+const appConfig = require('../../config/config.' + process.env.NODE_ENV + '.js');
 
 const reducer = combineReducers({
 	routing: routerReducer,

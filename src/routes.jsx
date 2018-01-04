@@ -1,8 +1,8 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { IndexRoute, Route } from 'react-router';
 
-import App from './src/containers/App.jsx';
-import AboutMe from './src/components/about/AboutMe.jsx';
+import App from './containers/App.jsx';
+import AboutMe from './components/about/AboutMe.jsx';
 
 export default function configureRoutes() {
 	return (

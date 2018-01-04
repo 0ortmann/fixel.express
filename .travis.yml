@@ -3,10 +3,9 @@ dist: trusty
 
 language: node_js
 node_js:
-  - "7"
+  - "node"
 
 install:
-  - cd site-front
   - npm install
 
 script:

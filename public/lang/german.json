@@ -5,12 +5,5 @@
 		"Momentan befinde ich mich im Masterstudium Informatik an der Uni Hamburg. Ich Entwickle Software seit 2011, es begann mit einem Forschungsprojekt zur verteilten Petrinetz Simulation. Meine interessensgebiete sind Programmiersprachen, Algorithmik und Netzwerke.",
 		"Ich bin gerne in der Natur unterwegs, entweder mit Rucksack & Zelt oder ich mache mit der Angel Jagd auf heimische Süßwasserräuber. Bei schlechtem Wetter bastel ich an kleinen Projekten, schau mal auf meinen github account!"
 	],
-	"box": "Sieht voll kacke aus?",
-	"connect-k": {
-		"new": "neues Spiel",
-		"level": "Level",
-		"rows": "Zeilen",
-		"cols": "Spalten",
-		"k": "k-gewinnt"
-	}
+	"box": "Sieht voll kacke aus?"
 }

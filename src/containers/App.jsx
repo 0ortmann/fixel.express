@@ -27,13 +27,10 @@ export class App extends Component {
 	}
 
 	render() {
-		const { langProps, getLanguage, children } = this.props;
-		if (langProps == undefined || langProps == null) {
-			return null;
-		}
+		const { boxText, getLanguage, children } = this.props;
 		return (
 			<div className='app'>
-				<Header boxText={langProps.box}/>
+				<Header boxText={boxText || 'Click me'}/>
 				<LanguageSelector selectCallback={getLanguage} langs={langs}/>
 				{children}
 				<Footer />
@@ -44,7 +41,7 @@ export class App extends Component {
 
 function mapStateToProps(state, ownProps) {
 	return {
-		langProps: state.lang.properties,
+		boxText: state.lang.box,
 		children: ownProps.children
 	};
 }

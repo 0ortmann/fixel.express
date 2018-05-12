@@ -5,7 +5,9 @@ import lang from '../../src/reducer/LanguageReducer.js';
 describe('LanguageReducer', () => {
 
 	const initialState =  {
-		properties: undefined,
+		box: "",
+		about: {},
+		imprint: {},
 		isFetching: false,
 		fetchError: false
 	};
@@ -19,7 +21,9 @@ describe('LanguageReducer', () => {
 			type: ACTIONS.GET_LANGUAGE
 		};
 		expect(lang(undefined, fetchAction)).toEqual({
-			properties: undefined,
+			box: "",
+			about: {},
+			imprint: {},
 			isFetching: true,
 			fetchError: false
 		});
@@ -27,20 +31,33 @@ describe('LanguageReducer', () => {
 
 	it('should handle "fetch success"', () => {
 		const response = {
-			some: 'props',
-			foo: 'bar'
+			about: {
+				title: 'ABOUT'
+			},
+			imprint: {
+				title: 'IMPRINT'
+			},
+			box: 'BOX',
 		};
 		const fetchAction = {
 			type: ACTIONS.GET_LANGUAGE_SUCCESS,
 			response
 		};
 		const previousState = {
-			properties: undefined,
+			about: {},
+			imprint: {},
+			box: '',
 			isFetching: true,
 			fetchError: false
 		};
 		const expectedNextState = {
-			properties: response,
+			about: {
+				title: 'ABOUT'
+			},
+			imprint: {
+				title: 'IMPRINT'
+			},
+			box: 'BOX',
 			isFetching: false,
 			fetchError: false
 		};
@@ -53,12 +70,16 @@ describe('LanguageReducer', () => {
 			type: ACTIONS.GET_LANGUAGE_ERROR,
 		};
 		const previousState = {
-			properties: { some: 'prop'},
+			about: {},
+			imprint: {},
+			box: '',
 			isFetching: true,
 			fetchError: false
 		};
 		const expectedNextState = {
-			properties: { some: 'prop'},
+			about: {},
+			imprint: {},
+			box: '',
 			isFetching: false,
 			fetchError: true
 		};

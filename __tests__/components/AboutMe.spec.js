@@ -7,7 +7,7 @@ import { AboutMe } from '../../src/components/about/AboutMe.jsx';
 
 describe('AboutMe', () => {
 
-	const langProps = {
+	const aboutProps = {
 		description: ['foo', 'bar'],
 		title: 't1',
 		box: 'box'
@@ -21,7 +21,7 @@ describe('AboutMe', () => {
 
 	beforeEach(function() {
 		about = TestUtils.renderIntoDocument(
-			<AboutMe langProps={langProps} getLanguage={getLanguage} fixHeader={fixHeader} />
+			<AboutMe about={aboutProps} getLanguage={getLanguage} fixHeader={fixHeader} />
 		);
 	});
 

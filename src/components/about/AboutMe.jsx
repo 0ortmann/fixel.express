@@ -14,16 +14,16 @@ export class AboutMe extends Component {
 
 	render() {
 		const { hideFixHint } = this.state;
-		const { langProps } = this.props;
+		const { about } = this.props;
 		return (
 			<div className='about'>
 				<h1>FELIX ORTMANN</h1>
 				<div className='about__subtitle'>
-					&mdash; {langProps.title} &mdash;
+					&mdash; {about.title} &mdash;
 				</div>
 				<img className='about__img'/>
 				<div className='about__description'>
-					{langProps.description.map((paragraph, i) => {
+					{about.description.map((paragraph, i) => {
 						return <p key={i}>{paragraph}</p>
 					})}
 				</div>
@@ -35,7 +35,7 @@ export class AboutMe extends Component {
 
 function mapStateToProps(state) {
 	return {
-		langProps: state.lang.properties
+		about: state.lang.about
 	}
 }
 

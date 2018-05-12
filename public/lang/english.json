@@ -1,10 +1,40 @@
 {
-	"title" : "Silver lining on the shell",
-	"description": [
-		"I like designing and implementing distributed systems and constantly look for challenges. Working on Linux servers is my favorite, a shell is everything I want. I love to learn new stuff and long for new intellectual input.",
-		"Currently I'm studying msc. at the University of Hamburg, Germany. I do software development since 2011; back then, things started with a distributed simulator for higher level Petri nets. For a living I do fullstack development, mostly web stuff (the backend parts) and devops.",
-		"I love being on the move in the nature, either with backpack & tent or I go fishing on local lakes and rivers.",
-		"I do a lot of fun coding as well, make sure to check out my github page!"
-	],
-	"box": "Looks super shitty?"
+  "box": "Looks super shitty?",
+  "about": {
+    "title": "Silver lining on the shell",
+    "description": [
+      "I like designing and implementing distributed systems and constantly look for challenges. Working on Linux servers is my favorite, a shell is everything I want. I love to learn new stuff and long for new intellectual input.",
+      "Currently I'm studying msc. at the University of Hamburg, Germany. I do software development since 2011; back then, things started with a distributed simulator for higher level Petri nets. For a living I do fullstack development, mostly web stuff (the backend parts) and devops.",
+      "I love being on the move in the nature, either with backpack & tent or I go fishing on local lakes and rivers.",
+      "I do a lot of fun coding as well, make sure to check out my github page!"
+    ]
+  },
+  "imprint": {
+    "title": "Legal Disclosure",
+    "subtitle": "Information in accordance with section 5 TMG",
+    "address": {
+      "name": "Felix Christian Ortmann",
+      "street": "Vereinsstraße 82",
+      "zip": "20357",
+      "city": "Hamburg",
+      "country": "Germany"
+    },
+    "contact": {
+      "phone": "+49 1748373193",
+      "email": "0ortmann@informatik.uni-hamburg.de"
+    },
+    "disclaimerTitle": "Disclaimer",
+    "contentAccountability": {
+      "title": "Accountability for content",
+      "text": "The contents of our pages have been created with the utmost care. However, we cannot guarantee the contents' accuracy, completeness or topicality. According to statutory provisions, we are furthermore responsible for our own content on these web pages. In this context, please note that we are accordingly not obliged to monitor merely the transmitted or saved information of third parties, or investigate circumstances pointing to illegal activity. Our obligations to remove or block the use of information under generally applicable laws remain unaffected by this as per &sect;&sect; 8 to 10 of the Telemedia Act (TMG)."
+    },
+    "linkAccountability": {
+      "title": "Accountability for links",
+      "text": "Responsibility for the content of external links (to web pages of third parties) lies solely with the operators of the linked pages. No violations were evident to us at the time of linking. Should any legal infringement become known to us, we will remove the respective link immediately."
+    },
+    "copyright": {
+      "title": "Copyright",
+      "text": "Our web pages and their contents are subject to German copyright law. Unless expressly permitted by law (&sect; 44a et seq. of the copyright law), every form of utilizing, reproducing or processing works subject to copyright protection on our web pages requires the prior written consent of the respective owner of the rights. Individual reproductions of a work are allowed only for private use, so must not serve either directly or indirectly for earnings. Unauthorized utilization of copyrighted works is punishable (&sect; 106 of the copyright law)."
+    }
+  }
 }

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
 import './LanguageSelector.scss';
@@ -25,6 +26,6 @@ export default class LanguageSelector extends Component {
 }
 
 LanguageSelector.propTypes = {
-	selectCallback: React.PropTypes.func.isRequired,
-	langs: React.PropTypes.array.isRequired
+	selectCallback: PropTypes.func.isRequired,
+	langs: PropTypes.array.isRequired
 }

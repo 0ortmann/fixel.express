@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import './FixHeaderBox.scss';
@@ -20,7 +21,7 @@ export default class FixHeaderBox extends Component {
 }
 
 FixHeaderBox.propTypes = {
-	displayText: React.PropTypes.string.isRequired,
-	fixIt: React.PropTypes.func.isRequired,
-	hide: React.PropTypes.bool.isRequired
+	displayText: PropTypes.string.isRequired,
+	fixIt: PropTypes.func.isRequired,
+	hide: PropTypes.bool.isRequired
 }

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 import Ugly from './Ugly.jsx';
@@ -54,5 +55,5 @@ export default class Header extends Component {
 }
 
 Header.propTypes = {
-	boxText: React.PropTypes.string.isRequired
+	boxText: PropTypes.string.isRequired
 }

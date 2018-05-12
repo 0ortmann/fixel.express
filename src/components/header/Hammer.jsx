@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import classNames from 'classnames';
 
@@ -67,5 +68,5 @@ export default class Hammer extends Component {
 }
 
 Hammer.propTypes = {
-    doneHammering: React.PropTypes.func.isRequired
+    doneHammering: PropTypes.func.isRequired
 }

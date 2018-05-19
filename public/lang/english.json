@@ -9,20 +9,20 @@
       "I do a lot of fun coding as well, make sure to check out my github page!"
     ]
   },
+  "address": {
+    "name": "Felix Christian Ortmann",
+    "street": "Vereinsstraße 82",
+    "zip": "20357",
+    "city": "Hamburg",
+    "country": "Germany"
+  },
+  "contact": {
+    "phone": "+49 1748373193",
+    "email": "0ortmann@informatik.uni-hamburg.de"
+  },
   "imprint": {
     "title": "Legal Disclosure",
     "subtitle": "Information in accordance with section 5 TMG",
-    "address": {
-      "name": "Felix Christian Ortmann",
-      "street": "Vereinsstraße 82",
-      "zip": "20357",
-      "city": "Hamburg",
-      "country": "Germany"
-    },
-    "contact": {
-      "phone": "+49 1748373193",
-      "email": "0ortmann@informatik.uni-hamburg.de"
-    },
     "disclaimerTitle": "Disclaimer",
     "contentAccountability": {
       "title": "Accountability for content",

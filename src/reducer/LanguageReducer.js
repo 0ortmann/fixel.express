@@ -1,11 +1,14 @@
 import ACTIONS from '../constants/Constants.js';
 
-const initialState = {
-	box: "",
+const initialState =  {
 	about: {},
+	address: {},
+	box: "",
+	contact: {},
+	fetchError: false,
 	imprint: {},
 	isFetching: false,
-	fetchError: false
+	privPolicy: {}
 };
 
 export default function lang(state = initialState, action) {
@@ -25,10 +28,13 @@ export default function lang(state = initialState, action) {
 		return { 
 			...state,
 			about: action.response.about,
-			imprint: action.response.imprint,
+			address: action.response.address,
 			box: action.response.box,
+			contact: action.response.contact,
 			fetchError: false,
-			isFetching: false
+			imprint: action.response.imprint,
+			isFetching: false,
+			privPolicy: action.response.privPolicy
 		};
 	default:
 		return state;

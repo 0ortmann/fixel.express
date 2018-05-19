@@ -10,7 +10,7 @@ export class Imprint extends Component {
     }
 
     render() {
-        const { imprint } = this.props;
+        const { imprint, address, contact } = this.props;
         if (!imprint) {
             return null;
         }
@@ -19,13 +19,13 @@ export class Imprint extends Component {
                 <h1>{imprint.title}</h1>
                 {imprint.subtitle}
                 <div className='imprint__block__fat'>
-                    {imprint.address.name}<br />
-                    {imprint.address.street}<br />
-                    {imprint.address.zip} {imprint.address.city}, {imprint.address.country}
+                    {address.name}<br />
+                    {address.street}<br />
+                    {address.zip} {address.city}, {address.country}
                 </div>
                 <div className='imprint__block__fat'>
-                    {imprint.contact.phone}<br />
-                    <a href={`mailto:${imprint.contact.email}`} target='_blank'>{imprint.contact.email}</a>
+                    {contact.phone}<br />
+                    <a href={`mailto:${contact.email}`} target='_blank'>{contact.email}</a>
                 </div>
                 <h2>{imprint.disclaimerTitle}</h2>
                 <div className='imprint__block'>
@@ -47,7 +47,9 @@ export class Imprint extends Component {
 
 function mapStateToProps(state) {
     return {
-        imprint: state.lang.imprint
+        imprint: state.lang.imprint,
+        address: state.lang.address,
+        contact: state.lang.contact,
     }
 }
 

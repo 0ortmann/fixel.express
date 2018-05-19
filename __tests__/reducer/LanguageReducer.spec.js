@@ -5,11 +5,14 @@ import lang from '../../src/reducer/LanguageReducer.js';
 describe('LanguageReducer', () => {
 
 	const initialState =  {
-		box: "",
 		about: {},
+		address: {},
+		box: "",
+		contact: {},
+		fetchError: false,
 		imprint: {},
 		isFetching: false,
-		fetchError: false
+		privPolicy: {}
 	};
 
 	it('should return the initial state', () => {
@@ -21,11 +24,8 @@ describe('LanguageReducer', () => {
 			type: ACTIONS.GET_LANGUAGE
 		};
 		expect(lang(undefined, fetchAction)).toEqual({
-			box: "",
-			about: {},
-			imprint: {},
+			...initialState,
 			isFetching: true,
-			fetchError: false
 		});
 	});
 

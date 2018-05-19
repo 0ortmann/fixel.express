@@ -8,20 +8,20 @@
       "Ich bin gerne in der Natur unterwegs, entweder mit Rucksack & Zelt oder ich mache mit der Angel Jagd auf heimische Süßwasserräuber. Bei schlechtem Wetter bastel ich an kleinen Projekten, schau mal auf meinen github account!"
     ]
   },
+  "address": {
+    "name": "Felix Christian Ortmann",
+    "street": "Vereinsstraße 82",
+    "zip": "20357",
+    "city": "Hamburg",
+    "country": "Germany"
+  },
+  "contact": {
+    "phone": "+49 1748373193",
+    "email": "0ortmann@informatik.uni-hamburg.de"
+  },
   "imprint": {
     "title": "Impressum",
     "subtitle": "Angaben gemäß § 5 TMG",
-    "address": {
-      "name": "Felix Christian Ortmann",
-      "street": "Vereinsstraße 82",
-      "zip": "20357",
-      "city": "Hamburg",
-      "country": "Germany"
-    },
-    "contact": {
-      "phone": "+49 1748373193",
-      "email": "0ortmann@informatik.uni-hamburg.de"
-    },
     "disclaimerTitle": "Haftungsausschluss",
     "contentAccountability": {
       "title": "Haftung für Inhalte",

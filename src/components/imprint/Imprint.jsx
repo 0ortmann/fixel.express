@@ -27,19 +27,14 @@ export class Imprint extends Component {
                     {contact.phone}<br />
                     <a href={`mailto:${contact.email}`} target='_blank'>{contact.email}</a>
                 </div>
-                <h2>{imprint.disclaimerTitle}</h2>
-                <div className='imprint__block'>
-                    <h3>{imprint.contentAccountability.title}</h3>
-                    <p>{imprint.contentAccountability.text}</p>
-                </div>
-                <div className='imprint__block'>
-                    <h3>{imprint.linkAccountability.title}</h3>
-                    <p>{imprint.linkAccountability.text}</p>
-                </div>
-                <div className='imprint__block'>
-                    <h3>{imprint.copyright.title}</h3>
-                    <p>{imprint.copyright.text}</p>
-                </div>
+                <h2>{imprint.sectionsTitle}</h2>
+                {imprint.sections.map(section => {
+
+                    return (<div className='imprint__block'>
+                        <h3>{section.title}</h3>
+                        <p>{section.text}</p>
+                    </div>);
+                })};
             </div>
         );
     }

@@ -2,6 +2,7 @@ import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import Address from '../address/Address.jsx';
 import Contact from '../address/Contact.jsx';
+import LegalSection from './LegalSection.jsx';
 
 export class Imprint extends Component {
     
@@ -22,10 +23,7 @@ export class Imprint extends Component {
                 <Contact contact={contact} />
                 <h2>{imprint.sectionsTitle}</h2>
                 {imprint.sections.map((section, index) => (
-                    <div key={index} className='content__block'>
-                        <h3>{section.title}</h3>
-                        <p>{section.text}</p>
-                    </div>
+                    <LegalSection key={index} title={section.title} text={section.text} />
                 ))};
             </div>
         );

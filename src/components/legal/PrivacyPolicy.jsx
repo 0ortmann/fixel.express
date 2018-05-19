@@ -2,6 +2,7 @@ import React,{ Component } from 'react';
 import { connect } from 'react-redux';
 import Address from '../address/Address.jsx';
 import Contact from '../address/Contact.jsx';
+import LegalSection from './LegalSection.jsx';
 
 export class PrivacyPolicy extends Component {
     
@@ -22,10 +23,7 @@ export class PrivacyPolicy extends Component {
                 <Contact contact={contact} />
                 <h2>{privPolicy.sectionsTitle}</h2>
                 {privPolicy.sections.map((section, index) => (
-                    <div key={index} className='content__block'>
-                        <h3>{section.title}</h3>
-                        <p>{section.text.map(subsection => (<span>{subsection}<br /></span>))}</p>
-                    </div>
+                    <LegalSection key={index} title={section.title} text={section.text} />
                 ))};
             </div>
         );

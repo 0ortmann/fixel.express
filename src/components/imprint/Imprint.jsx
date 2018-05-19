@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React,{ Component } from 'react';
 import { connect } from 'react-redux';
-
-import './Imprint.scss';
+import Address from '../address/Address.jsx';
+import Contact from '../address/Contact.jsx';
 
 export class Imprint extends Component {
     
@@ -15,26 +15,18 @@ export class Imprint extends Component {
             return null;
         }
         return (
-            <div className='imprint'>
+            <div className='content'>
                 <h1>{imprint.title}</h1>
                 {imprint.subtitle}
-                <div className='imprint__block__fat'>
-                    {address.name}<br />
-                    {address.street}<br />
-                    {address.zip} {address.city}, {address.country}
-                </div>
-                <div className='imprint__block__fat'>
-                    {contact.phone}<br />
-                    <a href={`mailto:${contact.email}`} target='_blank'>{contact.email}</a>
-                </div>
+                <Address address={address} />
+                <Contact contact={contact} />
                 <h2>{imprint.sectionsTitle}</h2>
-                {imprint.sections.map(section => {
-
-                    return (<div className='imprint__block'>
+                {imprint.sections.map((section, index) => (
+                    <div key={index} className='content__block'>
                         <h3>{section.title}</h3>
                         <p>{section.text}</p>
-                    </div>);
-                })};
+                    </div>
+                ))};
             </div>
         );
     }

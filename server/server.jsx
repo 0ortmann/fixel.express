@@ -77,10 +77,9 @@ function renderFullPage(html, preloadedState) {
 		<head>
 			<meta charset='utf-8'>
 			<meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable=yes" />
-			<meta name="description" content="Homepage of Felix Ortmann. I love code." />
+			<meta name="description" content="Homepage of Felix Ortmann. I like to code, I love to think." />
 			<title>Fixel Express</title>
 			<link rel='stylesheet' type='text/css' href='/assets/bundle.css'>
-			<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 			<link sizes="96x96" href="/favicon.ico" type="image/png" rel="icon">
 		</head>
 

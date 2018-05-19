@@ -3,7 +3,7 @@ import { IndexRoute, Route } from 'react-router';
 
 import App from './containers/App.jsx';
 import AboutMe from './components/about/AboutMe.jsx';
-import Imprint from './components/imprint/Imprint.jsx';
+import Imprint from './components/legal/Imprint.jsx';
 
 export default function configureRoutes() {
 	return (

@@ -29,7 +29,7 @@ export class AboutMe extends Component {
 							<p>{about.description}</p>
 						</div>
 						<div className='profile_content__image'>
-							<img src='/img/profile-small.jpg' alt='Felix Ortmann' width='305' height='400' />
+							<img src='/img/profile-small.png' alt='Felix Ortmann' width='320' height='320' />
 						</div>
 					</div>
 				</div>

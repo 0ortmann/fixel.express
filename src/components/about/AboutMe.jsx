@@ -7,27 +7,32 @@ export class AboutMe extends Component {
 	
 	constructor(props) {
 		super(props);
-		this.state = { 
-			hideFixHint: false
-		};
 	}
 
 	render() {
-		const { hideFixHint } = this.state;
 		const { about } = this.props;
 		return (
-			<div className='about'>
-				<h1>FELIX ORTMANN</h1>
-				<div className='about__subtitle'>
-					&mdash; {about.title} &mdash;
+			<div>
+				<div className='cover'>
+					<div className='cover__title'>
+						<h1>FELIX ORTMANN</h1>
+						<p>{about.title}</p>
+					</div>
 				</div>
-				<img className='about__img'/>
-				<div className='about__description'>
-					{about.description.map((paragraph, i) => {
-						return <p key={i}>{paragraph}</p>
-					})}
+				<div className='profile container'>
+					<h2>Profile</h2>
+					<p>I like to code, I love to think.</p>
+					<hr />
+					<div className='profile_content'>
+						<div className='profile_content__description'>
+							<h3>About Me</h3>
+							<p>{about.description}</p>
+						</div>
+						<div className='profile_content__image'>
+							<img src='/img/profile-small.jpg' alt='Felix Ortmann' width='305' height='400' />
+						</div>
+					</div>
 				</div>
-				<object className='gopher__left'/>
 			</div>
 		);
 	}

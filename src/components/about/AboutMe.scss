@@ -1,10 +1,65 @@
 @import '../../variables.scss';
-.about {
-    position: relative;
+.cover {
+    height: 100vh;
     text-align: center;
+    padding: 0;
+    margin: 0;
+    background-color: $customBlue;
 }
 
-.about__img {
+.cover__title {
+    top: 28%;
+    position: relative;
+    h1 {
+        padding-bottom: 20px;
+        display: inline-block;
+        border-bottom: 1px solid $customWhite;
+        font-size: 58px;
+    }
+    p {
+        font-size: 24px;
+        color: $customWhite;
+    }
+
+    -webkit-animation: fadein 2s;
+    animation: fadein 2s;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.profile {
+    h2 {
+        color: $customBlue;
+    }
+}
+
+.profile_content {
+}
+
+.profile_content__description {
+    text-align: justify;
+    h3 {
+        color: $customBlue;
+    }
+}
+
+.profile_content__image {
+    text-align: center;
+    img {
+        vertical-align: middle;
+        border-radius: 450px / 600px;
+    }
+}
+
+.cover__img {
     background-image: url('/img/little-me-small.jpg');
     border-radius: 450px / 600px;
     height: 395px;
@@ -15,19 +70,19 @@
 
 }
 
-.about__img:hover {
+.cover__img:hover {
     background-image: url('/img/profile-small.jpg');
     transition: 300ms ease-in-out;
 }
 
-.about__description {
+.cover__description {
     align: center;
     left: 25%;
     position: relative;
     width: 50%;
 }
 
-.about__description p {
+.cover__description p {
     margin: 20px auto;
     max-width: 640px;
     text-align: justify;
@@ -56,7 +111,7 @@
 }
 
 @media screen and (min-device-width: 320px) and (max-device-width: 540px) {
-    .about__description {
+    .cover__description {
         width: $handheldContentWidth;
         left: $handheldContentLeft;
         font-size: 13px; 

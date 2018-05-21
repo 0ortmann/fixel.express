@@ -7,9 +7,9 @@ describe('LanguageReducer', () => {
 	const initialState =  {
 		about: {},
 		address: {},
-		box: "",
 		contact: {},
 		fetchError: false,
+		footer: {},
 		imprint: {},
 		isFetching: false,
 		privPolicy: {}
@@ -37,7 +37,6 @@ describe('LanguageReducer', () => {
 			imprint: {
 				title: 'IMPRINT'
 			},
-			box: 'BOX',
 		};
 		const fetchAction = {
 			type: ACTIONS.GET_LANGUAGE_SUCCESS,
@@ -46,7 +45,6 @@ describe('LanguageReducer', () => {
 		const previousState = {
 			about: {},
 			imprint: {},
-			box: '',
 			isFetching: true,
 			fetchError: false
 		};
@@ -57,7 +55,6 @@ describe('LanguageReducer', () => {
 			imprint: {
 				title: 'IMPRINT'
 			},
-			box: 'BOX',
 			isFetching: false,
 			fetchError: false
 		};
@@ -72,14 +69,14 @@ describe('LanguageReducer', () => {
 		const previousState = {
 			about: {},
 			imprint: {},
-			box: '',
+			footer: {},
 			isFetching: true,
 			fetchError: false
 		};
 		const expectedNextState = {
 			about: {},
 			imprint: {},
-			box: '',
+			footer: {},
 			isFetching: false,
 			fetchError: true
 		};

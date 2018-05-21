@@ -1,101 +1,31 @@
 @import '../../variables.scss';
 
-footer {
-	margin-top: 20px;
-	height: 80px;
-	width: 100%;
-	float: left;
-	line-height: 40px;
-	overflow: hidden;
-}
-
-.social {
-	background: #EDEDED;
-	border: 2px solid $lightGrey;
-	border-radius: 9px;
-	position: relative;
-	float: left;
+.footer {
 	text-align: center;
-	width: 50%;
-	left: 25%;
+	background-color: $customGray;
+	color: $customWhite;
+	height: 100vh;
 }
 
-@media screen and (max-device-width: 580px) {
-	.social {
-		width: $handheldContentWidth;
-		left: $handheldContentLeft;
+.footer_content {
+	ul {
+		list-style-type: none;
 	}
-}
-
-.social__link {
-	display: inline-block;
-	margin: 20px 20px 0 20px;
-}
-
-svg {
-	width: 40px;
-	height: 40px;
-}
-
-svg:hover {
-	border: none !important;
-	display: block;
-	transform: scale(1.1);
-	transition: $footerTransitionTime;
-}
-
-.social__svg:hover {
-	background-color: #EDEDED;
-	transition-timing-function: ease-in-out;
-	transition: $footerTransitionTime;
-
-	.animated__white {
-		fill: white;
-	}
-	
-	.xing__animated__green {
-		fill: $xingGreen;
-	}
-
-	.github__animated__blue {
-		fill: $githubBlue;
-	}
-
-	.facebook__animated__blue {
-		fill: $facebookBlue;
-	}
-
-	.linkedin__animated__blue {
-		fill: $linkedInBlue;
+	a {
+		color: $customWhite;
+		text-decoration: none;
 	}
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 720px) {
+.footer_content_social {
+	text-align: left;
+	li {
+		padding: 10px;
+	}
+}
 
-	svg {
-		width: 30px;
-		height: 30px;
-	}
-	.animated__white {
-		fill: white;
-	}
-	.xing__animated__green {
-		fill: $xingGreen;
-	}
-
-	.github__animated__blue {
-		fill: $githubBlue;
-	}
-
-	.facebook__animated__blue {
-		fill: $facebookBlue;
-	}
-
-	.animated__white {
-		fill: white;
-	}
-
-	.linkedin__animated__blue {
-		fill: $linkedInBlue;
-	}
+.footer_content_links li {
+	font-size: 24px;
+	display: inline;
+	padding: 20px 20px;
 }

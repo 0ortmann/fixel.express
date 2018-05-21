@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Footer from '../components/footer/Footer.jsx';
-import Header from '../components/header/Header.jsx';
 import LanguageSelector from '../components/language/LanguageSelector.jsx';
 
 import { getLanguage } from '../actions/LanguageActionCreators.js';
@@ -27,10 +26,9 @@ export class App extends Component {
 	}
 
 	render() {
-		const { boxText, getLanguage, children } = this.props;
+		const { getLanguage, children } = this.props;
 		return (
 			<div className='app'>
-				<Header boxText={boxText || 'Click me'}/>
 				<LanguageSelector selectCallback={getLanguage} langs={langs}/>
 				{children}
 				<Footer />
@@ -41,7 +39,6 @@ export class App extends Component {
 
 function mapStateToProps(state, ownProps) {
 	return {
-		boxText: state.lang.box,
 		children: ownProps.children
 	};
 }

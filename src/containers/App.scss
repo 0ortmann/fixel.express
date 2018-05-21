@@ -1,18 +1,23 @@
 @import '../variables.scss';
 
+body {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+}
+
+.content {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+}
+
 .app {
-	width: 100%;
-	overflow: hidden;
-	padding: 20px 0;
 	font-family: Verdana,Geneva,'Bitstream Vera Sans','DejaVu Sans',sans-serif;
 	font-weight: lighter;
 	font-size: 16px;
-}
-
-@media screen and (min-device-width: 320px) and (max-device-width: 480px) {
-	.app {
-		padding: 0;
-	}
+    line-height: 24px;
+	padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -21,24 +26,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-	color: $grey;
+	color: #ffffff;
+    font-size: 63px;
 }
 
-/* Preload image(s), so I have no flicker on hover */
-body:after{
-	position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
-	content: url('/img/little-me-small.jpg') url('/img/profile-small.jpg') url('/img/gopher_straight_look_rotated.svg') 
-		url('/img/arrow.svg') url('/img/gopher_hammer_right.svg') url('/img/gopher_hammer_right_2.svg')
-		url('/img/gopher_hammer_left.svg') url('/img/gopher_hammer_left_2.svg');
+h2 {
+    font-size: 50px;
 }
 
-.hide {
-	display: none;
+h3 {
+    font-size: 32px;
 }
 
-.number::-webkit-inner-spin-button, .number::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
+.container {
+    margin: auto;
+    padding: 50px 180px;
+    text-align: center;
 }
 
 .content {

@@ -3,9 +3,9 @@ import ACTIONS from '../constants/Constants.js';
 const initialState =  {
 	about: {},
 	address: {},
-	box: "",
 	contact: {},
 	fetchError: false,
+	footer: {},
 	imprint: {},
 	isFetching: false,
 	privPolicy: {}
@@ -29,9 +29,9 @@ export default function lang(state = initialState, action) {
 			...state,
 			about: action.response.about,
 			address: action.response.address,
-			box: action.response.box,
 			contact: action.response.contact,
 			fetchError: false,
+			footer: action.response.footer,
 			imprint: action.response.imprint,
 			isFetching: false,
 			privPolicy: action.response.privPolicy

@@ -1,5 +1,4 @@
 {
-  "box": "Sieht voll kacke aus?",
   "about": {
     "title": "Silver lining on the shell",
     "description": [
@@ -18,6 +17,10 @@
   "contact": {
     "phone": "+49 1748373193",
     "email": "0ortmann@informatik.uni-hamburg.de"
+  },
+  "footer": {
+    "imprintLink": "Impressum",
+    "privPolicyLink": "Datenschutzerklärung"
   },
   "imprint": {
     "title": "Impressum",

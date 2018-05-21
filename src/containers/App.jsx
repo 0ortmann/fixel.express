@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Footer from '../components/footer/Footer.jsx';
-import LanguageSelector from '../components/language/LanguageSelector.jsx';
 
 import { getLanguage } from '../actions/LanguageActionCreators.js';
 
@@ -29,7 +28,6 @@ export class App extends Component {
 		const { getLanguage, children } = this.props;
 		return (
 			<div className='app'>
-				<LanguageSelector selectCallback={getLanguage} langs={langs}/>
 				{children}
 				<Footer />
 			</div>

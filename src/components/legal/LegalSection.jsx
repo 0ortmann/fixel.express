@@ -1,6 +1,8 @@
 import React,{ Component } from 'react';
 import PropTypes from 'prop-types';
 
+import './Legal.scss';
+
 export default class LegalSection extends Component {
     
     constructor(props) {
@@ -13,8 +15,8 @@ export default class LegalSection extends Component {
             return null;
         }
         return (
-            <div className='content__block'>
-                <h3>{title}</h3>
+            <div className='legal_content__block'>
+                <h4>{title}</h4>
                 <p>{text.map(subsection => (<span>{subsection}<br /></span>))}</p>
             </div>
         );

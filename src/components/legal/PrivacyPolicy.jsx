@@ -4,6 +4,8 @@ import Address from '../address/Address.jsx';
 import Contact from '../address/Contact.jsx';
 import LegalSection from './LegalSection.jsx';
 
+import './Legal.scss';
+
 export class PrivacyPolicy extends Component {
     
     constructor(props) {
@@ -16,12 +18,12 @@ export class PrivacyPolicy extends Component {
             return null;
         }
         return (
-            <div className='content'>
-                <h1>{privPolicy.title}</h1>
-                {privPolicy.subtitle}
+            <div className='legal_container'>
+                <h2>{privPolicy.title}</h2>
+                <h4>{privPolicy.subtitle}</h4>
                 <Address address={address} />
                 <Contact contact={contact} />
-                <h2>{privPolicy.sectionsTitle}</h2>
+                <h3>{privPolicy.sectionsTitle}</h3>
                 {privPolicy.sections.map((section, index) => (
                     <LegalSection key={index} title={section.title} text={section.text} />
                 ))};

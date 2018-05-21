@@ -32,26 +32,13 @@ h3 {
     font-size: 32px;
 }
 
+h4 {
+    font-size: 24px;
+}
+
 .container {
     margin: auto;
     padding: 50px 180px;
     text-align: center;
     max-width: 1280px;
-}
-
-.content {
-    position: relative;
-    text-align: left;
-    display: block;
-    margin: 0px;
-    padding: 0px;
-}
-.content__block {
-    margin: 20px auto;
-    text-align: justify;
-}
-
-.content__block__fat {
-    @extend .content__block;
-    font-weight: normal;
 }

@@ -4,6 +4,8 @@ import Address from '../address/Address.jsx';
 import Contact from '../address/Contact.jsx';
 import LegalSection from './LegalSection.jsx';
 
+import './Legal.scss';
+
 export class Imprint extends Component {
     
     constructor(props) {
@@ -16,12 +18,12 @@ export class Imprint extends Component {
             return null;
         }
         return (
-            <div className='content'>
-                <h1>{imprint.title}</h1>
-                {imprint.subtitle}
+            <div className='legal_container'>
+                <h2>{imprint.title}</h2>
+                <h4>{imprint.subtitle}</h4>
                 <Address address={address} />
                 <Contact contact={contact} />
-                <h2>{imprint.sectionsTitle}</h2>
+                <h3>{imprint.sectionsTitle}</h3>
                 {imprint.sections.map((section, index) => (
                     <LegalSection key={index} title={section.title} text={section.text} />
                 ))};

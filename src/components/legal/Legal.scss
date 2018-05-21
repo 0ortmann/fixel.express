@@ -1,0 +1,17 @@
+.legal_container {
+    position: relative;
+    text-align: left;
+    display: block;
+    margin: 0px;
+    padding: 200px 140px;
+    max-width: 1280px;
+}
+.legal_content__block {
+    margin: 20px auto;
+    text-align: justify;
+}
+
+.legal_content__block__fat {
+    @extend .legal_content__block;
+    font-weight: normal;
+}

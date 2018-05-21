@@ -4,7 +4,6 @@
 	text-align: center;
 	background-color: $customGray;
 	color: $customWhite;
-	height: 100vh;
 }
 
 .footer_content {
@@ -14,6 +13,18 @@
 	a {
 		color: $customWhite;
 		text-decoration: none;
+		opacity: 0.75;
+	}
+	a:hover {
+		opacity: 1;
+	}
+	span {
+		padding: 10px;
+	}
+	svg {
+		position: relative;
+		width: 28px;
+		height: 28px;
 	}
 }
 

@@ -6,12 +6,6 @@ body {
     padding: 0px;
 }
 
-.content {
-    display: block;
-    margin: 0px;
-    padding: 0px;
-}
-
 .app {
 	font-family: Verdana,Geneva,'Bitstream Vera Sans','DejaVu Sans',sans-serif;
 	font-weight: lighter;
@@ -42,11 +36,15 @@ h3 {
     margin: auto;
     padding: 50px 180px;
     text-align: center;
+    max-width: 1280px;
 }
 
 .content {
     position: relative;
     text-align: left;
+    display: block;
+    margin: 0px;
+    padding: 0px;
 }
 .content__block {
     margin: 20px auto;

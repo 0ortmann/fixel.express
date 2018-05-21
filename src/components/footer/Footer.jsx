@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import FaLinkedinSquare from 'react-icons/lib/fa/linkedin-square';
+import FaXingSquare from 'react-icons/lib/fa/xing-square';
+import FaFacebookSquare from 'react-icons/lib/fa/facebook-square';
+import FaGithubSquare from 'react-icons/lib/fa/github-square';
+import FaLocationArrow from 'react-icons/lib/fa/location-arrow';
 
 import './Footer.scss';
 
@@ -20,11 +25,11 @@ export class Footer extends Component {
 					<hr />
 					<div className='footer_content_social'>
 						<ul>
-							<li><a href='https://de.linkedin.com/in/felix-ortmann' target='_blank'><span className='icon'></span>https://de.linkedin.com/in/felix-ortmann</a></li>
-							<li><a href='https://www.xing.com/profile/Felix_Ortmann2' target='_blank'><span className='icon'></span>https://www.xing.com/profile/Felix_Ortmann2</a></li>
-							<li><a href='https://github.com/0ortmann' target='_blank'><span className='icon'></span>https://github.com/0ortmann</a></li>
-							<li><a href='https://facebook.com/fixelexpress' target='_blank'><span className='icon'></span>https://facebook.com/fixelexpress</a></li>
-							<li><a href='mailto:0ortmann@informatik.uni-hamburg.de' target='_blank'><span className='icon'></span>0ortmann@informatik.uni-hamburg.de</a></li>
+							<li><a href='https://de.linkedin.com/in/felix-ortmann' target='_blank'><FaLinkedinSquare /><span>https://de.linkedin.com/in/felix-ortmann</span></a></li>
+							<li><a href='https://www.xing.com/profile/Felix_Ortmann2' target='_blank'><FaXingSquare /><span>https://www.xing.com/profile/Felix_Ortmann2</span></a></li>
+							<li><a href='https://github.com/0ortmann' target='_blank'><FaGithubSquare /><span>https://github.com/0ortmann</span></a></li>
+							<li><a href='https://facebook.com/fixelexpress' target='_blank'><FaFacebookSquare /><span>https://facebook.com/fixelexpress</span></a></li>
+							<li><a href='mailto:0ortmann@informatik.uni-hamburg.de' target='_blank'><FaLocationArrow /><span>0ortmann@informatik.uni-hamburg.de</span></a></li>
 						</ul>
 					</div>
 					<hr />

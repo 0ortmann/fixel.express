@@ -1,7 +1,7 @@
 {
   "name": "fixel.express",
   "description": "My personal webpage",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/0ortmann/fixel.express"
@@ -22,6 +22,11 @@
   "author": "Felix Ortmann",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.47",
+    "@babel/polyfill": "^7.0.0-beta.47",
+    "@babel/preset-env": "^7.0.0-beta.47",
+    "@babel/preset-react": "^7.0.0-beta.47",
+    "@babel/register": "^7.0.0-beta.47",
     "express": "^4.16.3",
     "isomorphic-fetch": "^2.2.1",
     "key-mirror": "^1.0.1",
@@ -37,12 +42,7 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.47",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0-beta.47",
-    "@babel/polyfill": "^7.0.0-beta.47",
-    "@babel/preset-env": "^7.0.0-beta.47",
-    "@babel/preset-react": "^7.0.0-beta.47",
-    "@babel/register": "^7.0.0-beta.47",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^22.4.4",
     "babel-loader": "^8.0.0-beta.3",

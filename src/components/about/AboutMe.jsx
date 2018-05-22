@@ -16,12 +16,12 @@ export class AboutMe extends Component {
 				<div className='cover'>
 					<div className='cover__title'>
 						<h1>FELIX ORTMANN</h1>
-						<p>{about.title}</p>
+						<p>{about.coverSubtitle}</p>
 					</div>
 				</div>
 				<div className='profile container'>
 					<h2>Profile</h2>
-					<p>I like to code, I love to think.</p>
+					<p>{about.profileSubtitle}</p>
 					<hr />
 					<div className='profile_content'>
 						<div className='profile_content__description'>

@@ -16,7 +16,7 @@ export class AboutMe extends Component {
 				<div className='cover'>
 					<div className='cover__title'>
 						<h1>FELIX ORTMANN</h1>
-						<p>{about.coverSubtitle}</p>
+						<h4>{about.coverSubtitle}</h4>
 					</div>
 				</div>
 				<div className='profile container'>

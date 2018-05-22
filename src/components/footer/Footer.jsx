@@ -25,10 +25,10 @@ export class Footer extends Component {
 					<hr />
 					<div className='footer_content_social'>
 						<ul>
-							<li><a href='https://de.linkedin.com/in/felix-ortmann' target='_blank'><FaLinkedinSquare /><span>https://de.linkedin.com/in/felix-ortmann</span></a></li>
-							<li><a href='https://www.xing.com/profile/Felix_Ortmann2' target='_blank'><FaXingSquare /><span>https://www.xing.com/profile/Felix_Ortmann2</span></a></li>
-							<li><a href='https://github.com/0ortmann' target='_blank'><FaGithubSquare /><span>https://github.com/0ortmann</span></a></li>
-							<li><a href='https://facebook.com/fixelexpress' target='_blank'><FaFacebookSquare /><span>https://facebook.com/fixelexpress</span></a></li>
+							<li><a href='https://de.linkedin.com/in/felix-ortmann' target='_blank'><FaLinkedinSquare /><span>de.linkedin.com/in/felix-ortmann</span></a></li>
+							<li><a href='https://www.xing.com/profile/Felix_Ortmann2' target='_blank'><FaXingSquare /><span>www.xing.com/profile/Felix_Ortmann2</span></a></li>
+							<li><a href='https://github.com/0ortmann' target='_blank'><FaGithubSquare /><span>github.com/0ortmann</span></a></li>
+							<li><a href='https://facebook.com/fixelexpress' target='_blank'><FaFacebookSquare /><span>facebook.com/fixelexpress</span></a></li>
 							<li><a href='mailto:0ortmann@informatik.uni-hamburg.de' target='_blank'><FaLocationArrow /><span>0ortmann@informatik.uni-hamburg.de</span></a></li>
 						</ul>
 					</div>

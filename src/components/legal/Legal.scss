@@ -1,10 +1,11 @@
+@import '../../variables.scss';
+
 .legal_container {
     position: relative;
     text-align: left;
     display: block;
     margin: 0px;
     padding: 10% 10%;
-    max-width: 1280px;
 }
 .legal_content__block {
     margin: 20px auto;
@@ -14,4 +15,19 @@
 .legal_content__block__fat {
     @extend .legal_content__block;
     font-weight: normal;
+}
+
+@media screen and (max-device-width: $smallDeviceWidth) {
+    .legal_container {
+        padding: 2%;
+        font-size: 14px;
+    }
+
+}
+
+@media screen and (max-device-width: $smallDeviceWidth) {
+    .legal_container {
+        padding: 2%;
+        font-size: 12px;
+    }
 }

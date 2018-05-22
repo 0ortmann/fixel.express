@@ -10,15 +10,11 @@
 .cover__title {
     top: 32%;
     position: relative;
+    color: $customWhite;
     h1 {
         padding-bottom: 20px;
         display: inline-block;
         border-bottom: 1px solid $customWhite;
-        font-size: 58px;
-    }
-    p {
-        font-size: 24px;
-        color: $customWhite;
     }
 
     -webkit-animation: fadein 2s;
@@ -42,12 +38,20 @@
 }
 
 .profile_content {
+    font-size: 16px;
+    line-height: 24px;
 }
 
 .profile_content__description {
     text-align: justify;
     h3 {
         color: $customBlue;
+    }
+}
+
+@media screen and (max-device-width: $smallDeviceWidth) {
+    .profile_content__description {
+        padding: 7%;
     }
 }
 

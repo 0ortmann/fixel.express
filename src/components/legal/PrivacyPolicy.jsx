@@ -26,7 +26,7 @@ export class PrivacyPolicy extends Component {
                 <h3>{privPolicy.sectionsTitle}</h3>
                 {privPolicy.sections.map((section, index) => (
                     <LegalSection key={index} title={section.title} text={section.text} />
-                ))};
+                ))}
             </div>
         );
     }

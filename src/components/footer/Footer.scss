@@ -40,3 +40,21 @@
 	display: inline;
 	padding: 20px 20px;
 }
+
+@media screen and (max-device-width: $smallDeviceWidth) {
+	.footer {
+		ul {
+			padding: 0;
+		}
+	}
+	.footer_content_links li {
+		padding: 2%;
+		font-size: 16px;
+	}
+	.footer_content_social {
+		font-size: 13px;
+		li {
+			padding: 2%;
+		}
+	}
+}

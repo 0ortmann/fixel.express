@@ -26,4 +26,4 @@ export default class LegalSection extends Component {
 LegalSection.propTypes = {
     title: PropTypes.string.isRequired,
     text: PropTypes.array.isRequired
-}
+};

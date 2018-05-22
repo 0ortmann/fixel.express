@@ -26,7 +26,7 @@ export class Imprint extends Component {
                 <h3>{imprint.sectionsTitle}</h3>
                 {imprint.sections.map((section, index) => (
                     <LegalSection key={index} title={section.title} text={section.text} />
-                ))};
+                ))}
             </div>
         );
     }

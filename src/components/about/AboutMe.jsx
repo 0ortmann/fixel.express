@@ -26,7 +26,9 @@ export class AboutMe extends Component {
 					<div className='profile_content'>
 						<div className='profile_content__description'>
 							<h3>About Me</h3>
-							<p>{about.description}</p>
+							{about.description.map((paragraph, i) => {
+								return <p key={i}>{paragraph}</p>;
+							})}
 						</div>
 						<div className='profile_content__image'>
 							<img src='/img/profile-small.png' alt='Felix Ortmann' width='320' height='320' />

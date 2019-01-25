@@ -1,4 +1,4 @@
-FROM node:9-alpine AS build
+FROM node:11-alpine AS build
 
 COPY package.json package.json
 COPY package-lock.json package-lock.json
@@ -15,7 +15,7 @@ COPY config/config.production.js config/config.production.js
 
 RUN npm run build
 
-FROM node:9-alpine
+FROM node:11-alpine
 COPY --from=build /public /public
 
 COPY package.json package.json
